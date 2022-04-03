@@ -8,10 +8,11 @@ public class ResourceManager
 {
     private Dictionary<string, UnityEngine.Object> _assets = new Dictionary<string, UnityEngine.Object>();
 
-    public void Load<T>(string key) where T : UnityEngine.Object
+    public void Load<T>(string key, Action<T> foo) where T : UnityEngine.Object
     {
         if (_assets.ContainsKey(key) == true)
         {
+            foo((T)_assets[key]);
             return;
         }
 
@@ -23,38 +24,21 @@ public class ResourceManager
         return;
     }
 
-    public void Instantiate<T>(string key, Action<T> foo) where T : UnityEngine.Object
+    //gameobject만 쓰세요
+    public void Instantiate(string key, Action<GameObject> foo)
     {
-        if(_assets.ContainsKey(key) == false)
-        {
-            Load<T>(key);
-        }
-
         if(Managers.Pool.GetOriginal(key) == true)
         {
-            foo(Managers.Pool.Pop(Managers.Pool.GetOriginal(key)).GetComponent<T>());
+            foo(Managers.Pool.Pop(Managers.Pool.GetOriginal(key)).gameObject);
         }
 
-        if (typeof(T) == typeof(GameObject))
+        Addressables.InstantiateAsync(_assets[key]).Completed += (handle) =>
         {
-            Addressables.InstantiateAsync(_assets[key]).Completed += (handle) =>
+            if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
             {
-                if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
-                {
-                    foo(handle.Result.GetComponent<T>());
-                }
-            };
-        }
-        else
-        {
-            Addressables.LoadAssetAsync<T>(key).Completed += (handle) =>
-            {
-                if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
-                {
-                    foo(handle.Result);
-                }
-            };
-        }
+                foo(handle.Result);
+            }
+        };
     }
 
     public void Release(string path)
