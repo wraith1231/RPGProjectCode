@@ -1,0 +1,43 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[Serializable]
+public class BattleCharacterData
+{
+    public float MaxHealthPoint { get; set; }
+    public float CurrentHealthPoint { get; set; }
+    public float MaxStaminaPoint { get; set; }
+    public float CurrentStaminaPoint { get; set; }
+    public float HealthRecovery { get; set; }
+    public float StaminaRecovery { get; set; }
+
+    public int Power { get; set; }
+    public int Dexterity { get; set; }
+    public float Defense { get; set; }
+
+    public BattleCharacterData(GlobalCharacterData data = null)
+    {
+        if (data != null)
+        {
+            MaxHealthPoint = CurrentHealthPoint = data.HealthPoint;
+            MaxStaminaPoint = CurrentStaminaPoint = data.StaminaPoint;
+            HealthRecovery = data.HealthRecovery;
+            StaminaRecovery = data.StaminaRecovery;
+            Power = data.Power;
+            Dexterity = data.Dexterity;
+            Defense = data.Defense;
+        }
+        else
+        {
+            MaxHealthPoint = CurrentHealthPoint = 100;
+            MaxStaminaPoint = CurrentStaminaPoint = 100;
+            HealthRecovery = 10;
+            StaminaRecovery = 10;
+            Power = 10;
+            Dexterity = 5;
+            Defense = 0;
+        }
+    }
+}
