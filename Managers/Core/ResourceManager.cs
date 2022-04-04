@@ -25,7 +25,6 @@ public class ResourceManager
             }
         }
     
-
         AsyncOperationHandle han = Addressables.LoadAssetAsync<T>(key);
         han.Completed += (handle) => { foo(handle.Result as T); };
 
@@ -43,7 +42,7 @@ public class ResourceManager
     }
 
     //gameobject만 쓰세요
-    public AsyncOperationHandle Instantiate(string key, Action<GameObject> foo)
+    public void Instantiate(string key, Action<GameObject> foo)
     {
         string name = GetName(key);
 
@@ -52,44 +51,50 @@ public class ResourceManager
             Debug.Log($"First you Need to Load {key}");
             foo(null);
 
-            return new AsyncOperationHandle();
+            return;
         }
 
         GameObject go = _assets[key] as GameObject;
         if(go.GetComponent<Poolable>() != null)
         {
             foo(Managers.Pool.Pop(go).gameObject);
-            return new AsyncOperationHandle();
+            return;
         }
 
         AsyncOperationHandle han = Addressables.InstantiateAsync(_assets[key]);
         
         han.Completed += (handle) =>
         {
-            if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+            if (handle.Status == AsyncOperationStatus.Succeeded)
             {
                 foo(handle.Result as GameObject);
             }
         };
 
-        return han;
+        return ;
     }
 
-    public void Release(string key)
+    public void Release(UnityEngine.Object obj)
     {
-        if (_assets[key] == null)
-            return;
-
-        Poolable poolable = (_assets[key] as GameObject).GetComponent<Poolable>();
-        if(poolable != null)
+        if (obj.GetType() == typeof(GameObject))
         {
-            Managers.Pool.Push(poolable);
-            return;
+            Poolable poolable = (obj as GameObject).GetComponent<Poolable>();
+            if (poolable != null)
+            {
+                Managers.Pool.Push(poolable);
+                return;
+            }
+            else
+                Addressables.ReleaseInstance(obj as GameObject);
         }
-
-        if (_assets[key].GetType() == typeof(GameObject))
-            Addressables.ReleaseInstance(_assets[key] as GameObject);
         else
-            Addressables.Release(_assets[key]);
+        {
+            UnityEngine.Object temp;
+            if(_assets.TryGetValue(obj.name, out temp))
+            {
+                _assets[obj.name] = null;
+                Addressables.Release(temp);
+            }
+        }
     }
 }

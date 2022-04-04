@@ -42,7 +42,7 @@ public class UIManager
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        GameObject go = Managers.Resource.Instantiate($"UI/Scene/{name}");
+        GameObject go = Managers.Resource.Instantiate($"UI/Scene/{name}", null).Result as GameObject;
 
         T scene = Util.GetOrAddComponent<T>(go);
         _scene = scene;
@@ -57,7 +57,7 @@ public class UIManager
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        GameObject go = Managers.Resource.Instantiate($"UI/SubItem/{name}");
+        GameObject go = Managers.Resource.Instantiate($"UI/SubItem/{name}", null).Result as GameObject;
 
         if (parent != null)
             go.transform.SetParent(parent);
@@ -70,7 +70,7 @@ public class UIManager
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        GameObject go = Managers.Resource.Instantiate($"UI/Popup/{name}");
+        GameObject go = Managers.Resource.Instantiate($"UI/Popup/{name}", null).Result as GameObject;
 
         T popup = Util.GetOrAddComponent<T>(go);
         _popupStack.Push(popup);
@@ -85,7 +85,7 @@ public class UIManager
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        GameObject go = Managers.Resource.Instantiate($"UI/WorldSpace/{name}");
+        GameObject go = Managers.Resource.Instantiate($"UI/WorldSpace/{name}", null).Result as GameObject;
 
         if (parent != null)
             go.transform.SetParent(parent);
@@ -117,7 +117,7 @@ public class UIManager
             return;
 
         UIPopup p = _popupStack.Pop();
-        Managers.Resource.Destroy(p.gameObject);
+        Managers.Resource.Release(p.gameObject.name);
         p = null;
 
         _order--;

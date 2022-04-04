@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public interface ILoader<Key, Value>
@@ -27,9 +28,9 @@ public class DataManager
         WeaponDataRead();
     }
 
-    private Loader LoadJson<Loader, Key, Value>(string path) where Loader : ILoader<Key, Value>
+    private Loader LoadJson<Loader, Key, Value>(string path, Action<Loader> action) where Loader : ILoader<Key, Value>
     {
-        TextAsset textAsset = Managers.Resource.Load<TextAsset>($"Datas/{path}");
+        TextAsset textAsset = Managers.Resource.Load<TextAsset>($"Data/{path}", null).Result as TextAsset;
         return JsonUtility.FromJson<Loader>(textAsset.text);
     }
 
@@ -38,6 +39,11 @@ public class DataManager
         Data.StatList list = LoadJson<Data.StatList, int, Data.StatData>("StatData");
         list.MakeDict();
         list.GetStatList(out _statDict);
+    }
+
+    private void StatDataLoaded(Data.StatData data)
+    {
+
     }
 
     private void WeaponDataRead()

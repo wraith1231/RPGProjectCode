@@ -67,13 +67,13 @@ public class SoundManager
 
         if(type == Define.SoundMode.BGM)
         {
-            clip = Managers.Resource.Load<AudioClip>(path);
+            clip = Managers.Resource.Load<AudioClip>(path, null).Result as AudioClip;
         }
         else
         {
             if(_audioClips.TryGetValue(path, out clip) == false)
             {
-                clip = Managers.Resource.Load<AudioClip>(path);
+                clip = Managers.Resource.Load<AudioClip>(path, null).Result as AudioClip;
                 _audioClips.Add(path, clip);
             }
         }
