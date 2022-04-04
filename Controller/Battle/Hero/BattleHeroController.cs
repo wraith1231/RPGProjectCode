@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -112,156 +113,101 @@ public abstract class BattleHeroController : MonoBehaviour
 
     protected void SetAnimatorAndWeapon(EquipWeapon left, EquipWeapon right)
     {
-        string path = "Animation/Controller/Battle/";
-        bool isDual = false;
-        if ((right.GetCategory() == Define.WeaponCategory.Unknown && left.GetCategory() == Define.WeaponCategory.Unknown)
-            || (right.GetWeaponType() == Define.WeaponType.Gauntlet)
-            || (right.GetCategory() == Define.WeaponCategory.Shield && left.GetCategory() == Define.WeaponCategory.Shield))
+        string key;
+
+        if((left.GetWeaponType() == Define.WeaponType.Unknown
+            || left.GetWeaponType() == Define.WeaponType.Shield)
+            && (left.GetWeaponType() == Define.WeaponType.Unknown
+            || right.GetWeaponType() == Define.WeaponType.Shield))
         {
-            path += "Unarmed";
-            _leftWeapon = true;
-            _rightWeapon = true;
+            key = "Unarmed";
         }
-        if (right.GetCategory() == Define.WeaponCategory.TwoHand)
+        else if(right.GetCategory() == Define.WeaponCategory.TwoHand)
         {
-            path += "TwoHand/";
-            _rightWeapon = true;
+            key = "Twohand/";
 
-            Define.WeaponType type = right.GetWeaponType();
-            switch (type)
-            {
-                case Define.WeaponType.Sword:
-                    path += "Sword";
-                    break;
-                case Define.WeaponType.Axe:
-                    path += "Axe";
-                    break;
-                case Define.WeaponType.Dagger:
-                    path += "Dagger";
-                    break;
-                case Define.WeaponType.Mace:
-                    path += "Mace";
-                    break;
-                case Define.WeaponType.Spear:
-                    path += "Spear";
-                    break;
-                case Define.WeaponType.Bow:
-                    path += "Bow";
-                    break;
-            }
-        }
-        else if (right.GetCategory() == Define.WeaponCategory.OneHand)
-        {
-            if (left.GetCategory() == Define.WeaponCategory.OneHand)
-            {
-                path += "Dual/";
-                isDual = true;
-                _leftWeapon = true;
-            }
-            else if (left.GetCategory() == Define.WeaponCategory.Shield)
-            {
-                path += "OneHand/LeftShield/";
-            }
-            else
-            {
-                path += "OneHand/Right/";
-            }
-            _rightWeapon = true;
+            if (right.GetWeaponType() == Define.WeaponType.Axe
+                || right.GetWeaponType() == Define.WeaponType.Mace)
+                key += "Blunt";
 
-            Define.WeaponType type = right.GetWeaponType();
-            switch (type)
-            {
-                case Define.WeaponType.Sword:
-                    path += "Sword";
-                    break;
-                case Define.WeaponType.Axe:
-                    path += "Axe";
-                    break;
-                case Define.WeaponType.Dagger:
-                    path += "Dagger";
-                    break;
-                case Define.WeaponType.Mace:
-                    path += "Mace";
-                    break;
-                case Define.WeaponType.Spear:
-                    path += "Spear";
-                    break;
-                case Define.WeaponType.Bow:
-                    path += "Bow";
-                    break;
-            }
+            if (right.GetWeaponType() == Define.WeaponType.Sword)
+                key += "Sword";
 
-            if (isDual == true)
-            {
-                type = left.GetWeaponType();
-                switch (type)
-                {
-                    case Define.WeaponType.Sword:
-                        path += "Sword";
-                        break;
-                    case Define.WeaponType.Axe:
-                        path += "Axe";
-                        break;
-                    case Define.WeaponType.Dagger:
-                        path += "Dagger";
-                        break;
-                    case Define.WeaponType.Mace:
-                        path += "Mace";
-                        break;
-                    case Define.WeaponType.Spear:
-                        path += "Spear";
-                        break;
-                    case Define.WeaponType.Bow:
-                        path += "Bow";
-                        break;
-                }
-            }
-        } //right.category == onehand
-        else if (left.GetCategory() == Define.WeaponCategory.OneHand)
-        {
-            if (right.GetCategory() == Define.WeaponCategory.Shield)
-            {
-                path += "OneHand/RightShield/";
-            }
-            else
-            {
-                path += "OneHand/Left/";
-            }
-            _leftWeapon = true;
-            Define.WeaponType type = left.GetWeaponType();
-            switch (type)
-            {
-                case Define.WeaponType.Sword:
-                    path += "Sword";
-                    break;
-                case Define.WeaponType.Axe:
-                    path += "Axe";
-                    break;
-                case Define.WeaponType.Dagger:
-                    path += "Dagger";
-                    break;
-                case Define.WeaponType.Mace:
-                    path += "Mace";
-                    break;
-                case Define.WeaponType.Spear:
-                    path += "Spear";
-                    break;
-                case Define.WeaponType.Bow:
-                    path += "Bow";
-                    break;
-            }
-        }
-
-        RuntimeAnimatorController controller = Managers.Resource.Load<RuntimeAnimatorController>(path);
-        if (controller != null)
-        {
-            _animator.runtimeAnimatorController = controller;
+            if (right.GetWeaponType() == Define.WeaponType.Spear)
+                key += "Spear";
         }
         else
         {
-            _animator.runtimeAnimatorController = Managers.Resource.Load<RuntimeAnimatorController>("Animation/Controller/Battle/Unarmed");
-            Debug.Log($"Missing animator controller {path}");
+            if(left.GetWeaponType() == Define.WeaponType.Shield)
+            {
+                key = "LeftShield/";
+
+                if (right.GetWeaponType() == Define.WeaponType.Sword
+                    || right.GetWeaponType() == Define.WeaponType.Dagger)
+                    key += "Sword";
+
+                else if (right.GetWeaponType() == Define.WeaponType.Mace
+                    || right.GetWeaponType() == Define.WeaponType.Axe)
+                    key += "Blunt";
+            }
+            else if (right.GetWeaponType() == Define.WeaponType.Shield)
+            {
+                key = "RightShield/";
+
+                if (left.GetWeaponType() == Define.WeaponType.Sword
+                    || left.GetWeaponType() == Define.WeaponType.Dagger)
+                    key += "Sword";
+
+                else if (left.GetWeaponType() == Define.WeaponType.Mace
+                    || left.GetWeaponType() == Define.WeaponType.Axe)
+                    key += "Blunt";
+            }
+            else if(left.GetWeaponType() == Define.WeaponType.Unknown)
+            {
+                key = "Right/";
+
+                if (right.GetWeaponType() == Define.WeaponType.Sword
+                    || right.GetWeaponType() == Define.WeaponType.Dagger)
+                    key += "Sword";
+
+                else if (right.GetWeaponType() == Define.WeaponType.Mace
+                    || right.GetWeaponType() == Define.WeaponType.Axe)
+                    key += "Blunt";
+            }
+            else if (right.GetWeaponType() == Define.WeaponType.Unknown)
+            {
+                key = "Left/";
+
+                if (left.GetWeaponType() == Define.WeaponType.Sword
+                    || left.GetWeaponType() == Define.WeaponType.Dagger)
+                    key += "Sword";
+
+                else if (left.GetWeaponType() == Define.WeaponType.Mace
+                    || left.GetWeaponType() == Define.WeaponType.Axe)
+                    key += "Blunt";
+            }
+            else
+            {
+                key = "Dual/";
+
+                if (left.GetWeaponType() == Define.WeaponType.Sword
+                    || left.GetWeaponType() == Define.WeaponType.Dagger)
+                    key += "Sword";
+                else if (left.GetWeaponType() == Define.WeaponType.Mace
+                    || left.GetWeaponType() == Define.WeaponType.Axe)
+                    key += "Blunt";
+
+                if (right.GetWeaponType() == Define.WeaponType.Sword
+                    || right.GetWeaponType() == Define.WeaponType.Dagger)
+                    key += "Sword";
+
+                else if (right.GetWeaponType() == Define.WeaponType.Mace
+                    || right.GetWeaponType() == Define.WeaponType.Axe)
+                    key += "Blunt";
+            }
         }
+
+        Managers.Resource.Load<RuntimeAnimatorController>(key, AnimatorSetting);
 
         if (right.GetCategory() != Define.WeaponCategory.Unknown)
         {
@@ -281,40 +227,71 @@ public abstract class BattleHeroController : MonoBehaviour
         }
     }
 
+    private void AnimatorSetting(RuntimeAnimatorController controller)
+    {
+        if (controller != null)
+        {
+            _animator.runtimeAnimatorController = controller;
+        }
+        else
+        {
+            Debug.Log($"Missing animator controller");
+        }
+    }
+
     protected void FindWeaponFile(bool isRight, EquipWeapon weapon, WeaponHolder holder)
     {
-        string path = "Weapons/";
+        string key = "";
+
         switch (weapon.GetCategory())
         {
             case Define.WeaponCategory.Unknown:
                 return;
             case Define.WeaponCategory.OneHand:
-                path += "OneHand/";
+                key += "OneHand/";
                 break;
             case Define.WeaponCategory.TwoHand:
-                path += "TwoHand/";
+                key += "TwoHand/";
                 break;
             case Define.WeaponCategory.Shield:
-                path += "Shield/";
+                key += "Shield/";
                 break;
         }
 
-        path += weapon.GetFileName();
+        key += weapon.GetFileName();
 
         if (isRight == true)
         {
-            GameObject go = Managers.Resource.Instantiate(path, holder.transform);
-            go.transform.localPosition = weapon.GetRightPosition();
-            go.transform.localEulerAngles = weapon.GetRightRotation();
-            go.transform.localScale = weapon.GetSize();
-        }
+            Managers.Resource.Instantiate(key, SetRightWeapon);
+            //GameObject go = Managers.Resource.Instantiate(path, holder.transform);
+            //go.transform.localPosition = weapon.GetRightPosition();
+            //go.transform.localEulerAngles = weapon.GetRightRotation();
+            //go.transform.localScale = weapon.GetSize();
+        }   
         else
         {
-            GameObject go = Managers.Resource.Instantiate(path, holder.transform);
-            go.transform.localPosition = weapon.GetLeftPosition();
-            go.transform.localEulerAngles = weapon.GetLeftRotation();
-            go.transform.localScale = weapon.GetSize();
+            Managers.Resource.Instantiate(key, SetLeftWeapon);
+            //GameObject go = Managers.Resource.Instantiate(path, holder.transform);
+            //go.transform.localPosition = weapon.GetLeftPosition();
+            //go.transform.localEulerAngles = weapon.GetLeftRotation();
+            //go.transform.localScale = weapon.GetSize();
         }
+    }
+
+    private void SetRightWeapon(GameObject go)
+    {
+        go.transform.parent = _rightWeaponHolder.transform;
+        go.transform.localPosition = _rightEquipWeapon.GetRightPosition();
+        go.transform.localEulerAngles = _rightEquipWeapon.GetRightRotation();
+        go.transform.localScale = _rightEquipWeapon.GetSize();
+    }
+
+    private void SetLeftWeapon(GameObject go)
+    {
+        go.transform.parent = _leftWeaponHolder.transform;
+        go.transform.localPosition = _leftEquipWeapon.GetRightPosition();
+        go.transform.localEulerAngles = _leftEquipWeapon.GetRightRotation();
+        go.transform.localScale = _leftEquipWeapon.GetSize();
     }
 
     protected void WeaponSetActive(bool active)

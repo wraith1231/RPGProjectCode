@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class BattleGameManager
@@ -13,6 +15,8 @@ public class BattleGameManager
 
     public Dictionary<string, GlobalCharacterData> _charDataList = new Dictionary<string, GlobalCharacterData>();
 
+    private int _id = 0;
+
     public Terrain BattleTerrain { get; set; }
 
     public List<BattleHeroController> GetGroupList(int num)
@@ -23,7 +27,7 @@ public class BattleGameManager
         return _groups[num];
     }
 
-    public CharacterData GetData(int id)
+    public CharacterData GetCharListData(int id)
     {
         return _charList[id];
     }
@@ -38,10 +42,8 @@ public class BattleGameManager
         _charDataList[name] = data;
     }
 
-    public void BattleSceneStart()
+    public void GroupInitialize()
     {
-        int id = 0;
-
         int listSize = _charList.Count;
         int max = -1;
         int num = 0;
@@ -55,29 +57,42 @@ public class BattleGameManager
 
         for (int i = 0; i <= max; i++)
             _groups.Add(new List<BattleHeroController>());
+    }
 
+    public void LoadCharacterPrefab()
+    {
+        Managers.Resource.Load<GameObject>("Camera", null);
+        Managers.Resource.Load<GameObject>("Human", HumanCharacterInstantiate);
+
+        Managers.Resource.Instantiate("Camera", (go) => { BattleSceneStart(); });
+    }
+
+    private void HumanCharacterInstantiate(GameObject go)
+    {
+        int listSize = _charList.Count;
         for(int listNum = 0; listNum < listSize; listNum++)
         {
-            GameObject go = Managers.Resource.Instantiate("Characters/Human");
+            if (_charList[listNum].Type != Define.CharacterType.Human) continue;
+
+            GameObject gameObject = Managers.Resource.Instantiate("Human", null).Result as GameObject;
 
             BattleHeroController controller;
-            if (_charList[listNum].Player == true)
+            if(_charList[listNum].Player == true)
             {
-                controller = go.AddComponent<PlayerHeroController>();
+                controller = gameObject.AddComponent<PlayerHeroController>();
                 _player = (PlayerHeroController)controller;
             }
             else
             {
-                //원래 캐릭터 성격에 따라, 미션에 따라 다른 식으로 할 예정이지만
-                //지금은 전부 test 박아넣음
-                controller = go.AddComponent<TestEnemyController>();
+                controller = gameObject.AddComponent<TestEnemyController>();
             }
 
-            CharacterOutfit outfit = go.GetComponent<CharacterOutfit>();
+            CharacterOutfit outfit = gameObject.GetComponent<CharacterOutfit>();
+
             outfit.SetOutfit(_charList[listNum].Outfit);
             controller.SetEquipWeapon(_charList[listNum].Left, _charList[listNum].Right);
 
-            _charList[listNum].HeroId = id++;
+            _charList[listNum].HeroId = _id++;
             controller.SetCharacterData(_charList[listNum]);
             if (_charDataList.ContainsKey(_charList[listNum].CharName))
                 controller.SetBattleCharacterData(_charDataList[_charList[listNum].CharName]);
@@ -88,9 +103,10 @@ public class BattleGameManager
 
             controller.transform.position = controller.Data.StartPosition;
         }
+    }
 
-        _camera = Managers.Resource.Instantiate("Camera").GetComponent<CameraController>();
-
+    private void BattleSceneStart()
+    {
         _camera.SetPlayer(_player);
         _player.SetCamera(_camera);
 

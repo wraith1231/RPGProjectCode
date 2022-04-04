@@ -15,15 +15,13 @@ public class LoadingScene : BaseScene
     // Start is called before the first frame update
     void Start()
     {
-        Action<UILoadingScene> uiscene = EndUIInstantiate;
-
-        Managers.Resource.Instantiate<UILoadingScene>("UI/Scene/LoadingScene", uiscene);
+        Managers.Resource.Instantiate("Scene/LoadingScene", EndUIInstantiate);
         
     }
 
-    void EndUIInstantiate(UILoadingScene obj)
+    void EndUIInstantiate(GameObject obj)
     {
-        _ui = obj;
+        _ui = obj.GetComponent<UILoadingScene>();
 
         StartCoroutine(LoadScene(Managers.Scene.NextSceneName));
     }

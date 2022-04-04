@@ -54,6 +54,7 @@ public class TestScene : BaseScene
             }
         }
         
-        Managers.Battle.BattleSceneStart();
+        Managers.Battle.GroupInitialize();
+        Managers.Battle.LoadCharacterPrefab();
     }
 }

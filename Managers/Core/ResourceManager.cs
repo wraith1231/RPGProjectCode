@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class ResourceManager
 {
@@ -10,39 +12,84 @@ public class ResourceManager
 
     public void Load<T>(string key, Action<T> foo) where T : UnityEngine.Object
     {
-        if (_assets.ContainsKey(key) == true)
+        if (typeof(T) == typeof(GameObject))
         {
-            foo((T)_assets[key]);
-            return;
-        }
+            string name = GetName(key);
 
-        Addressables.LoadAssetAsync<T>(key).Completed += (handle) =>
-        {
-            _assets[key] = handle.Result;
-        };
+            GameObject go = Managers.Pool.GetOriginal(name);
+
+            if (go != null)
+            {
+                foo(go as T);
+                return;
+            }
+        }
+    
+
+        AsyncOperationHandle han = Addressables.LoadAssetAsync<T>(key);
+        han.Completed += (handle) => { foo(handle.Result as T); };
 
         return;
     }
 
-    //gameobject만 쓰세요
-    public void Instantiate(string key, Action<GameObject> foo)
+    private string GetName(string key)
     {
-        if(Managers.Pool.GetOriginal(key) == true)
+        string name = key;
+        int index = name.LastIndexOf('/');
+        if (index >= 0)
+            name = name.Substring(index + 1);
+
+        return name;
+    }
+
+    //gameobject만 쓰세요
+    public AsyncOperationHandle Instantiate(string key, Action<GameObject> foo)
+    {
+        string name = GetName(key);
+
+        if(_assets.ContainsKey(key) == false)
         {
-            foo(Managers.Pool.Pop(Managers.Pool.GetOriginal(key)).gameObject);
+            Debug.Log($"First you Need to Load {key}");
+            foo(null);
+
+            return new AsyncOperationHandle();
         }
 
-        Addressables.InstantiateAsync(_assets[key]).Completed += (handle) =>
+        GameObject go = _assets[key] as GameObject;
+        if(go.GetComponent<Poolable>() != null)
+        {
+            foo(Managers.Pool.Pop(go).gameObject);
+            return new AsyncOperationHandle();
+        }
+
+        AsyncOperationHandle han = Addressables.InstantiateAsync(_assets[key]);
+        
+        han.Completed += (handle) =>
         {
             if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
             {
-                foo(handle.Result);
+                foo(handle.Result as GameObject);
             }
         };
+
+        return han;
     }
 
-    public void Release(string path)
+    public void Release(string key)
     {
-        Addressables.Release(_assets[path]);
+        if (_assets[key] == null)
+            return;
+
+        Poolable poolable = (_assets[key] as GameObject).GetComponent<Poolable>();
+        if(poolable != null)
+        {
+            Managers.Pool.Push(poolable);
+            return;
+        }
+
+        if (_assets[key].GetType() == typeof(GameObject))
+            Addressables.ReleaseInstance(_assets[key] as GameObject);
+        else
+            Addressables.Release(_assets[key]);
     }
 }

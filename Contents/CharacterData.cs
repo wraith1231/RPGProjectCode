@@ -51,6 +51,7 @@ public class CharacterData
     private bool _isPlayer = false;
 
     private Define.CharacterType _type = Define.CharacterType.Human;
+    public Define.CharacterType Type { get { return _type; } set { _type = value; } }
 
     private int _heroId = -1;
     public int HeroId { get { return _heroId; } set { _heroId = value; } }
