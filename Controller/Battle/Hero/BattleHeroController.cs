@@ -117,14 +117,14 @@ public abstract class BattleHeroController : MonoBehaviour
 
         if((left.GetWeaponType() == Define.WeaponType.Unknown
             || left.GetWeaponType() == Define.WeaponType.Shield)
-            && (left.GetWeaponType() == Define.WeaponType.Unknown
+            && (right.GetWeaponType() == Define.WeaponType.Unknown
             || right.GetWeaponType() == Define.WeaponType.Shield))
         {
             key = "Unarmed";
         }
         else if(right.GetCategory() == Define.WeaponCategory.TwoHand)
         {
-            key = "Twohand/";
+            key = "TwoHand/";
 
             if (right.GetWeaponType() == Define.WeaponType.Axe
                 || right.GetWeaponType() == Define.WeaponType.Mace)
@@ -248,10 +248,10 @@ public abstract class BattleHeroController : MonoBehaviour
             case Define.WeaponCategory.Unknown:
                 return;
             case Define.WeaponCategory.OneHand:
-                key += "OneHand/";
+                key += "Onehand/";
                 break;
             case Define.WeaponCategory.TwoHand:
-                key += "TwoHand/";
+                key += "Twohand/";
                 break;
             case Define.WeaponCategory.Shield:
                 key += "Shield/";
@@ -289,8 +289,8 @@ public abstract class BattleHeroController : MonoBehaviour
     private void SetLeftWeapon(GameObject go)
     {
         go.transform.parent = _leftWeaponHolder.transform;
-        go.transform.localPosition = _leftEquipWeapon.GetRightPosition();
-        go.transform.localEulerAngles = _leftEquipWeapon.GetRightRotation();
+        go.transform.localPosition = _leftEquipWeapon.GetLeftPosition();
+        go.transform.localEulerAngles = _leftEquipWeapon.GetLeftRotation();
         go.transform.localScale = _leftEquipWeapon.GetSize();
     }
 

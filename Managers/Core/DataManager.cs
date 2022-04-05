@@ -24,32 +24,46 @@ public class DataManager
 
     public void Init()
     {
-        StatDataRead();
-        WeaponDataRead();
+        //StatDataRead();
+        LoadJson("StatData", StatDataLoad);
+        LoadJson("WeaponList", WeaponDataLoad);
+        //WeaponDataRead();
     }
 
-    private Loader LoadJson<Loader, Key, Value>(string path, Action<Loader> action) where Loader : ILoader<Key, Value>
+    //private Loader LoadJson<Loader, Key, Value>(string path, Action<Loader> action) where Loader : ILoader<Key, Value>
+    //{
+    //    TextAsset textAsset = Managers.Resource.Load<TextAsset>($"Data/{path}", null).Result as TextAsset;
+    //    return JsonUtility.FromJson<Loader>(textAsset.text);
+    //}
+
+    private void LoadJson(string key, Action<TextAsset> action)
     {
-        TextAsset textAsset = Managers.Resource.Load<TextAsset>($"Data/{path}", null).Result as TextAsset;
-        return JsonUtility.FromJson<Loader>(textAsset.text);
+        Managers.Resource.Load<TextAsset>($"Data/{key}", action);
     }
-
-    private void StatDataRead()
+    //
+    //private void StatDataRead()
+    //{
+    //    Data.StatList list = LoadJson<Data.StatList, int, Data.StatData>("StatData");
+    //    list.MakeDict();
+    //    list.GetStatList(out _statDict);
+    //}
+    private void StatDataLoad(TextAsset asset)
     {
-        Data.StatList list = LoadJson<Data.StatList, int, Data.StatData>("StatData");
-        list.MakeDict();
-        list.GetStatList(out _statDict);
+        Data.StatList loader = JsonUtility.FromJson<Data.StatList>(asset.text);
+        loader.MakeDict();
+        loader.GetStatList(out _statDict);
     }
-
-    private void StatDataLoaded(Data.StatData data)
+    private void WeaponDataLoad(TextAsset asset)
     {
-
+        Data.WeaponList loader = JsonUtility.FromJson<Data.WeaponList>(asset.text);
+        loader.MakeDict();
+        loader.GetWeaponDict(out _onehandDict, out _twohandDict, out _shieldDict);
     }
 
-    private void WeaponDataRead()
-    {
-        Data.WeaponList list = LoadJson<Data.WeaponList, string, Data.WeaponData>("WeaponList");
-        list.MakeDict();
-        list.GetWeaponDict(out _onehandDict, out _twohandDict, out _shieldDict);
-    }
+    //private void WeaponDataRead()
+    //{
+    //    Data.WeaponList list = LoadJson<Data.WeaponList, string, Data.WeaponData>("WeaponList");
+    //    list.MakeDict();
+    //    list.GetWeaponDict(out _onehandDict, out _twohandDict, out _shieldDict);
+    //}
 }

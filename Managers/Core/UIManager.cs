@@ -7,14 +7,16 @@ public class UIManager
     int _order = 10;
 
     Stack<UIPopup> _popupStack = new Stack<UIPopup>();
+    List<UIPopup> _subItemList = new List<UIPopup>();
     UIScene _scene = null;
+    UIBase _worldSpaceUI = null;
 
     public void SetCanvas(GameObject go, bool sort = true)
     {
         Canvas canvas = Util.GetOrAddComponent<Canvas>(go);
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.overrideSorting = true;
-
+        
         if(sort)
         {
             canvas.sortingOrder = _order;
@@ -37,64 +39,74 @@ public class UIManager
         }
     }
 
-    public T ShowSceneUI<T>(string name = null) where T : UIScene
+    public void ShowSceneUI<T>(string name = null) where T : UIScene
     {
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        GameObject go = Managers.Resource.Instantiate($"UI/Scene/{name}", null).Result as GameObject;
+        Managers.Resource.Instantiate($"Scene/{name}", SceneUIInstantiate);
+        
+        return;
+    }
 
-        T scene = Util.GetOrAddComponent<T>(go);
+    private void SceneUIInstantiate(GameObject obj)
+    {
+        UIScene scene = Util.GetOrAddComponent<UIScene>(obj);
         _scene = scene;
 
-        go.transform.SetParent(UIRoot.transform);
-
-        return scene;
+        obj.transform.SetParent(UIRoot.transform);
     }
 
-    public T MakeSubItem<T>(Transform parent = null, string name = null) where T : UIBase
+    public void MakeSubItem<T>(Transform parent = null, string name = null) where T : UIBase
     {
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        GameObject go = Managers.Resource.Instantiate($"UI/SubItem/{name}", null).Result as GameObject;
+        //GameObject go = Managers.Resource.Instantiate($"SubItem/{name}", null).Result as GameObject;
+        Managers.Resource.Instantiate($"SubItem/{name}", SubItemInstantiate, parent);
 
-        if (parent != null)
-            go.transform.SetParent(parent);
-
-        return go.GetOrAddComponent<T>();
+        return;
     }
 
-    public T MakePopupUI<T>(string name = null) where T : UIPopup
+    private void SubItemInstantiate(GameObject obj)
+    {
+        _subItemList.Add( obj.GetComponent<UIPopup>());
+    }
+
+    public void MakePopupUI<T>(string name = null) where T : UIPopup
     {
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        GameObject go = Managers.Resource.Instantiate($"UI/Popup/{name}", null).Result as GameObject;
+        Managers.Resource.Instantiate($"Popup/{name}", PopupUIInstantiate, UIRoot.transform);
 
-        T popup = Util.GetOrAddComponent<T>(go);
+        return;
+    }
+
+    private void PopupUIInstantiate(GameObject obj)
+    {
+        UIPopup popup = Util.GetOrAddComponent<UIPopup>(obj);
         _popupStack.Push(popup);
-
-        go.transform.SetParent(UIRoot.transform);
-
-        return popup;
     }
 
-    public T MakeWorldSpaceUI<T>(Transform parent = null, string name = null) where T : UIBase
+
+    public void MakeWorldSpaceUI<T>(Transform parent = null, string name = null) where T : UIBase
     {
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        GameObject go = Managers.Resource.Instantiate($"UI/WorldSpace/{name}", null).Result as GameObject;
+        Managers.Resource.Instantiate($"WorldSpace/{name}", WorldSpaceUIInstantiate, parent);
 
-        if (parent != null)
-            go.transform.SetParent(parent);
+        return;
+    }
 
-        Canvas canvas = go.GetComponent<Canvas>();
+    private void WorldSpaceUIInstantiate(GameObject obj)
+    {
+        Canvas canvas = obj.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
         canvas.worldCamera = Camera.main;
 
-        return go.GetOrAddComponent<T>();
+        _worldSpaceUI = obj.GetComponent<UIBase>();
     }
 
     public void ClosePopupUI(UIPopup popup)
@@ -117,7 +129,7 @@ public class UIManager
             return;
 
         UIPopup p = _popupStack.Pop();
-        Managers.Resource.Release(p.gameObject.name);
+        Managers.Resource.Release(p.gameObject);
         p = null;
 
         _order--;

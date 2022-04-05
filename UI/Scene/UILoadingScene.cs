@@ -22,6 +22,7 @@ public class UILoadingScene : UIScene
     }
 
     public bool IsDone = false;
+    public bool Initialized = false;
 
     // Start is called before the first frame update
     void Start()
@@ -34,6 +35,8 @@ public class UILoadingScene : UIScene
 
         GetButton((int)Buttons.StartButton).gameObject.BindUIEvent(OnButtonClicked);
         GetButton((int)Buttons.StartButton).gameObject.SetActive(false);
+
+        Initialized = true;
     }
 
     public void SetSliderValue(float value)

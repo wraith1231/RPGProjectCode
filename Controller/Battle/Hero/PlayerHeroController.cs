@@ -87,6 +87,11 @@ public class PlayerHeroController : BattleHeroController
             Managers.Input.RightMouseAction += OnRightMouseEvent;
         }
 
+        if (Managers.Battle.BothInit == true)
+        {
+            SetCamera(Managers.Battle.Camera);
+            _camera.SetPlayer(this);
+        }
         _prevMouse = Input.GetAxis("Mouse X");
 
         currentState = UpdateIdle;
@@ -363,6 +368,7 @@ public class PlayerHeroController : BattleHeroController
         }
     }
     #endregion
+
     #region InputFunction
 
     public void OnKeyboardEvent()
@@ -407,7 +413,8 @@ public class PlayerHeroController : BattleHeroController
         switch (mouseEvent)
         {
             case Define.MouseEvent.PointerDown:
-                if (_rightWeapon == true && _leftWeapon == false || _rightWeapon == true && _leftWeapon == true)
+                if (_rightWeapon == true && _leftWeapon == false || _rightWeapon == true && _leftWeapon == true
+                    || _rightWeapon == false && _leftWeapon == false)
                 {
                     if (CanCurruptState() && IsEnoughToBehavior(AttackStamina))
                     {
@@ -439,14 +446,15 @@ public class PlayerHeroController : BattleHeroController
                     if (CanCurruptState() && IsEnoughToBehavior(AttackStamina))
                         State = Define.HeroState.Attack;
                 }
-                else if (_leftWeapon == false && _rightWeapon == true || _leftWeapon == true && _rightWeapon == true)
+                else if (_leftWeapon == false && _rightWeapon == true || _leftWeapon == true && _rightWeapon == true || _rightWeapon == false && _leftWeapon == false)
                 {
                     if ((CanCurruptState() || State == Define.HeroState.Attack) && IsEnoughToBehavior(BlockStamina))
                         State = Define.HeroState.Block;
                 }
                 break;
             case Define.MouseEvent.PointerUp:
-                if (State == Define.HeroState.Block && (_leftWeapon == false && _rightWeapon == true || _leftWeapon == true && _rightWeapon == true))
+                if (State == Define.HeroState.Block && (_leftWeapon == false && _rightWeapon == true || _leftWeapon == true && _rightWeapon == true
+                    || _rightWeapon == false && _leftWeapon == false))
                     _blockEnd = true;
                 break;
         }

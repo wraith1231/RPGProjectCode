@@ -42,31 +42,28 @@ public class ResourceManager
     }
 
     //gameobject만 쓰세요
-    public void Instantiate(string key, Action<GameObject> foo)
+    public void Instantiate(string key, Action<GameObject> foo, Transform parent = null)
     {
         string name = GetName(key);
 
-        if(_assets.ContainsKey(key) == false)
+        UnityEngine.Object go;
+        if(_assets.TryGetValue(key, out go) == true)
         {
-            Debug.Log($"First you Need to Load {key}");
-            foo(null);
-
-            return;
+            GameObject gameObject = go as GameObject;
+            if (gameObject.GetComponent<Poolable>() != null)
+            {
+                foo(Managers.Pool.Pop(gameObject).gameObject);
+                return;
+            }
         }
 
-        GameObject go = _assets[key] as GameObject;
-        if(go.GetComponent<Poolable>() != null)
-        {
-            foo(Managers.Pool.Pop(go).gameObject);
-            return;
-        }
-
-        AsyncOperationHandle han = Addressables.InstantiateAsync(_assets[key]);
+        AsyncOperationHandle han = Addressables.InstantiateAsync(key, parent);
         
         han.Completed += (handle) =>
         {
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
+                
                 foo(handle.Result as GameObject);
             }
         };

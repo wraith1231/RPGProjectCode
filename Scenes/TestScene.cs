@@ -18,6 +18,8 @@ public class TestScene : BaseScene
         Managers.General.GlobalPlayer.Data.CharName = "Player";
         Vector3 mainPos = Managers.Battle.BattleTerrain.terrainData.size * 0.5f;
         mainPos.y = 0;
+        Managers.General.GlobalPlayer.SetLeftWeapon(Define.WeaponCategory.OneHand, "Axe1");
+        Managers.General.GlobalPlayer.SetRightWeapon(Define.WeaponCategory.OneHand, "Sword1");
         Managers.General.GlobalPlayer.Data.StartPosition = mainPos;
         Managers.Battle.AddCharList(Managers.General.GlobalPlayer.Data);
 

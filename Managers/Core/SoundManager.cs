@@ -5,8 +5,11 @@ using UnityEngine;
 public class SoundManager 
 {
     AudioSource[] _audioSources = new AudioSource[(int)Define.SoundMode.MaxCount];
+
+    AudioClip _bgmClip = null;
     Dictionary<string, AudioClip> _audioClips = new Dictionary<string, AudioClip>();
 
+    //이용 방법 - LoadClip으로 일단 로드 후에 Play할 것
     public void Init()
     {
         GameObject root = GameObject.Find("@Sound");
@@ -52,13 +55,33 @@ public class SoundManager
         }
     }
 
-    public void Play(string path, Define.SoundMode type = Define.SoundMode.Effect, float pitch = 1.0f)
+    public void Play(string key, Define.SoundMode type = Define.SoundMode.Effect, float pitch = 1.0f)
     {
-        AudioClip clip = GetOrAddClip(path, type);
+        AudioClip clip = null;
+
+        if(type == Define.SoundMode.BGM)
+        {
+            clip = _bgmClip;
+        }
+        else
+        {
+            if(_audioClips.TryGetValue(key, out clip) == false)
+            {
+                Debug.LogError($"You need to load clip first {key}");
+                return;
+            }
+        }
+
         Play(clip, type, pitch);
     }
 
-    public AudioClip GetOrAddClip(string path, Define.SoundMode type = Define.SoundMode.Effect)
+    /*public void Play(string path, Define.SoundMode type = Define.SoundMode.Effect, float pitch = 1.0f)
+    {
+        AudioClip clip = GetOrAddClip(path, type);
+        Play(clip, type, pitch);
+    }*/
+
+    /*public AudioClip GetOrAddClip(string path, Define.SoundMode type = Define.SoundMode.Effect)
     {
         if (path.Contains("Sound/") == false)
             path = $"Sound/{path}";
@@ -81,6 +104,34 @@ public class SoundManager
             Debug.Log($"Audio Clip does not found : {path}");
 
         return clip;
+    }*/
+
+    public void LoadClip(string key, Define.SoundMode type = Define.SoundMode.Effect)
+    {
+        if (key.Contains("Sound/") == false)
+            key = $"Sound/{key}";
+
+        if(type == Define.SoundMode.BGM)
+        {
+            Managers.Resource.Load<AudioClip>(key, BGMAudioClipLoad);
+        }
+        else
+        {
+            AudioClip clip = null;
+            if(_audioClips.TryGetValue(key, out clip) == false)
+            {
+                Managers.Resource.Load<AudioClip>(key, EffectAudioClipLoad);
+            }
+        }
+    }
+
+    private void BGMAudioClipLoad(AudioClip clip)
+    {
+        _bgmClip = clip;
+    }
+    private void EffectAudioClipLoad(AudioClip clip)
+    {
+        _audioClips.Add(clip.name, clip);
     }
 
     public void Clear()

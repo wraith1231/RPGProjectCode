@@ -144,6 +144,7 @@ public abstract class EnemyHeroController : BattleHeroController
     #region NearCharacter
     public BattleHeroController CalculateNearestCharacter()
     {
+        _nearEnemyCollider.enabled = true;
         if (_charKeys.Count == 0)
         {
             return null;
@@ -164,6 +165,7 @@ public abstract class EnemyHeroController : BattleHeroController
             }
         }
 
+        _nearEnemyCollider.enabled = false;
         return _currentNearCharacter;
     }
 
@@ -330,7 +332,6 @@ public abstract class EnemyHeroController : BattleHeroController
     {
         base.ResetBooleanValues();
 
-        _nearEnemyCollider.enabled = true;
     }
 
     private void FixedUpdate()

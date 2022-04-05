@@ -6,8 +6,12 @@ using UnityEngine;
 
 public class BattleGameManager
 {
-    public PlayerHeroController _player;
-    public CameraController _camera;
+    private PlayerHeroController _player;
+    private CameraController _camera;
+    private bool _playerInit = false;
+    private bool _cameraInit = false;
+    public bool BothInit { get { return _playerInit == true && _cameraInit == true; } }
+    public CameraController Camera { get { return _camera; } }
 
     public List<List<BattleHeroController>> _groups = new List<List<BattleHeroController>>();
 
@@ -61,55 +65,78 @@ public class BattleGameManager
 
     public void LoadCharacterPrefab()
     {
-        Managers.Resource.Load<GameObject>("Camera", null);
-        Managers.Resource.Load<GameObject>("Human", HumanCharacterInstantiate);
+        _id = 0;
 
-        Managers.Resource.Instantiate("Camera", (go) => { BattleSceneStart(); });
+        CharacterInstantiate();
+
+        Managers.Resource.Instantiate("Camera", (go) => { _camera = go.GetComponent<CameraController>(); BattleSceneStart(); });
     }
 
-    private void HumanCharacterInstantiate(GameObject go)
+    private void CharacterInstantiate()
     {
         int listSize = _charList.Count;
         for(int listNum = 0; listNum < listSize; listNum++)
         {
-            if (_charList[listNum].Type != Define.CharacterType.Human) continue;
-
-            GameObject gameObject = Managers.Resource.Instantiate("Human", null).Result as GameObject;
-
-            BattleHeroController controller;
-            if(_charList[listNum].Player == true)
+            switch (_charList[listNum].Type)
             {
-                controller = gameObject.AddComponent<PlayerHeroController>();
-                _player = (PlayerHeroController)controller;
+                case Define.CharacterType.Human:
+                    Managers.Resource.Instantiate("Human", HumanCharacterInstantiate);
+                    break;
+                case Define.CharacterType.Animal:
+                    break;
+                case Define.CharacterType.Monster:
+                    break;
+                case Define.CharacterType.Unknown:
+                    Managers.Resource.Instantiate("Human", HumanCharacterInstantiate);
+                    break;
+                default:
+                    Managers.Resource.Instantiate("Human", HumanCharacterInstantiate);
+                    break;
             }
-            else
-            {
-                controller = gameObject.AddComponent<TestEnemyController>();
-            }
-
-            CharacterOutfit outfit = gameObject.GetComponent<CharacterOutfit>();
-
-            outfit.SetOutfit(_charList[listNum].Outfit);
-            controller.SetEquipWeapon(_charList[listNum].Left, _charList[listNum].Right);
-
-            _charList[listNum].HeroId = _id++;
-            controller.SetCharacterData(_charList[listNum]);
-            if (_charDataList.ContainsKey(_charList[listNum].CharName))
-                controller.SetBattleCharacterData(_charDataList[_charList[listNum].CharName]);
-            else
-                controller.SetBattleCharacterData(null);
-
-            _groups[_charList[listNum].Group].Add(controller);
-
-            controller.transform.position = controller.Data.StartPosition;
         }
+    }
+
+    private void HumanCharacterInstantiate(GameObject go)
+    {
+        int id = _id++;
+        BattleHeroController controller;
+        if(_charList[id].Player == true)
+        {
+            controller = go.AddComponent<PlayerHeroController>();
+            _player = controller as PlayerHeroController;
+            _playerInit = true;
+        }
+        else
+        {
+            controller = go.AddComponent<TestEnemyController>();
+        }
+
+        CharacterOutfit outfit = go.GetComponent<CharacterOutfit>();
+
+        outfit.SetOutfit(_charList[id].Outfit);
+        controller.SetEquipWeapon(_charList[id].Left, _charList[id].Right);
+
+        _charList[id].HeroId = id;
+        controller.SetCharacterData(_charList[id]);
+        if (_charDataList.ContainsKey(_charList[id].CharName))
+            controller.SetBattleCharacterData(_charDataList[_charList[id].CharName]);
+        else
+            controller.SetBattleCharacterData(null);
+
+        _groups[_charList[id].Group].Add(controller);
+
+        controller.transform.position = controller.Data.StartPosition;
+
     }
 
     private void BattleSceneStart()
     {
-        _camera.SetPlayer(_player);
-        _player.SetCamera(_camera);
-
+        _cameraInit = true;
+        if (BothInit)
+        {
+            _camera.SetPlayer(_player);
+            _player.SetCamera(_camera);
+        }
         _camera.BattleSceneInit();
     }
 

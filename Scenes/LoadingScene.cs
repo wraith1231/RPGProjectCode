@@ -15,6 +15,7 @@ public class LoadingScene : BaseScene
     // Start is called before the first frame update
     void Start()
     {
+        base.Init();
         Managers.Resource.Instantiate("Scene/LoadingScene", EndUIInstantiate);
         
     }
@@ -31,8 +32,17 @@ public class LoadingScene : BaseScene
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
         operation.allowSceneActivation = false;
 
+        if(Managers.Scene.NextSceneName == "TestScene")
+        {
+            Managers.Resource.Load<GameObject>("Camera", null);
+            Managers.Resource.Load<GameObject>("Human", null);
+        }
+
         while (operation.isDone == false)
         {
+            while (_ui.Initialized == false)
+                yield return null;
+
             _ui.SetSliderValue(operation.progress);
             
             if(operation.progress >= 0.9f)
@@ -40,7 +50,7 @@ public class LoadingScene : BaseScene
                 _ui.SetButtonActive();
                 while (_ui.IsDone == false)
                     yield return null;
-
+                
                 operation.allowSceneActivation = true;
             }
 
