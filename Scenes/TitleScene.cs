@@ -12,12 +12,13 @@ public class TitleScene : BaseScene
     // Start is called before the first frame update
     void Start()
     {
-        
+        base.Init();
+
+        //Managers.Resource.Load<GameObject>("Human", HumanResourcePooling);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void HumanResourcePooling(GameObject go)
     {
-        
+        Managers.Pool.CreatePool(go, 100);
     }
 }

@@ -26,7 +26,7 @@ public class ResourceManager
         }
     
         AsyncOperationHandle han = Addressables.LoadAssetAsync<T>(key);
-        han.Completed += (handle) => { foo(handle.Result as T); };
+        han.Completed += (handle) => { if(foo != null) foo(handle.Result as T); };
 
         return;
     }
@@ -58,13 +58,13 @@ public class ResourceManager
         }
 
         AsyncOperationHandle han = Addressables.InstantiateAsync(key, parent);
-        
+
         han.Completed += (handle) =>
         {
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
-                
-                foo(handle.Result as GameObject);
+                if(foo != null)
+                    foo(handle.Result as GameObject);
             }
         };
 

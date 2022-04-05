@@ -30,7 +30,7 @@ public class SceneManagerEX
         {
             Managers.Clear();
 
-            SceneManager.LoadScene("LoadingScene");
+            SceneManager.LoadSceneAsync("LoadingScene");
         }
         else
         {

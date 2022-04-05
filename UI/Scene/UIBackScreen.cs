@@ -33,7 +33,7 @@ public class UIBackScreen : UIScene
 
     public void OnNewGameButton(PointerEventData data)
     {
-        Managers.Scene.LoadSceneAsync(Define.SceneType.TestScene);
+        Managers.Scene.LoadSceneAsync(Define.SceneType.AreaScene);
     }
 
     public void OnContinueButton(PointerEventData data)

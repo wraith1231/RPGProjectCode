@@ -50,7 +50,8 @@ public class Managers : MonoBehaviour
 
     void Update()
     {
-        _input.OnUpdate();
+        if(_input != null)
+            _input.OnUpdate();
     }
 
     static void Init()

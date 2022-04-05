@@ -80,7 +80,7 @@ public class PoolManager
 
         if(_pool.ContainsKey(name) == false)
         {
-            GameObject.Destroy(poolable.gameObject);
+            Managers.Resource.Release(poolable.gameObject);
             return;
         }
 
@@ -115,7 +115,7 @@ public class PoolManager
     public void Clear()
     {
         foreach (Transform child in _root)
-            GameObject.Destroy(child.gameObject);
+            Managers.Resource.Release(child.gameObject);
 
         _pool.Clear();
     }

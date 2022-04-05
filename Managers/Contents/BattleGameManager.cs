@@ -66,6 +66,8 @@ public class BattleGameManager
     public void LoadCharacterPrefab()
     {
         _id = 0;
+        Managers.Resource.Load<GameObject>("Camera", null);
+        //Managers.Resource.Load<GameObject>("Human", null);
 
         CharacterInstantiate();
 

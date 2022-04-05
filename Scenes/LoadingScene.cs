@@ -31,15 +31,9 @@ public class LoadingScene : BaseScene
     {
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
         operation.allowSceneActivation = false;
-
-        if(Managers.Scene.NextSceneName == "TestScene")
-        {
-            Managers.Resource.Load<GameObject>("Camera", null);
-            Managers.Resource.Load<GameObject>("Human", null);
-        }
-
         while (operation.isDone == false)
         {
+            Managers.Resource.Load<GameObject>("Human", PoolingHuman);
             while (_ui.Initialized == false)
                 yield return null;
 
@@ -52,9 +46,15 @@ public class LoadingScene : BaseScene
                     yield return null;
                 
                 operation.allowSceneActivation = true;
+                Managers.Resource.Release(_ui.gameObject);
             }
 
             yield return null;
         }
+    }
+
+    private void PoolingHuman(GameObject go)
+    {
+        Managers.Pool.CreatePool(go, 100);
     }
 }
