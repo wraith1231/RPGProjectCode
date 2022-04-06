@@ -25,7 +25,7 @@ public abstract class EnemyHeroController : BattleHeroController
 
     public float AnimFixedTime { get { return _fixedTime; } }
 
-    public override Define.HeroState State { get { return _state; } }
+    public override Define.HeroState State { get { return _state; } protected set { _state = value; } }
 
     protected List<int> _charKeys = new List<int>();
     protected Dictionary<int, BattleHeroController> _nearCharacter = new Dictionary<int, BattleHeroController>();
@@ -45,7 +45,7 @@ public abstract class EnemyHeroController : BattleHeroController
         _nearEnemyCollider.enabled = true;
 
         for (int i = 0; i < (int)Define.HeroState.Unknown; i++)
-            AnimationSpeedChange((Define.HeroState)i, 1.0f);
+            AnimationSpeedChange((Define.HeroState)i, 1.0f * ( 1 + _battleData.FinalDexterity));
     }
     private void AnimationSpeedChange(Define.HeroState state, float speed)
     {
@@ -157,6 +157,8 @@ public abstract class EnemyHeroController : BattleHeroController
 
         for(int i =0; i < size; i++)
         {
+            if (_nearCharacter[_charKeys[i]].State == Define.HeroState.Die)
+                continue;
             float dist = Vector3.Distance(_transform.position, _nearCharacter[_charKeys[i]].transform.position);
             if(dist < min)
             {
@@ -223,20 +225,33 @@ public abstract class EnemyHeroController : BattleHeroController
 
     public override void GetBlocked(BattleHeroController attacker)
     {
-        if(_justGuard == true)
+        float defense = 1 - _battleData.FinalDefense / (_battleData.FinalDefense + 50);
+        float attack = _battleData.FinalPower * _battleData.DefenseAdvantage - attacker.BattleData.FinalPower;
+        if (attack < 0)
+        {
+            GetDamaged(attacker);
+            return;
+        }
+
+        float blockDamage = (attacker.BattleData.FinalPower * defense) * attack * 0.5f;
+
+        if (_justGuard == true)
         {
 
+            _battleData.CurrentStaminaPoint -= blockDamage;
+            if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
         }
         else
         {
-
+            if (blockDamage > _battleData.CurrentStaminaPoint * 0.5f)
+            {
+                GetDamaged(attacker);
+                return;
+            }
+            _battleData.CurrentStaminaPoint -= (attacker.BattleData.FinalPower * defense) * attack;
+            if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
         }
 
-        if (_battleData.CurrentHealthPoint <= 0)
-        {
-            _isDead = true;
-            return;
-        }
         _blockHit = true;
         _animator.Play("BlockHit");
     }
@@ -289,10 +304,11 @@ public abstract class EnemyHeroController : BattleHeroController
     #region Damaged
     public override void GetDamaged(BattleHeroController attacker)
     {
+        float defense = 1 - _battleData.FinalDefense / (_battleData.FinalDefense + 50);
+        _battleData.CurrentHealthPoint -= (attacker.BattleData.FinalPower * defense);
 
         if(_battleData.CurrentHealthPoint <= 0)
         {
-            _isDead = true;
             State = Define.HeroState.Die;
             return;
         }
@@ -319,13 +335,18 @@ public abstract class EnemyHeroController : BattleHeroController
     #endregion
     protected override void DyingProcess()
     {
+        _deadTime += Time.deltaTime;
         if (_isDead == false)
         {
             _isDead = true;
+            _characterCollider.enabled = false;
             StopAllCoroutines();
 
             AnimationStart(Define.HeroState.Die);
         }
+
+        if (_deadTime >= 5.0f)
+            gameObject.SetActive(false);
     }
 
     protected override void ResetBooleanValues()
@@ -336,13 +357,17 @@ public abstract class EnemyHeroController : BattleHeroController
 
     private void FixedUpdate()
     {
-        if (_root != null && _isDead == false && State != Define.HeroState.Damaged)
-            _root.Evaluate();
-        else if (_isDead == true)
+        //if (_battleData.CurrentHealthPoint <= 0 && State != Define.HeroState.Die)
+        //{
+        //    State = Define.HeroState.Die;
+        //}
+        if (State == Define.HeroState.Die)
         {
             DyingProcess();
             return;
         }
+        else if (_root != null && (State != Define.HeroState.Die && State != Define.HeroState.Damaged))
+            _root.Evaluate();
 
         if (_state == Define.HeroState.Running)
         {

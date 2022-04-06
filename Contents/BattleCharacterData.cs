@@ -14,8 +14,14 @@ public class BattleCharacterData
     public float StaminaRecovery { get; set; }
 
     public int Power { get; set; }
+    public float PowerAdvantage { get; set; }
     public int Dexterity { get; set; }
     public float Defense { get; set; }
+    public float DefenseAdvantage { get; set; }
+
+    public float FinalPower { get { return Power * PowerAdvantage; } }
+    public float FinalDefense { get { return Defense * DefenseAdvantage; } }
+    public float FinalDexterity { get { return Dexterity / (Dexterity + 100f); } }
 
     public BattleCharacterData(GlobalCharacterData data = null)
     {
@@ -37,7 +43,9 @@ public class BattleCharacterData
             StaminaRecovery = 10;
             Power = 10;
             Dexterity = 5;
-            Defense = 0;
+            Defense = 10;
         }
+        PowerAdvantage = 1.0f;
+        DefenseAdvantage = 1.0f;
     }
 }

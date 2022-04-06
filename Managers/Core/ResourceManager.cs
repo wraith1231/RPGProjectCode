@@ -8,7 +8,21 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class ResourceManager
 {
+    private List<string> _keys = new List<string>();
     private Dictionary<string, UnityEngine.Object> _assets = new Dictionary<string, UnityEngine.Object>();
+
+    public void ReleaseStock()
+    {
+        int size = _keys.Count;
+        for (int i = 0; i < size; i++)
+        {
+            if(_assets[_keys[i]] != null)
+            Addressables.Release(_assets[_keys[i]]);
+        }
+
+        _keys.Clear();
+        _assets.Clear();
+    }
 
     public void Load<T>(string key, Action<T> foo) where T : UnityEngine.Object
     {
@@ -26,7 +40,18 @@ public class ResourceManager
         }
     
         AsyncOperationHandle han = Addressables.LoadAssetAsync<T>(key);
-        han.Completed += (handle) => { if(foo != null) foo(handle.Result as T); };
+        han.Completed += (handle) =>
+        {
+            if (_assets.ContainsKey(key) == false)
+            {
+                if (handle.Result.GetType() == typeof(GameObject))
+                { 
+                    _keys.Add(key);
+                    _assets[key] = handle.Result as T;
+                }
+            }
+            if(foo != null) foo(handle.Result as T); 
+        };
 
         return;
     }
@@ -91,6 +116,10 @@ public class ResourceManager
             {
                 _assets[obj.name] = null;
                 Addressables.Release(temp);
+            }
+            else
+            {
+                Addressables.Release(obj);
             }
         }
     }

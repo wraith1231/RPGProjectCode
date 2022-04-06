@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerHeroController : BattleHeroController
 {
     //외부
-    private CameraController _camera;
+    private CameraController _camera = null;
 
     //내부
     //상태에 따라 실행할 함수
@@ -97,9 +97,9 @@ public class PlayerHeroController : BattleHeroController
         currentState = UpdateIdle;
 
         for (int i = 0; i < (int)Define.HeroState.Unknown; i++)
-            AnimationSpeedChange((Define.HeroState)i, 1.0f);
+            AnimationSpeedChange((Define.HeroState)i, 1.0f * (1 + _battleData.FinalDexterity));
 
-        AnimationSpeedChange(Define.HeroState.Rolling, 2.0f);
+        AnimationSpeedChange(Define.HeroState.Rolling, 1.0f * (1 +_battleData.FinalDexterity));
 
         AnimationStart(State);
     }
@@ -187,6 +187,8 @@ public class PlayerHeroController : BattleHeroController
 
     private void RotateCharacter()
     {
+        if (_camera == null) return;
+
         float curMouse = Input.GetAxis("Mouse X");
 
         float power = (curMouse - _prevMouse) * _camera.MouseSpeed * Time.deltaTime;
@@ -224,6 +226,7 @@ public class PlayerHeroController : BattleHeroController
         if(_isDead == false)
         {
             _isDead = true;
+            _characterCollider.enabled = false;
             StopAllCoroutines();
 
             AnimationStart(Define.HeroState.Die);
@@ -271,20 +274,31 @@ public class PlayerHeroController : BattleHeroController
     }
     public override void GetBlocked(BattleHeroController attacker)
     {
+        float defense = 1 - _battleData.FinalDefense / (_battleData.FinalDefense + 50);
+        float attack = _battleData.FinalPower * _battleData.DefenseAdvantage - attacker.BattleData.FinalPower;
+        if (attack < 0)
+        {
+            GetDamaged(attacker);
+            return;
+        }
+
+        float blockDamage = (attacker.BattleData.FinalPower * defense) * attack * 0.5f;
+
         if (_justGuard == true)
         {
-
+            
+            _battleData.CurrentStaminaPoint -= blockDamage;
+            if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
         }
         else
         {
-
-        }
-
-        if (_battleData.CurrentHealthPoint <= 0)
-        {
-            _isDead = true;
-            State = Define.HeroState.Die;
-            return;
+            if(blockDamage > _battleData.CurrentStaminaPoint * 0.5f)
+            {
+                GetDamaged(attacker);
+                return;
+            }
+            _battleData.CurrentStaminaPoint -= (attacker.BattleData.FinalPower * defense) * attack;
+            if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
         }
 
         _blockHit = true;
@@ -336,9 +350,11 @@ public class PlayerHeroController : BattleHeroController
     #region Damaged
     public override void GetDamaged(BattleHeroController attacker)
     {
+        float defense = 1 - _battleData.FinalDefense / (_battleData.FinalDefense + 50);
+        _battleData.CurrentHealthPoint -= (attacker.BattleData.FinalPower * defense);
+
         if (_battleData.CurrentHealthPoint <= 0)
         {
-            _isDead = true;
             State = Define.HeroState.Die;
             return;
         }

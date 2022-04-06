@@ -14,6 +14,7 @@ public class BattleGameManager
     public CameraController Camera { get { return _camera; } }
 
     public List<List<BattleHeroController>> _groups = new List<List<BattleHeroController>>();
+    public List<GameObject> _objects = new List<GameObject>();
 
     public List<CharacterData> _charList = new List<CharacterData>();
 
@@ -67,11 +68,12 @@ public class BattleGameManager
     {
         _id = 0;
         Managers.Resource.Load<GameObject>("Camera", null);
-        //Managers.Resource.Load<GameObject>("Human", null);
+        Managers.Resource.Load<GameObject>("Human", null);
 
         CharacterInstantiate();
 
-        Managers.Resource.Instantiate("Camera", (go) => { _camera = go.GetComponent<CameraController>(); BattleSceneStart(); });
+        Managers.Resource.Instantiate("Camera", (go) => 
+        { _objects.Add(go); GameObject.DontDestroyOnLoad(go); _camera = go.GetComponent<CameraController>(); });
     }
 
     private void CharacterInstantiate()
@@ -100,6 +102,8 @@ public class BattleGameManager
 
     private void HumanCharacterInstantiate(GameObject go)
     {
+        _objects.Add(go);
+        GameObject.DontDestroyOnLoad(go);
         int id = _id++;
         BattleHeroController controller;
         if(_charList[id].Player == true)
@@ -117,7 +121,7 @@ public class BattleGameManager
 
         outfit.SetOutfit(_charList[id].Outfit);
         controller.SetEquipWeapon(_charList[id].Left, _charList[id].Right);
-
+        go.name = _charList[id].CharName;
         _charList[id].HeroId = id;
         controller.SetCharacterData(_charList[id]);
         if (_charDataList.ContainsKey(_charList[id].CharName))
@@ -131,7 +135,7 @@ public class BattleGameManager
 
     }
 
-    private void BattleSceneStart()
+    public void BattleSceneStart()
     {
         _cameraInit = true;
         if (BothInit)
@@ -152,8 +156,12 @@ public class BattleGameManager
         _charDataList.Clear();
         _charList.Clear();
 
-        foreach (List<BattleHeroController> group in _groups)
-            group.Clear();
+        int size = _objects.Count;
+        for (int i = 0; i < size; i++)
+        {
+            Managers.Resource.Release(_objects[i]);
+        }
+        _objects.Clear();
 
         _groups.Clear();
     }

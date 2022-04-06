@@ -17,7 +17,7 @@ public class LoadingScene : BaseScene
     {
         base.Init();
         Managers.Resource.Instantiate("Scene/LoadingScene", EndUIInstantiate);
-        
+        Managers.Resource.ReleaseStock();
     }
 
     void EndUIInstantiate(GameObject obj)
@@ -31,9 +31,12 @@ public class LoadingScene : BaseScene
     {
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
         operation.allowSceneActivation = false;
+        Time.timeScale = 0;
+
+        if (sceneName.Equals("TestScene") || sceneName.Equals("BattleScene"))
+            BattleSceneLoad();
         while (operation.isDone == false)
         {
-            Managers.Resource.Load<GameObject>("Human", PoolingHuman);
             while (_ui.Initialized == false)
                 yield return null;
 
@@ -46,6 +49,8 @@ public class LoadingScene : BaseScene
                     yield return null;
                 
                 operation.allowSceneActivation = true;
+
+                Time.timeScale = 1;
                 Managers.Resource.Release(_ui.gameObject);
             }
 
@@ -53,8 +58,14 @@ public class LoadingScene : BaseScene
         }
     }
 
-    private void PoolingHuman(GameObject go)
+    private void BattleSceneLoad()
     {
-        Managers.Pool.CreatePool(go, 100);
+        Managers.Battle.GroupInitialize();
+        Managers.Battle.LoadCharacterPrefab();
+    }
+
+    private void AreaSceneLoad()
+    {
+
     }
 }

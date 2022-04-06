@@ -19,6 +19,10 @@ public abstract class BattleHeroController : MonoBehaviour
     protected BattleCharacterData _battleData;
     public CharacterData Data { get { return _data; } }
     public BattleCharacterData BattleData { get { return _battleData; } set { _battleData = value; } }
+    private List<UnityEngine.Object> _attached = new List<UnityEngine.Object>();
+    protected CapsuleCollider _characterCollider;
+    protected Rigidbody _rigidBody;
+    protected float _deadTime = 0;
 
     //애니메이션 스피드
     protected float[] _animationSpeed = new float[(int)Define.HeroState.Unknown];
@@ -63,6 +67,9 @@ public abstract class BattleHeroController : MonoBehaviour
         _transform = GetComponent<Transform>();
         _leftWeaponHolder = gameObject.GetComponentInChildren<LeftWeaponHolder>();
         _rightWeaponHolder = gameObject.GetComponentInChildren<RightWeaponHolder>();
+        _characterCollider = GetComponent<CapsuleCollider>();
+        _rigidBody = GetComponent<Rigidbody>();
+        
         CreateWeapon();
 
         Init();
@@ -212,12 +219,10 @@ public abstract class BattleHeroController : MonoBehaviour
         if (right.GetCategory() != Define.WeaponCategory.Unknown)
         {
             FindWeaponFile(true, right, _rightWeaponHolder);
-            _rightWeaponHolder.CheckColliders(left.GetCategory() != Define.WeaponCategory.Unknown, this);
         }
         if (left.GetCategory() != Define.WeaponCategory.Unknown)
         {
             FindWeaponFile(false, left, _leftWeaponHolder);
-            _leftWeaponHolder.CheckColliders(right.GetCategory() != Define.WeaponCategory.Unknown, this);
         }
 
         if(right.GetCategory() == Define.WeaponCategory.Unknown && left.GetCategory() == Define.WeaponCategory.Unknown)
@@ -232,6 +237,7 @@ public abstract class BattleHeroController : MonoBehaviour
         if (controller != null)
         {
             _animator.runtimeAnimatorController = controller;
+            _attached.Add(controller);
         }
         else
         {
@@ -263,35 +269,31 @@ public abstract class BattleHeroController : MonoBehaviour
         if (isRight == true)
         {
             Managers.Resource.Instantiate(key, SetRightWeapon);
-            //GameObject go = Managers.Resource.Instantiate(path, holder.transform);
-            //go.transform.localPosition = weapon.GetRightPosition();
-            //go.transform.localEulerAngles = weapon.GetRightRotation();
-            //go.transform.localScale = weapon.GetSize();
         }   
         else
         {
             Managers.Resource.Instantiate(key, SetLeftWeapon);
-            //GameObject go = Managers.Resource.Instantiate(path, holder.transform);
-            //go.transform.localPosition = weapon.GetLeftPosition();
-            //go.transform.localEulerAngles = weapon.GetLeftRotation();
-            //go.transform.localScale = weapon.GetSize();
         }
     }
 
     private void SetRightWeapon(GameObject go)
     {
+        _attached.Add(go);
         go.transform.parent = _rightWeaponHolder.transform;
         go.transform.localPosition = _rightEquipWeapon.GetRightPosition();
         go.transform.localEulerAngles = _rightEquipWeapon.GetRightRotation();
         go.transform.localScale = _rightEquipWeapon.GetSize();
+        _rightWeaponHolder.CheckColliders(_rightEquipWeapon.GetCategory() != Define.WeaponCategory.Unknown, this);
     }
 
     private void SetLeftWeapon(GameObject go)
     {
+        _attached.Add(go);
         go.transform.parent = _leftWeaponHolder.transform;
         go.transform.localPosition = _leftEquipWeapon.GetLeftPosition();
         go.transform.localEulerAngles = _leftEquipWeapon.GetLeftRotation();
         go.transform.localScale = _leftEquipWeapon.GetSize();
+        _leftWeaponHolder.CheckColliders(_leftEquipWeapon.GetCategory() != Define.WeaponCategory.Unknown, this);
     }
 
     protected void WeaponSetActive(bool active)
@@ -306,6 +308,16 @@ public abstract class BattleHeroController : MonoBehaviour
         if (_rightWeaponHolder.HasWeaponCollider() == true)
             _rightWeaponHolder.SetActive(active);
     }
+
+    private void OnDestroy()
+    {
+        int size = _attached.Count;
+        for (int i = 0; i < size; i++)
+            Managers.Resource.Release(_attached[i]);
+
+        _attached.Clear();
+    }
+
     #endregion
 
     //이하 상태 animation 관련 coroutine은 before, after 함수를 추상으로 둬서 설정하도록 할것

@@ -6,7 +6,8 @@ public class TestScene : BaseScene
 {
     public override void Clear()
     {
-
+        Cursor.lockState = CursorLockMode.Confined;
+        Managers.Battle.Clear();
     }
 
     public override void SceneInitialize()
@@ -18,7 +19,17 @@ public class TestScene : BaseScene
         base.Init();
 
         Managers.Battle.BattleTerrain = GameObject.FindGameObjectWithTag("Terrain").GetComponent<Terrain>();
-        Managers.Battle.GroupInitialize();
-        Managers.Battle.LoadCharacterPrefab();
+        Managers.Battle.BattleSceneStart();
+        //Managers.Battle.GroupInitialize();
+        //Managers.Battle.LoadCharacterPrefab();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            Managers.Scene.LoadSceneAsync(Define.SceneType.AreaScene);
+        }
+
     }
 }
