@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,12 +40,12 @@ public class UIManager
         }
     }
 
-    public void ShowSceneUI<T>(string name = null) where T : UIScene
+    public void ShowSceneUI<T>(string name = null, Action<GameObject> foo = null) where T : UIScene
     {
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
-
-        Managers.Resource.Instantiate($"Scene/{name}", SceneUIInstantiate);
+        Action<GameObject> action = SceneUIInstantiate + foo;
+        Managers.Resource.Instantiate($"Scene/{name}", action);
         
         return;
     }

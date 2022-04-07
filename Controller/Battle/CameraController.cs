@@ -16,7 +16,7 @@ public class CameraController : MonoBehaviour
     private Vector3 _currentPos;
 
     private bool _lockOn = false;
-    private Transform _target;
+    //private Transform _target;
 
     private Vector3 _lookAt;
 
@@ -51,8 +51,8 @@ public class CameraController : MonoBehaviour
 
             if (_lockOn == false)
                 transform.LookAt(_player.transform.position + _lookAt);
-            else
-                transform.LookAt(_target);
+            //else
+            //    transform.LookAt(_target);
         }
     }
 

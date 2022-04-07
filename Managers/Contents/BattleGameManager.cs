@@ -11,6 +11,7 @@ public class BattleGameManager
     private bool _playerInit = false;
     private bool _cameraInit = false;
     public bool BothInit { get { return _playerInit == true && _cameraInit == true; } }
+    public PlayerHeroController Player { get { return _player; } }
     public CameraController Camera { get { return _camera; } }
 
     public List<List<BattleHeroController>> _groups = new List<List<BattleHeroController>>();
@@ -21,35 +22,19 @@ public class BattleGameManager
     public Dictionary<string, GlobalCharacterData> _charDataList = new Dictionary<string, GlobalCharacterData>();
 
     private int _id = 0;
+    //게임 클리어 조건용
+    private int _livingChar = 0;
+    public void AnotherOneBiteDust()
+    {
+        _livingChar--;
+    }
 
     public Terrain BattleTerrain { get; set; }
-
-    public List<BattleHeroController> GetGroupList(int num)
-    {
-        if (num < 0 || _groups.Count <= num)
-            return null;
-
-        return _groups[num];
-    }
-
-    public CharacterData GetCharListData(int id)
-    {
-        return _charList[id];
-    }
-
-    public int GetMaxGroupList()
-    {
-        return _groups.Count;
-    }
-
-    public void AddCharacterData(string name, GlobalCharacterData data)
-    {
-        _charDataList[name] = data;
-    }
 
     public void GroupInitialize()
     {
         int listSize = _charList.Count;
+        _livingChar = _charList.Count;
         int max = -1;
         int num = 0;
 
@@ -64,16 +49,17 @@ public class BattleGameManager
             _groups.Add(new List<BattleHeroController>());
     }
 
-    public void LoadCharacterPrefab()
+    public void InstantiateCharacterPrefab()
     {
         _id = 0;
-        Managers.Resource.Load<GameObject>("Camera", null);
-        Managers.Resource.Load<GameObject>("Human", null);
+        //Managers.Resource.Load<GameObject>("Camera", null);
+        //Managers.Resource.Load<GameObject>("Human", null);
 
         CharacterInstantiate();
 
         Managers.Resource.Instantiate("Camera", (go) => 
         { _objects.Add(go); GameObject.DontDestroyOnLoad(go); _camera = go.GetComponent<CameraController>(); });
+        Managers.Resource.Instantiate("BattleTerrain", TerrainInstantiate);
     }
 
     private void CharacterInstantiate()
@@ -151,6 +137,14 @@ public class BattleGameManager
         _charList.Add(data);
     }
 
+    private void TerrainInstantiate(GameObject go)
+    {
+        _objects.Add(go);
+        GameObject.DontDestroyOnLoad(go);
+
+        BattleTerrain = go.GetComponent<Terrain>();
+    }
+
     public void Clear()
     {
         _charDataList.Clear();
@@ -159,10 +153,12 @@ public class BattleGameManager
         int size = _objects.Count;
         for (int i = 0; i < size; i++)
         {
+            if(_objects[i] != null)
             Managers.Resource.Release(_objects[i]);
         }
         _objects.Clear();
 
         _groups.Clear();
     }
+
 }

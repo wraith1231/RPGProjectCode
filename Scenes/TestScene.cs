@@ -18,7 +18,7 @@ public class TestScene : BaseScene
     {
         base.Init();
 
-        Managers.Battle.BattleTerrain = GameObject.FindGameObjectWithTag("Terrain").GetComponent<Terrain>();
+        Managers.Resource.Instantiate("Popup/UIPlayerGauge", PlayerGaugeInstantiated);
         Managers.Battle.BattleSceneStart();
         //Managers.Battle.GroupInitialize();
         //Managers.Battle.LoadCharacterPrefab();
@@ -31,5 +31,12 @@ public class TestScene : BaseScene
             Managers.Scene.LoadSceneAsync(Define.SceneType.AreaScene);
         }
 
+    }
+
+    private void PlayerGaugeInstantiated(GameObject go)
+    {
+        UIPlayerGauge gauge = go.GetComponent<UIPlayerGauge>();
+
+        gauge.SetPlayer(Managers.Battle.Player);
     }
 }

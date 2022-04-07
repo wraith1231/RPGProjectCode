@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class AreaScene : BaseScene
 {
+    [SerializeField] Terrain _terrain;
+    float[,] _data;
+
     public override void Clear()
     {
 
@@ -55,10 +58,8 @@ public class AreaScene : BaseScene
                 Managers.Battle.AddCharList(data);
             }
         }
-    }
 
-    public override void SceneInitialize()
-    {
+        _data = _terrain.terrainData.GetHeights(100, 100, 300, 300);
     }
 
     void Update()
@@ -67,6 +68,5 @@ public class AreaScene : BaseScene
         {
             Managers.Scene.LoadSceneAsync(Define.SceneType.TestScene);
         }
-
     }
 }

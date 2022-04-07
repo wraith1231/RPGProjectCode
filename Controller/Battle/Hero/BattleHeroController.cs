@@ -102,8 +102,54 @@ public abstract class BattleHeroController : MonoBehaviour
         _data = data;
     }
 
-    public abstract void GetDamaged(BattleHeroController attacker);
-    public abstract void GetBlocked(BattleHeroController attacker);
+    public virtual void GetDamaged(BattleHeroController attacker)
+    {
+        float defense = 1 - _battleData.FinalDefense / (_battleData.FinalDefense + 50);
+        _battleData.CurrentHealthPoint -= (attacker.BattleData.FinalPower * defense);
+
+        if (_battleData.CurrentHealthPoint <= 0)
+        {
+            State = Define.HeroState.Die;
+            return;
+        }
+        StopAllCoroutines();
+
+        _transform.LookAt(attacker.transform);
+
+        StartCoroutine(DamagedProcess());
+    }
+    public virtual void GetBlocked(BattleHeroController attacker)
+    {
+        float defense = 1 - _battleData.FinalDefense / (_battleData.FinalDefense + 50);
+        float attack = _battleData.FinalPower * _battleData.DefenseAdvantage - attacker.BattleData.FinalPower;
+        if (attack < 0)
+        {
+            GetDamaged(attacker);
+            return;
+        }
+
+        float blockDamage = (attacker.BattleData.FinalPower * defense) * attack * 0.5f;
+
+        if (_justGuard == true)
+        {
+
+            _battleData.CurrentStaminaPoint -= blockDamage;
+            if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
+        }
+        else
+        {
+            if (blockDamage > _battleData.CurrentStaminaPoint * 0.5f)
+            {
+                GetDamaged(attacker);
+                return;
+            }
+            _battleData.CurrentStaminaPoint -= (attacker.BattleData.FinalPower * defense) * attack;
+            if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
+        }
+
+        _blockHit = true;
+        _animator.Play("BlockHit");
+    }
     #endregion
 
     #region WeaponAndAnimator
@@ -337,12 +383,12 @@ public abstract class BattleHeroController : MonoBehaviour
             //패링 안당한 경우
             if (_parried == false)
             {
-                if (normalizedTime >= 0.93f)
+                if (normalizedTime >= 0.6f)
                 {
                     WeaponSetActive(false);
                     break;
                 }
-                else if (normalizedTime >= 0.2f)
+                else if (normalizedTime >= 0.4f)
                 {
                     WeaponSetActive(true);
                 }

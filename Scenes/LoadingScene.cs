@@ -16,7 +16,7 @@ public class LoadingScene : BaseScene
     void Start()
     {
         base.Init();
-        Managers.Resource.Instantiate("Scene/LoadingScene", EndUIInstantiate);
+        Managers.UI.ShowSceneUI<UILoadingScene>(foo : EndUIInstantiate);
         Managers.Resource.ReleaseStock();
     }
 
@@ -61,7 +61,7 @@ public class LoadingScene : BaseScene
     private void BattleSceneLoad()
     {
         Managers.Battle.GroupInitialize();
-        Managers.Battle.LoadCharacterPrefab();
+        Managers.Battle.InstantiateCharacterPrefab();
     }
 
     private void AreaSceneLoad()

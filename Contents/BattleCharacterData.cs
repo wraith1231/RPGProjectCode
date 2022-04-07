@@ -8,8 +8,10 @@ public class BattleCharacterData
 {
     public float MaxHealthPoint { get; set; }
     public float CurrentHealthPoint { get; set; }
+    public float CurrentHPPercent { get { return CurrentHealthPoint / MaxHealthPoint; } }
     public float MaxStaminaPoint { get; set; }
     public float CurrentStaminaPoint { get; set; }
+    public float CurrentSPPercent { get { return CurrentStaminaPoint / MaxStaminaPoint; } }
     public float HealthRecovery { get; set; }
     public float StaminaRecovery { get; set; }
 
