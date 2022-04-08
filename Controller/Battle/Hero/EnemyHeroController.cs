@@ -82,7 +82,6 @@ public abstract class EnemyHeroController : BattleHeroController
                     _prevAttack = rand;
                 }
                 _animator.SetFloat("Attack", rand);
-                _animator.SetFloat("speed", _animationSpeed[(int)Define.HeroState.Attack]);
                 _animator.Play("Attack");
                 break;
             case Define.HeroState.Block:
@@ -155,12 +154,12 @@ public abstract class EnemyHeroController : BattleHeroController
 
         _currentNearCharacter = null;
 
-        for(int i =0; i < size; i++)
+        for (int i = 0; i < size; i++)
         {
             if (_nearCharacter[_charKeys[i]].State == Define.HeroState.Die)
                 continue;
             float dist = Vector3.Distance(_transform.position, _nearCharacter[_charKeys[i]].transform.position);
-            if(dist < min)
+            if (dist < min)
             {
                 min = dist;
                 _currentNearCharacter = _nearCharacter[_charKeys[i]];
@@ -176,13 +175,13 @@ public abstract class EnemyHeroController : BattleHeroController
         return _currentNearCharacter;
     }
 
-    #endregion
+#endregion
     public void SetHeroState(Define.HeroState state)
     {
         _state = state;
     }
 
-    #region Attack
+#region Attack
     public bool PlayAttackAnimation()
     {
         if(_attacking == false)
@@ -206,13 +205,15 @@ public abstract class EnemyHeroController : BattleHeroController
         _attacking = false;
         _parried = false;
         _nearEnemyCollider.enabled = true;
+        InBattleTarget = false;
+        NextState = Define.HeroState.Idle;
 
         AnimationStart(Define.HeroState.Idle);
     }
 
-    #endregion
+#endregion
 
-    #region Block
+#region Block
     public bool PlayBlockAnimation()
     {
         if (_isBlock == false)
@@ -240,12 +241,14 @@ public abstract class EnemyHeroController : BattleHeroController
         _isBlock = false;
         _blockEnd = false;
         _blockHit = false;
+        InBattleTarget = false;
+        NextState = Define.HeroState.Idle;
 
         AnimationStart(Define.HeroState.Idle);
     }
-    #endregion
+#endregion
 
-    #region Rolling
+#region Rolling
     public bool PlayRollAnimation()
     {
         if (_isRolling == false)
@@ -267,26 +270,39 @@ public abstract class EnemyHeroController : BattleHeroController
     {
         _isRolling = false;
 
+        NextState = Define.HeroState.Idle;
+        InBattleTarget = false;
+
         AnimationStart(Define.HeroState.Idle);
     }
-    #endregion
+#endregion
 
-    #region Damaged
+#region Damaged
+    public override void GetDamaged(BattleHeroController attacker)
+    {
+        base.GetDamaged(attacker);
+
+        NextState = Define.HeroState.Damaged;
+        _currentNearCharacter = attacker;
+    }
+
     protected override void BeforeDamaged()
     {
         ResetBooleanValues();
-        NextState = Define.HeroState.Unknown;
         InBattleTarget = false;
         _isDamaged = true;
+
         AnimationStart(Define.HeroState.Damaged);
     }
     protected override void AfterDamaged()
     {
         _isDamaged = false;
+        NextState = Define.HeroState.Idle;
+        InBattleTarget = false;
 
         AnimationStart(Define.HeroState.Idle);
     }
-    #endregion
+#endregion
     protected override void DyingProcess()
     {
         _deadTime += Time.deltaTime;
@@ -306,13 +322,12 @@ public abstract class EnemyHeroController : BattleHeroController
         }
     }
 
-    protected override void ResetBooleanValues()
-    {
-        base.ResetBooleanValues();
+    //protected override void ResetBooleanValues()
+    //{
+    //    base.ResetBooleanValues();
+    //}
 
-    }
-
-    private void FixedUpdate()
+    protected override void FixedUpdate()
     {
         if (_battleData.CurrentHealthPoint <= 0 && State != Define.HeroState.Die)
         {
@@ -323,7 +338,7 @@ public abstract class EnemyHeroController : BattleHeroController
             DyingProcess();
             return;
         }
-        else if (_root != null && (State != Define.HeroState.Die && State != Define.HeroState.Damaged))
+        else if (_root != null && State != Define.HeroState.Damaged)
             _root.Evaluate();
 
         if (_state == Define.HeroState.Running)

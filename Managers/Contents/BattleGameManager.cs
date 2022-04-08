@@ -97,6 +97,11 @@ public class BattleGameManager
             controller = go.AddComponent<PlayerHeroController>();
             _player = controller as PlayerHeroController;
             _playerInit = true;
+            if (BothInit)
+            {
+                _camera.SetPlayer(_player);
+                _player.SetCamera(_camera);
+            }
         }
         else
         {

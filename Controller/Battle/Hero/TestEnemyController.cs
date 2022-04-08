@@ -47,17 +47,13 @@ public class TestEnemyController : EnemyHeroController
         _root = selector;
     }
 
-    protected override void Update()
-    {
-    }
-
     public override Define.HeroState CheckNextState()
     {
         float rand = Random.Range(0.0f, 1.0f);
 
-        if (rand < 0.2f) NextState = Define.HeroState.Attack;
-        else if (rand < 0.5) NextState = Define.HeroState.Block;
-        else if (rand < 0.7) NextState = Define.HeroState.Strafe;
+        if (rand < 0.4f) NextState = Define.HeroState.Attack;
+        else if (rand < 0.6f) NextState = Define.HeroState.Block;
+        else if (rand < 0.8f) NextState = Define.HeroState.Strafe;
         else NextState = Define.HeroState.Rolling;
 
         return NextState;

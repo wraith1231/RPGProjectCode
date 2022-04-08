@@ -15,9 +15,6 @@ public class WeaponHolder : MonoBehaviour
         if (_colliders.Length == 0 && otherHand == false)
         {
             _colliders = _unarmColliders;
-            //int unarmSize = _unarmColliders.Length;
-            //for (int i = 0; i < unarmSize; i++)
-            //    _colliders.SetValue(_unarmColliders[i], i);
         }
         else
         {
@@ -27,6 +24,7 @@ public class WeaponHolder : MonoBehaviour
         }
 
         int size = _colliders.Length;
+        
         for (int i = 0; i < size; i++)
         {
             _colliders[i].isTrigger = true;

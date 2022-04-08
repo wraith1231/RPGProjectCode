@@ -5,4 +5,8 @@ using UnityEngine;
 public class GlobalPlayerController : GlobalCharacterController
 {
 
+    public GlobalPlayerController() : base()
+    {
+        _data.Player = true;
+    }
 }

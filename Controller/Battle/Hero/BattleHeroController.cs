@@ -87,7 +87,7 @@ public abstract class BattleHeroController : MonoBehaviour
         return false;
     }
 
-    protected abstract void Update();
+    protected abstract void FixedUpdate();
 
     public abstract void Init();
     protected abstract void DyingProcess();
@@ -104,6 +104,10 @@ public abstract class BattleHeroController : MonoBehaviour
 
     public virtual void GetDamaged(BattleHeroController attacker)
     {
+        if (State == Define.HeroState.Damaged || State == Define.HeroState.Die || State == Define.HeroState.Rolling) return;
+        State = Define.HeroState.Damaged;
+        Managers.Resource.Instantiate("HitEffect", (go) => { _attached.Add(go); }, _transform);
+
         float defense = 1 - _battleData.FinalDefense / (_battleData.FinalDefense + 50);
         _battleData.CurrentHealthPoint -= (attacker.BattleData.FinalPower * defense);
 
@@ -113,7 +117,6 @@ public abstract class BattleHeroController : MonoBehaviour
             return;
         }
         StopAllCoroutines();
-
         _transform.LookAt(attacker.transform);
 
         StartCoroutine(DamagedProcess());
@@ -383,12 +386,15 @@ public abstract class BattleHeroController : MonoBehaviour
             //패링 안당한 경우
             if (_parried == false)
             {
-                if (normalizedTime >= 0.6f)
+                if (normalizedTime >= 0.95f)
                 {
-                    WeaponSetActive(false);
                     break;
                 }
-                else if (normalizedTime >= 0.4f)
+                else if(normalizedTime >= 0.7f)
+                {
+                    WeaponSetActive(false);
+                }
+                else if (normalizedTime >= 0.2f)
                 {
                     WeaponSetActive(true);
                 }
@@ -524,7 +530,7 @@ public abstract class BattleHeroController : MonoBehaviour
 
         while (true)
         {
-            if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.95f)
+            if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
                 break;
 
             yield return null;

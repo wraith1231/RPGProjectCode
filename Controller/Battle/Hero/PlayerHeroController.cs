@@ -103,7 +103,7 @@ public class PlayerHeroController : BattleHeroController
 
         AnimationStart(State);
     }
-    protected override void Update()
+    protected override void FixedUpdate()
     {
         _horizontal = Input.GetAxis("Horizontal");
         _vertical = Input.GetAxis("Vertical");

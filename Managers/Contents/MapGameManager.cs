@@ -83,4 +83,15 @@ public class MapGameManager
 
         _camera = go.GetComponent<AreaCameraController>();
     }
+    public void Clear()
+    {
+        int size = _objects.Count;
+        for (int i = 0; i < size; i++)
+        {
+            if (_objects[i] != null)
+                Managers.Resource.Release(_objects[i]);
+        }
+        _objects.Clear();
+        _charLists.Clear();
+    }
 }

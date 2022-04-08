@@ -34,13 +34,11 @@ public class WeaponAttack : MonoBehaviour
             if(controller.State == Define.HeroState.Block && isOpposite == true)
             {
                 controller.GetBlocked(_parentController);
-                //Debug.Log($"{controller.name} block : {controller.BattleData.CurrentStaminaPoint}");
                 _parentController.Parried = true;
             }
-            else if (controller.State != Define.HeroState.Die && controller.State != Define.HeroState.Rolling && controller.State != Define.HeroState.Damaged)
+            else
             {
                 controller.GetDamaged(_parentController);
-                //Debug.Log($"{controller.name} attacked : {controller.BattleData.CurrentHealthPoint}");
             }
         }
     }

@@ -4,12 +4,10 @@ using UnityEngine;
 
 public class AreaScene : BaseScene
 {
-    [SerializeField] Terrain _terrain;
-    float[,] _data;
 
     public override void Clear()
     {
-
+        Managers.Map.Clear();
     }
     
     void Awake()
@@ -22,8 +20,8 @@ public class AreaScene : BaseScene
         Managers.General.GlobalPlayer.Data.CharName = "Player";
         Vector3 mainPos = new Vector3(50, 0, 50); //Managers.Battle.BattleTerrain.terrainData.size * 0.5f;
         mainPos.y = 0;
-        Managers.General.GlobalPlayer.SetLeftWeapon(Define.WeaponCategory.OneHand, "Axe1");
-        Managers.General.GlobalPlayer.SetRightWeapon(Define.WeaponCategory.OneHand, "Sword1");
+        Managers.General.GlobalPlayer.SetRightWeapon(Define.WeaponCategory.TwoHand, "Sword1");
+        Managers.General.GlobalPlayer.Data.Outfit.SetAllGenderData(Define.HumanOutfitAllGender.AllGenderBackAttachment, 2);
         Managers.General.GlobalPlayer.Data.StartPosition = mainPos;
         Managers.Battle.AddCharList(Managers.General.GlobalPlayer.Data);
 
@@ -43,12 +41,14 @@ public class AreaScene : BaseScene
             outfit2.OneGender[i] = 3;
         }
 
-        for (int x = -5; x < 6; x++)
+        for (int x = -5; x < 5; x++)
         {
-            for (int z = -5; z < 6; z++)
+            for (int z = -5; z < 5; z++)
             {
                 int group = Mathf.Abs((x + z) % 5);
                 CharacterData data = null;
+                outfit1.SetOneGenderData(Define.HumanOutfitOneGender.Torso, group * 5);
+                outfit2.SetOneGenderData(Define.HumanOutfitOneGender.Torso, group * 5);
                 if (group % 2 == 0)
                     data = new CharacterData(new Vector3(mainPos.x + 15 + x * (-2), 0, mainPos.z + 10 + z * (-3)), group: group, outfit: outfit1, left: weapon);
                 else
@@ -58,8 +58,6 @@ public class AreaScene : BaseScene
                 Managers.Battle.AddCharList(data);
             }
         }
-
-        _data = _terrain.terrainData.GetHeights(100, 100, 300, 300);
     }
 
     void Update()
