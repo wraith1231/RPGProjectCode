@@ -45,7 +45,7 @@ public class BattleCharacterData
             StaminaRecovery = 10;
             Power = 10;
             Dexterity = 5;
-            Defense = 10;
+            Defense = 5;
         }
         PowerAdvantage = 1.0f;
         DefenseAdvantage = 1.0f;

@@ -14,14 +14,18 @@ public class AreaScene : BaseScene
     {
         base.Init();
         //Managers.Battle.BattleTerrain = GameObject.FindGameObjectWithTag("Terrain").GetComponent<Terrain>();
-
+/*
         Managers.General.GlobalPlayer.Data.Group = 0;
         Managers.General.GlobalPlayer.Data.HeroId = 0;
         Managers.General.GlobalPlayer.Data.CharName = "Player";
-        Vector3 mainPos = new Vector3(50, 0, 50); //Managers.Battle.BattleTerrain.terrainData.size * 0.5f;
+        Vector3 mainPos = new Vector3(150, 0, 150); //Managers.Battle.BattleTerrain.terrainData.size * 0.5f;
         mainPos.y = 0;
-        Managers.General.GlobalPlayer.SetRightWeapon(Define.WeaponCategory.TwoHand, "Sword1");
+        Managers.General.GlobalPlayer.SetRightWeapon(Define.WeaponCategory.OneHand, "Sword1");
+        Managers.General.GlobalPlayer.SetLeftWeapon(Define.WeaponCategory.Shield, "Buckler1");
         Managers.General.GlobalPlayer.Data.Outfit.SetAllGenderData(Define.HumanOutfitAllGender.AllGenderBackAttachment, 2);
+        Managers.General.GlobalPlayer.Data.Outfit.SetOneGenderData(Define.HumanOutfitOneGender.HeadGear, 5);
+        Managers.General.GlobalPlayer.Data.Outfit.SetOneGenderData(Define.HumanOutfitOneGender.Torso, 9);
+        Managers.General.GlobalPlayer.Data.Outfit.SetOneGenderData(Define.HumanOutfitOneGender.Hips, 12);
         Managers.General.GlobalPlayer.Data.StartPosition = mainPos;
         Managers.Battle.AddCharList(Managers.General.GlobalPlayer.Data);
 
@@ -57,7 +61,7 @@ public class AreaScene : BaseScene
 
                 Managers.Battle.AddCharList(data);
             }
-        }
+        }*/
     }
 
     void Update()

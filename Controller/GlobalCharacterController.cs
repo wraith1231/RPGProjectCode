@@ -5,7 +5,7 @@ using UnityEngine;
 public class GlobalCharacterController
 {
     protected CharacterData _data = new CharacterData(Vector3.zero);
-    public CharacterData Data { get { return _data; } }
+    public CharacterData Data { get { return _data; } set { _data = value; } }
 
     public GlobalCharacterController()
     {

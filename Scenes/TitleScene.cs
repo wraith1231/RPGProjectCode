@@ -16,9 +16,4 @@ public class TitleScene : BaseScene
 
         //Managers.Resource.Load<GameObject>("Human", HumanResourcePooling);
     }
-
-    private void HumanResourcePooling(GameObject go)
-    {
-        Managers.Pool.CreatePool(go, 100);
-    }
 }

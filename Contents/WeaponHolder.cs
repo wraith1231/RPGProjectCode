@@ -24,12 +24,12 @@ public class WeaponHolder : MonoBehaviour
         }
 
         int size = _colliders.Length;
-        
+        WeaponAttack attack = _colliders[0].gameObject.AddComponent<WeaponAttack>();
+        attack.SetHeroController(controller);
+
         for (int i = 0; i < size; i++)
         {
             _colliders[i].isTrigger = true;
-            WeaponAttack attack = _colliders[i].gameObject.AddComponent<WeaponAttack>();
-            attack.SetHeroController(controller);
         }
         SetActive(false);
     }

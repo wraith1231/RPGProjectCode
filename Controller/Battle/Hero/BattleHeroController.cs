@@ -92,11 +92,6 @@ public abstract class BattleHeroController : MonoBehaviour
     public abstract void Init();
     protected abstract void DyingProcess();
 
-    private void StopCoroutines()
-    {
-        StopAllCoroutines();
-    }
-
     public void SetCharacterData(CharacterData data)
     {
         _data = data;
@@ -123,7 +118,7 @@ public abstract class BattleHeroController : MonoBehaviour
     }
     public virtual void GetBlocked(BattleHeroController attacker)
     {
-        float defense = 1 - _battleData.FinalDefense / (_battleData.FinalDefense + 50);
+        float defense = 1f - _battleData.FinalDefense / (_battleData.FinalDefense + 50f);
         float attack = _battleData.FinalPower * _battleData.DefenseAdvantage - attacker.BattleData.FinalPower;
         if (attack < 0)
         {
@@ -131,12 +126,12 @@ public abstract class BattleHeroController : MonoBehaviour
             return;
         }
 
-        float blockDamage = (attacker.BattleData.FinalPower * defense) * attack * 0.5f;
+        float blockDamage = (attacker.BattleData.FinalPower * defense);
 
         if (_justGuard == true)
         {
 
-            _battleData.CurrentStaminaPoint -= blockDamage;
+            _battleData.CurrentStaminaPoint -= blockDamage * 0.5f;
             if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
         }
         else
@@ -146,7 +141,7 @@ public abstract class BattleHeroController : MonoBehaviour
                 GetDamaged(attacker);
                 return;
             }
-            _battleData.CurrentStaminaPoint -= (attacker.BattleData.FinalPower * defense) * attack;
+            _battleData.CurrentStaminaPoint -= blockDamage;
             if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
         }
 
@@ -478,7 +473,7 @@ public abstract class BattleHeroController : MonoBehaviour
                         break;
                 }
             }
-            else if (_blockHit == true)
+            else
             {
                 if (normalizedTime >= 0.9f)
                 {
@@ -489,6 +484,7 @@ public abstract class BattleHeroController : MonoBehaviour
                     else
                     {
                         _blockHit = false;
+                        _animator.StopPlayback();
                         _animator.Play("Block");
                     }
                 }

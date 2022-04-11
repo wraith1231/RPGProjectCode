@@ -107,7 +107,7 @@ public class PlayerHeroController : BattleHeroController
     {
         _horizontal = Input.GetAxis("Horizontal");
         _vertical = Input.GetAxis("Vertical");
-
+        
         currentState();
 
         if (State == Define.HeroState.Running)

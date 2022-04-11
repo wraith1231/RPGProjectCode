@@ -11,7 +11,7 @@ public class WeaponAttack : MonoBehaviour
         _parentController = controller;
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         BattleHeroController controller = other.GetComponent<BattleHeroController>();
 
@@ -29,17 +29,26 @@ public class WeaponAttack : MonoBehaviour
 
         if(controller.Data.Group != _parentController.Data.Group)
         {
-            float dot = Vector3.Dot(controller.transform.forward, _parentController.transform.forward);
-            bool isOpposite = dot < -0.7 ? true : false;
-            if(controller.State == Define.HeroState.Block && isOpposite == true)
+            if(controller.State == Define.HeroState.Block)
             {
-                controller.GetBlocked(_parentController);
-                _parentController.Parried = true;
+
+                float dot = Vector3.Dot(controller.transform.forward, _parentController.transform.forward);
+                bool isOpposite = dot < -0.7 ? true : false;
+                if (controller.State == Define.HeroState.Block && isOpposite == true)
+                {
+                    controller.GetBlocked(_parentController);
+                    _parentController.Parried = true;
+                }
+                else
+                {
+                    controller.GetDamaged(_parentController);
+                }
             }
             else
             {
                 controller.GetDamaged(_parentController);
             }
+
         }
     }
 }

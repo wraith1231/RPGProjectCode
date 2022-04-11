@@ -42,7 +42,7 @@ public abstract class EnemyHeroController : BattleHeroController
         _nearEnemyCollider = GetComponent<SphereCollider>();
         _nearEnemyCollider.isTrigger = true;
         _nearEnemyCollider.radius = _detectRange;
-        _nearEnemyCollider.enabled = true;
+        _nearEnemyCollider.enabled = false;
 
         for (int i = 0; i < (int)Define.HeroState.Unknown; i++)
             AnimationSpeedChange((Define.HeroState)i, 1.0f * ( 1 + _battleData.FinalDexterity));
@@ -104,7 +104,7 @@ public abstract class EnemyHeroController : BattleHeroController
     {
         BattleHeroController controller = other.GetComponent<BattleHeroController>();
 
-        if (controller == null)
+        if (controller == null || controller.State == Define.HeroState.Die)
             return;
 
         int id = controller.Data.HeroId;
@@ -150,22 +150,31 @@ public abstract class EnemyHeroController : BattleHeroController
         }
 
         int size = _charKeys.Count;
+        float dist = 0;
         float min = 99999;
-
         _currentNearCharacter = null;
 
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size;)
         {
             if (_nearCharacter[_charKeys[i]].State == Define.HeroState.Die)
+            {
+                _nearCharacter.Remove(_charKeys[i]);
+                _charKeys.RemoveAt(i);
+                size--;
+
                 continue;
-            float dist = Vector3.Distance(_transform.position, _nearCharacter[_charKeys[i]].transform.position);
+            }
+
+            dist = Vector3.Distance(_transform.position, _nearCharacter[_charKeys[i]].transform.position);
             if (dist < min)
             {
                 min = dist;
                 _currentNearCharacter = _nearCharacter[_charKeys[i]];
             }
+            i++;
         }
 
+        TargetDistance = min;
         _nearEnemyCollider.enabled = false;
         return _currentNearCharacter;
     }
@@ -283,7 +292,8 @@ public abstract class EnemyHeroController : BattleHeroController
         base.GetDamaged(attacker);
 
         NextState = Define.HeroState.Damaged;
-        _currentNearCharacter = attacker;
+        if(_nearCharacter.ContainsKey(attacker.Data.HeroId) == false)
+            _nearCharacter.Add(attacker.Data.HeroId, attacker);
     }
 
     protected override void BeforeDamaged()

@@ -26,8 +26,11 @@ public class CheckBehaviorNearTarget : HeroNode
         if (_parentController.IsEnoughToBehavior(BattleHeroController.RollingStamina) == false)
         {
             _state = NodeState.Success;
-            _parentController.InBattleTarget = true;
-            _parentController.NextState = Define.HeroState.Strafe;
+            if (_parentController.State != Define.HeroState.Damaged)
+            {
+                _parentController.InBattleTarget = true;
+                _parentController.NextState = Define.HeroState.Strafe;
+            }
             return _state;
         }
 

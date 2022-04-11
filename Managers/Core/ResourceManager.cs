@@ -38,7 +38,7 @@ public class ResourceManager
                 return;
             }
         }
-    
+
         AsyncOperationHandle han = Addressables.LoadAssetAsync<T>(key);
         han.Completed += (handle) =>
         {

@@ -22,7 +22,7 @@ public class MoveTargetsSurround : HeroNode
 
     public override NodeState Evaluate()
     {
-        if (_parentController.NextState != Define.HeroState.Strafe)
+        if (_parentController.NextState != Define.HeroState.Strafe && _parentController.State != Define.HeroState.Strafe)
         {
             _state = NodeState.Success;
             return _state;
@@ -44,15 +44,16 @@ public class MoveTargetsSurround : HeroNode
         else
         {
             _moveTime += Time.deltaTime;
-            float dist = Vector3.Distance(_destPosition, _transform.position);
-
-            if (dist > 0.5f || _parentController.TargetDistance < _parentController.AttackRange || _moveTime <= 1f)
+            
+            if (_parentController.TargetDistance <
+                _parentController.AttackRange || _moveTime <= 0.5f)
             {
-                ContinueMove();
+                if(_parentController.State != Define.HeroState.Idle)
+                    EndMove();
             }
             else
             {
-                EndMove();
+                ContinueMove();
             }
 
         }

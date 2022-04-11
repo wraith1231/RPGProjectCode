@@ -35,6 +35,9 @@ public class LoadingScene : BaseScene
 
         if (sceneName.Equals("TestScene") || sceneName.Equals("BattleScene"))
             BattleSceneLoad();
+        else if (sceneName.Equals("AreaScene"))
+            AreaSceneLoad(); 
+
         while (operation.isDone == false)
         {
             while (_ui.Initialized == false)
@@ -66,6 +69,6 @@ public class LoadingScene : BaseScene
 
     private void AreaSceneLoad()
     {
-
+        Managers.Map.DataInstantiate();
     }
 }
