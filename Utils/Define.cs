@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class Define
 {
+
+    public enum CharacterRelationship
+    {
+        Baddess,
+        Bad,
+        Normal,
+        Good,
+        Best,
+    }
+
     public enum CharacterType
     {
         Human,

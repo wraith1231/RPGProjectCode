@@ -21,6 +21,9 @@ public class BattleGameManager
 
     public Dictionary<string, GlobalCharacterData> _charDataList = new Dictionary<string, GlobalCharacterData>();
 
+    private static int PROGRESS = 4;
+    private int _progress = 0;
+    public float CurrentProgress { get { return (float)_progress / (float)PROGRESS; } }
     private int _id = 0;
     //게임 클리어 조건용
     private int _livingChar = 0;
@@ -31,7 +34,19 @@ public class BattleGameManager
 
     public Terrain BattleTerrain { get; set; }
 
-    public void GroupInitialize()
+    public void BattleSceneInitialize()
+    {
+        _id = 0;
+        _playerInit = false;
+        _cameraInit = false;
+        _progress = 0;
+
+        GroupInitialize();
+
+        InstantiateCharacterPrefab();
+    }
+
+    private void GroupInitialize()
     {
         int listSize = _charList.Count;
         _livingChar = _charList.Count;
@@ -47,19 +62,19 @@ public class BattleGameManager
 
         for (int i = 0; i <= max; i++)
             _groups.Add(new List<BattleHeroController>());
+
+        _progress++;
     }
 
-    public void InstantiateCharacterPrefab()
+    private void InstantiateCharacterPrefab()
     {
-        _id = 0;
-        _playerInit = false;
-        _cameraInit = false;
+        Managers.Resource.Instantiate("Camera", (go) =>
+        { _objects.Add(go); GameObject.DontDestroyOnLoad(go); _camera = go.GetComponent<CameraController>(); _progress++; });
+
+        Managers.Resource.Instantiate("BattleTerrain", TerrainInstantiate);
 
         CharacterInstantiate();
 
-        Managers.Resource.Instantiate("Camera", (go) => 
-        { _objects.Add(go); GameObject.DontDestroyOnLoad(go); _camera = go.GetComponent<CameraController>(); });
-        Managers.Resource.Instantiate("BattleTerrain", TerrainInstantiate);
     }
 
     private void CharacterInstantiate()
@@ -124,6 +139,8 @@ public class BattleGameManager
 
         controller.transform.position = controller.Data.StartPosition;
 
+        if (_id == _charList.Count)
+            _progress++;
     }
 
     public void BattleSceneStart()
@@ -148,6 +165,7 @@ public class BattleGameManager
         GameObject.DontDestroyOnLoad(go);
 
         BattleTerrain = go.GetComponent<Terrain>();
+        _progress++;
     }
 
     public void Clear()

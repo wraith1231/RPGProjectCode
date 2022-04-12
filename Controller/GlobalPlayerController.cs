@@ -8,5 +8,6 @@ public class GlobalPlayerController : GlobalCharacterController
     public GlobalPlayerController() : base()
     {
         _data.Player = true;
+        _data.HeroId = 0;
     }
 }

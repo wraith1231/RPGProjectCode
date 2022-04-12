@@ -36,16 +36,26 @@ public class LoadingScene : BaseScene
         if (sceneName.Equals("TestScene") || sceneName.Equals("BattleScene"))
             BattleSceneLoad();
         else if (sceneName.Equals("AreaScene"))
-            AreaSceneLoad(); 
+            AreaSceneLoad();
 
+        float progress = 0;
         while (operation.isDone == false)
         {
             while (_ui.Initialized == false)
                 yield return null;
-
-            _ui.SetSliderValue(operation.progress);
             
-            if(operation.progress >= 0.9f)
+            if(sceneName.Equals("TestScene") || sceneName.Equals("BattleScene"))
+            {
+                progress = Managers.Battle.CurrentProgress;
+            }
+            else if(sceneName.Equals("AreaScene"))
+            {
+                progress = Managers.Map.CurrentProgress;
+            }
+
+            _ui.SetSliderValue(progress);
+            
+            if(progress >= 0.9f)
             {
                 _ui.SetButtonActive();
                 while (_ui.IsDone == false)
@@ -63,8 +73,7 @@ public class LoadingScene : BaseScene
 
     private void BattleSceneLoad()
     {
-        Managers.Battle.GroupInitialize();
-        Managers.Battle.InstantiateCharacterPrefab();
+        Managers.Battle.BattleSceneInitialize();
     }
 
     private void AreaSceneLoad()

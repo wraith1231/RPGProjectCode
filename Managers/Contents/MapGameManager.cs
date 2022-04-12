@@ -17,13 +17,18 @@ public class MapGameManager
 
     private Terrain _areaTerrain;
 
+    private static int PROGRESS = 4;
+    private int _progress = 0;
+    public float CurrentProgress { get { return (float)_progress / (float)PROGRESS; } }
+
     public void DataInstantiate()
     {
         _id = 0;
         _playerInit = false;
         _cameraInit = false;
-        Managers.Resource.Instantiate("AreaTerrain", TerrainInstantiated);
+        _progress = 0;
 
+        Managers.Resource.Instantiate("AreaTerrain", TerrainInstantiated);
     }
 
     private void TerrainInstantiated(GameObject go)
@@ -32,7 +37,7 @@ public class MapGameManager
         GameObject.DontDestroyOnLoad(go);
 
         _areaTerrain = go.GetComponent<Terrain>();
-
+        _progress++;
         CharacterInstantiate();
         CameraInstantiate();
     }
@@ -57,24 +62,25 @@ public class MapGameManager
         _player = controller as AreaPlayerController;
         _playerInit = true;
         SetPlayerAndCameraIfInitialized();
-        go.AddComponent<UnityEngine.AI.NavMeshAgent>();
+        //go.AddComponent<UnityEngine.AI.NavMeshAgent>();
 
+        controller.SetCharacterData(Managers.General.GlobalPlayer.Data);
         CharacterOutfit outfit = go.GetComponent<CharacterOutfit>();
+        outfit.SetOutfit( controller.Data.Outfit);
+        go.name = controller.Data.CharName;
 
-        outfit.SetOutfit(data[id].Data.Outfit);
-        go.name = data[id].Data.CharName;
-        data[id].Data.HeroId = id;
-        controller.SetCharacterData(data[id].Data);
-
-        controller.transform.position = controller.Data.StartPosition;
-
+        Vector3 pos = controller.Data.StartPosition;
+        pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x / _areaTerrain.terrainData.size.x, pos.z / _areaTerrain.terrainData.size.z);
+        controller.transform.position = pos;
+        _charLists.Add(controller);
+        _progress++;
     }
 
     private void NPCInstantiate()
     {
         List<GlobalNPCController> data = Managers.General.GlobalCharacters;
         int listSize = data.Count;
-        for (int listNum = 1; listNum < listSize; listNum++)
+        for (int listNum = 0; listNum < listSize; listNum++)
         {
             switch (data[listNum].Data.Type)
             {
@@ -99,24 +105,28 @@ public class MapGameManager
     {
         _objects.Add(go);
         GameObject.DontDestroyOnLoad(go);
-        int id = _id++;
+        int id = _id - 1;
+        _id++;
 
         AreaCharController controller = null;
 
         List<GlobalNPCController> data = Managers.General.GlobalCharacters;
         controller = go.AddComponent<AreaNPCController>();
-        go.AddComponent<UnityEngine.AI.NavMeshAgent>();
+        //go.AddComponent<UnityEngine.AI.NavMeshAgent>();
 
         CharacterOutfit outfit = go.GetComponent<CharacterOutfit>();
 
         outfit.SetOutfit(data[id].Data.Outfit);
         go.name = data[id].Data.CharName;
-        data[id].Data.HeroId = id;
+        data[id].Data.HeroId = id + 1;
         controller.SetCharacterData(data[id].Data);
-
+        
         Vector3 pos = controller.Data.StartPosition;
-        pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x, pos.z);
+        pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x / _areaTerrain.terrainData.size.x, pos.z / _areaTerrain.terrainData.size.z);
         controller.transform.position = pos;
+        _charLists.Add(controller);
+        if (_charLists.Count == data.Count)
+            _progress++;
     }
 
     private void CameraInstantiate()
@@ -133,6 +143,7 @@ public class MapGameManager
         SetPlayerAndCameraIfInitialized();
 
         _camera = go.GetComponent<AreaCameraController>();
+        _progress++;
     }
 
     private void SetPlayerAndCameraIfInitialized()

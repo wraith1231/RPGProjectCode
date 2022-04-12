@@ -7,6 +7,8 @@ public class GlobalCharacterController
     protected CharacterData _data = new CharacterData(Vector3.zero);
     public CharacterData Data { get { return _data; } set { _data = value; } }
 
+    private Dictionary<int, Define.CharacterRelationship> _relations = new Dictionary<int, Define.CharacterRelationship>();
+
     public GlobalCharacterController()
     {
         _data.Player = false;

@@ -10,6 +10,14 @@ public class CharacterOutfit : MonoBehaviour
     private List<int> _currentAllGenderOutfit = new List<int>();
     private List<int> _currentGenderOutfit = new List<int>();
 
+    private int _prevAllGenderHeadBase = -1;
+    private int _prevAllGenderMask = -1;
+    private int _prevAllGenderNoHair = -1;
+    private int _prevAllGenderHair = -1;
+
+    private int _prevHeadGear = -1;
+    private int _prevHead = -1;
+
     [SerializeField] private List<GameObject> _genderParts;
 
     #region All Gender
@@ -168,15 +176,51 @@ public class CharacterOutfit : MonoBehaviour
             switch (part)
             {
                 case Define.HumanOutfitAllGender.HeadCoveringBase:
+                    _prevAllGenderNoHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.HeadCoveringNoHair, _prevAllGenderNoHair, false);
+
+                    _prevAllGenderMask = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringMask];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.HeadCoveringMask, _prevAllGenderMask, false);
+
+                    _prevAllGenderHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderHair];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.AllGenderHair, _prevAllGenderHair, false);
+
                     _headCoveringsBase[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.HeadCoveringMask:
+                    _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.HeadCoveringBase, _prevAllGenderHeadBase, false);
+
+                    _prevAllGenderNoHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.HeadCoveringNoHair, _prevAllGenderNoHair, false);
+
+                    _prevAllGenderHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderHair];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.AllGenderHair, _prevAllGenderHair, false);
+
                     _headCoveringsMask[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.HeadCoveringNoHair:
+                    _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.HeadCoveringBase, _prevAllGenderHeadBase, false);
+
+                    _prevAllGenderMask = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringMask];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.HeadCoveringMask, _prevAllGenderMask, false);
+
+                    _prevAllGenderHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderHair];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.AllGenderHair, _prevAllGenderHair, false);
+
                     _headCoveringsNoHair[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderHair:
+                    _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.HeadCoveringBase, _prevAllGenderHeadBase, false);
+
+                    _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.HeadCoveringBase, _prevAllGenderHeadBase, false);
+
+                    _prevAllGenderNoHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair];
+                    SetActiveAllGenderParts(Define.HumanOutfitAllGender.HeadCoveringNoHair, _prevAllGenderNoHair, false);
+
                     _allGenderHair[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderHeadAttachment:
@@ -247,9 +291,15 @@ public class CharacterOutfit : MonoBehaviour
             switch (part)
             {
                 case Define.HumanOutfitOneGender.Head:
+                    _prevHeadGear = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.HeadGear];
+                    SetActiveMaleParts(Define.HumanOutfitOneGender.HeadGear, _prevHeadGear, false);
+
                     _maleHead[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.HeadGear:
+                    _prevHead = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.Head];
+                    SetActiveMaleParts(Define.HumanOutfitOneGender.Head, _prevHead, false);
+
                     _maleHeadGear[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.Eyebrows:
@@ -303,9 +353,15 @@ public class CharacterOutfit : MonoBehaviour
             switch (part)
             {
                 case Define.HumanOutfitOneGender.Head:
+                    _prevHeadGear = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.HeadGear];
+                    SetActiveFemaleParts(Define.HumanOutfitOneGender.HeadGear, _prevHeadGear, false);
+
                     _femaleHead[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.HeadGear:
+                    _prevHead = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.Head];
+                    SetActiveFemaleParts(Define.HumanOutfitOneGender.Head, _prevHead, false);
+
                     _femaleHeadGear[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.Eyebrows:
