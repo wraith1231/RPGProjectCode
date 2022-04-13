@@ -13,11 +13,17 @@ public class GeneralGameManager
     {
         _globalPlayer = new GlobalPlayerController();
         _globalCharacters = new List<GlobalNPCController>();
-        //_globalPlayer.SetRightWeapon(Define.WeaponCategory.TwoHand, "Mace1");
-        //_globalPlayer.SetRightWeapon(Define.WeaponCategory.OneHand, "Sword4");
-        //_globalPlayer.SetLeftWeapon(Define.WeaponCategory.OneHand, "Axe1");
-        //_globalPlayer.SetLeftWeapon(Define.WeaponCategory.Shield, "Buckler1");
-        //_globalPlayer.SetRightWeapon(Define.WeaponCategory.Shield, "KiteShield1");
-        //_globalPlayer.SetRightWeapon(Define.WeaponCategory.TwoHand, "Spear1");
+    }
+
+    public bool ConstainsId(int id)
+    {
+        int size = _globalCharacters.Count;
+        for(int i = 0; i < size; i++)
+        {
+            if (id == _globalCharacters[i].Data.HeroId)
+                return true;
+        }
+
+        return false;
     }
 }

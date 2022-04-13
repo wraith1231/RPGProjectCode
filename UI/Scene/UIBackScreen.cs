@@ -45,8 +45,7 @@ public class UIBackScreen : UIScene
         Managers.General.GlobalPlayer.Data.Outfit.SetOneGenderData(Define.HumanOutfitOneGender.Torso, 9);
         Managers.General.GlobalPlayer.Data.Outfit.SetOneGenderData(Define.HumanOutfitOneGender.Hips, 12);
         Managers.General.GlobalPlayer.Data.StartPosition = mainPos;
-        Managers.Battle.AddCharList(Managers.General.GlobalPlayer.Data);
-
+        
         EquipWeapon weapon = new EquipWeapon(Define.WeaponCategory.OneHand, "Sword1");
         HumanOutfit outfit1 = new HumanOutfit();
         HumanOutfit outfit2 = new HumanOutfit();

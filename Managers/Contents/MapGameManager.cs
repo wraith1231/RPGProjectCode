@@ -14,6 +14,7 @@ public class MapGameManager
 
     private List<AreaCharController> _charLists = new List<AreaCharController>(); //��ü ĳ���� ������
     private List<GameObject> _objects = new List<GameObject>();  //release ��
+    private Dictionary<string, List<int>> _charIdList = new Dictionary<string, List<int>>();
 
     private Terrain _areaTerrain;
 
@@ -21,12 +22,15 @@ public class MapGameManager
     private int _progress = 0;
     public float CurrentProgress { get { return (float)_progress / (float)PROGRESS; } }
 
+    private int _instantiatedChar = 0;
+
     public void DataInstantiate()
     {
         _id = 0;
         _playerInit = false;
         _cameraInit = false;
         _progress = 0;
+        _instantiatedChar = 0;
 
         Managers.Resource.Instantiate("AreaTerrain", TerrainInstantiated);
     }
@@ -44,6 +48,7 @@ public class MapGameManager
 
     private void CharacterInstantiate()
     {
+        //근데 이거 캐릭터 말고 카트로 바꿀 수 있음
         Managers.Resource.Instantiate("Human", PlayerInstantiated);
         NPCInstantiate();
 
@@ -80,11 +85,16 @@ public class MapGameManager
     {
         List<GlobalNPCController> data = Managers.General.GlobalCharacters;
         int listSize = data.Count;
+        string key = "";
         for (int listNum = 0; listNum < listSize; listNum++)
         {
             switch (data[listNum].Data.Type)
             {
                 case Define.CharacterType.Human:
+                    key = "Human";
+                    if (_charIdList.ContainsKey(key) == false)
+                        _charIdList[key] = new List<int>();
+                    _charIdList[key].Add(listNum);
                     Managers.Resource.Instantiate("Human", HumanCharInstantiated);
                     break;
                 case Define.CharacterType.Animal:
@@ -92,9 +102,17 @@ public class MapGameManager
                 case Define.CharacterType.Monster:
                     break;
                 case Define.CharacterType.Unknown:
+                    key = "Human";
+                    if (_charIdList.ContainsKey(key) == false)
+                        _charIdList[key] = new List<int>();
+                    _charIdList[key].Add(listNum);
                     Managers.Resource.Instantiate("Human", HumanCharInstantiated);
                     break;
                 default:
+                    key = "Human";
+                    if (_charIdList.ContainsKey(key) == false)
+                        _charIdList[key] = new List<int>();
+                    _charIdList[key].Add(listNum);
                     Managers.Resource.Instantiate("Human", HumanCharInstantiated);
                     break;
             }
@@ -104,27 +122,27 @@ public class MapGameManager
     private void HumanCharInstantiated(GameObject go)
     {
         _objects.Add(go);
+        _instantiatedChar++;
         GameObject.DontDestroyOnLoad(go);
-        int id = _id - 1;
-        _id++;
+        int id = _charIdList[go.name][0];
+        _charIdList[go.name].RemoveAt(0);
 
         AreaCharController controller = null;
 
         List<GlobalNPCController> data = Managers.General.GlobalCharacters;
         controller = go.AddComponent<AreaNPCController>();
-        //go.AddComponent<UnityEngine.AI.NavMeshAgent>();
 
         CharacterOutfit outfit = go.GetComponent<CharacterOutfit>();
 
         outfit.SetOutfit(data[id].Data.Outfit);
         go.name = data[id].Data.CharName;
-        data[id].Data.HeroId = id + 1;
         controller.SetCharacterData(data[id].Data);
         
         Vector3 pos = controller.Data.StartPosition;
         pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x / _areaTerrain.terrainData.size.x, pos.z / _areaTerrain.terrainData.size.z);
         controller.transform.position = pos;
         _charLists.Add(controller);
+        
         if (_charLists.Count == data.Count)
             _progress++;
     }

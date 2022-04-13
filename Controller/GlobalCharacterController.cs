@@ -7,7 +7,11 @@ public class GlobalCharacterController
     protected CharacterData _data = new CharacterData(Vector3.zero);
     public CharacterData Data { get { return _data; } set { _data = value; } }
 
-    private Dictionary<int, Define.CharacterRelationship> _relations = new Dictionary<int, Define.CharacterRelationship>();
+    protected GlobalCharacterData _globalData = new GlobalCharacterData();
+    public GlobalCharacterData GlobalData { get { return _globalData; } set { _globalData = value; } }
+
+    //0이면 Normal로, +면 좋은거 -면 나쁜거
+    private Dictionary<int, float> _relations = new Dictionary<int, float>();
 
     public GlobalCharacterController()
     {

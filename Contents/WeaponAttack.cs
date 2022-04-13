@@ -27,7 +27,7 @@ public class WeaponAttack : MonoBehaviour
             return;
         }
 
-        if(controller.Data.Group != _parentController.Data.Group)
+        if(controller.Group != _parentController.Group)
         {
             if(controller.State == Define.HeroState.Block)
             {

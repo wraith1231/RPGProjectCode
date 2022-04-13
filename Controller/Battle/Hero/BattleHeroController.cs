@@ -6,19 +6,26 @@ using UnityEngine;
 public abstract class BattleHeroController : MonoBehaviour
 {
     //general
-    [SerializeField] public static float AttackStamina = 30f;
-    [SerializeField] public static float RollingStamina = 30f;
-    [SerializeField] public static float BlockStamina = 20f;
-    [SerializeField] protected float _fixedTime = 0.1f;     //animation 보정용
+    public static float AttackStamina = 30f;
+    public static float RollingStamina = 30f;
+    public static float BlockStamina = 20f;
+
+    protected float _fixedTime = 0.1f;     //animation 보정용
     protected Transform _transform;
     protected Transform _target = null;
     protected Animator _animator;
-    protected CharacterData _data;
+
+    protected int _heroId;
+    protected int _group;
+    public int HeroId { get { return _heroId; } set { _heroId = value; } }
+    public int Group { get { return _group; } set { _group = value; } }
+
     protected Define.HeroState _state = Define.HeroState.Idle;
     public virtual Define.HeroState State { get; protected set; }
+
     protected BattleCharacterData _battleData;
-    public CharacterData Data { get { return _data; } }
     public BattleCharacterData BattleData { get { return _battleData; } set { _battleData = value; } }
+
     private List<UnityEngine.Object> _attached = new List<UnityEngine.Object>();
     protected CapsuleCollider _characterCollider;
     protected Rigidbody _rigidBody;
@@ -69,7 +76,7 @@ public abstract class BattleHeroController : MonoBehaviour
         _rightWeaponHolder = gameObject.GetComponentInChildren<RightWeaponHolder>();
         _characterCollider = GetComponent<CapsuleCollider>();
         _rigidBody = GetComponent<Rigidbody>();
-        
+
         CreateWeapon();
 
         Init();
@@ -92,61 +99,13 @@ public abstract class BattleHeroController : MonoBehaviour
     public abstract void Init();
     protected abstract void DyingProcess();
 
-    public void SetCharacterData(CharacterData data)
+    private void OnDestroy()
     {
-        _data = data;
-    }
+        int size = _attached.Count;
+        for (int i = 0; i < size; i++)
+            Managers.Resource.Release(_attached[i]);
 
-    public virtual void GetDamaged(BattleHeroController attacker)
-    {
-        if (State == Define.HeroState.Damaged || State == Define.HeroState.Die || State == Define.HeroState.Rolling) return;
-        State = Define.HeroState.Damaged;
-        Managers.Resource.Instantiate("HitEffect", (go) => { _attached.Add(go); }, _transform);
-
-        float defense = 1 - _battleData.FinalDefense / (_battleData.FinalDefense + 50);
-        _battleData.CurrentHealthPoint -= (attacker.BattleData.FinalPower * defense);
-
-        if (_battleData.CurrentHealthPoint <= 0)
-        {
-            State = Define.HeroState.Die;
-            return;
-        }
-        StopAllCoroutines();
-        _transform.LookAt(attacker.transform);
-
-        StartCoroutine(DamagedProcess());
-    }
-    public virtual void GetBlocked(BattleHeroController attacker)
-    {
-        float defense = 1f - _battleData.FinalDefense / (_battleData.FinalDefense + 50f);
-        float attack = _battleData.FinalPower * _battleData.DefenseAdvantage - attacker.BattleData.FinalPower;
-        if (attack < 0)
-        {
-            GetDamaged(attacker);
-            return;
-        }
-
-        float blockDamage = (attacker.BattleData.FinalPower * defense);
-
-        if (_justGuard == true)
-        {
-
-            _battleData.CurrentStaminaPoint -= blockDamage * 0.5f;
-            if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
-        }
-        else
-        {
-            if (blockDamage > _battleData.CurrentStaminaPoint * 0.5f)
-            {
-                GetDamaged(attacker);
-                return;
-            }
-            _battleData.CurrentStaminaPoint -= blockDamage;
-            if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
-        }
-
-        _blockHit = true;
-        _animator.Play("BlockHit");
+        _attached.Clear();
     }
     #endregion
 
@@ -166,14 +125,14 @@ public abstract class BattleHeroController : MonoBehaviour
     {
         string key;
 
-        if((left.GetWeaponType() == Define.WeaponType.Unknown
+        if ((left.GetWeaponType() == Define.WeaponType.Unknown
             || left.GetWeaponType() == Define.WeaponType.Shield)
             && (right.GetWeaponType() == Define.WeaponType.Unknown
             || right.GetWeaponType() == Define.WeaponType.Shield))
         {
             key = "Unarmed";
         }
-        else if(right.GetCategory() == Define.WeaponCategory.TwoHand)
+        else if (right.GetCategory() == Define.WeaponCategory.TwoHand)
         {
             key = "TwoHand/";
 
@@ -189,7 +148,7 @@ public abstract class BattleHeroController : MonoBehaviour
         }
         else
         {
-            if(left.GetWeaponType() == Define.WeaponType.Shield)
+            if (left.GetWeaponType() == Define.WeaponType.Shield)
             {
                 key = "LeftShield/";
 
@@ -213,7 +172,7 @@ public abstract class BattleHeroController : MonoBehaviour
                     || left.GetWeaponType() == Define.WeaponType.Axe)
                     key += "Blunt";
             }
-            else if(left.GetWeaponType() == Define.WeaponType.Unknown)
+            else if (left.GetWeaponType() == Define.WeaponType.Unknown)
             {
                 key = "Right/";
 
@@ -269,7 +228,7 @@ public abstract class BattleHeroController : MonoBehaviour
             FindWeaponFile(false, left, _leftWeaponHolder);
         }
 
-        if(right.GetCategory() == Define.WeaponCategory.Unknown && left.GetCategory() == Define.WeaponCategory.Unknown)
+        if (right.GetCategory() == Define.WeaponCategory.Unknown && left.GetCategory() == Define.WeaponCategory.Unknown)
         {
             _rightWeaponHolder.CheckColliders(false, this);
             _leftWeaponHolder.CheckColliders(false, this);
@@ -313,7 +272,7 @@ public abstract class BattleHeroController : MonoBehaviour
         if (isRight == true)
         {
             Managers.Resource.Instantiate(key, SetRightWeapon);
-        }   
+        }
         else
         {
             Managers.Resource.Instantiate(key, SetLeftWeapon);
@@ -353,21 +312,71 @@ public abstract class BattleHeroController : MonoBehaviour
             _rightWeaponHolder.SetActive(active);
     }
 
-    private void OnDestroy()
-    {
-        int size = _attached.Count;
-        for (int i = 0; i < size; i++)
-            Managers.Resource.Release(_attached[i]);
-
-        _attached.Clear();
-    }
 
     #endregion
 
+    #region Animation
+
+    protected void AnimationSpeedChange(Define.HeroState state, float speed)
+    {
+        _animationSpeed[(int)state] = speed;
+    }
+    protected void AnimationStart(Define.HeroState state)
+    {
+        _animator.SetFloat("speed", _animationSpeed[(int)state]);
+        switch (state)
+        {
+            case Define.HeroState.Idle:
+                _animator.CrossFade("Idle", _fixedTime);
+                break;
+            case Define.HeroState.Strafe:
+                _animator.CrossFade("Strafe", _fixedTime);
+                break;
+            case Define.HeroState.Running:
+                _animator.CrossFade("Run", _fixedTime);
+                break;
+            case Define.HeroState.Rolling:
+                _animator.Play("Roll");
+                break;
+            case Define.HeroState.Attack:
+                int rand = UnityEngine.Random.Range(0, 7);
+                if (rand == _prevAttack)
+                {
+                    rand = _prevAttack + 1;
+                    if (rand >= 7)
+                        rand = 0;
+
+                    _prevAttack = rand;
+                }
+                _animator.SetFloat("Attack", rand);
+                _animator.Play("Attack");
+                break;
+            case Define.HeroState.Block:
+                _animator.Play("Block");
+                break;
+            case Define.HeroState.Damaged:
+                _animator.Play("Damaged");
+                break;
+            case Define.HeroState.Die:
+                _animator.SetFloat("Attack", UnityEngine.Random.Range(0, 2));
+                _animator.Play("Death");
+                break;
+            default:
+                break;
+        }
+    }
+    #endregion
     //이하 상태 animation 관련 coroutine은 before, after 함수를 추상으로 둬서 설정하도록 할것
 
     #region AttackProcess
-    protected abstract void BeforeAttack();
+    protected virtual void BeforeAttack()
+    {
+        _attacking = true;
+        _parried = false;
+        _battleData.CurrentStaminaPoint -= AttackStamina;
+
+        AnimationStart(Define.HeroState.Attack);
+    }
 
     protected IEnumerator AttackProcess()
     {
@@ -385,7 +394,7 @@ public abstract class BattleHeroController : MonoBehaviour
                 {
                     break;
                 }
-                else if(normalizedTime >= 0.7f)
+                else if (normalizedTime >= 0.7f)
                 {
                     WeaponSetActive(false);
                 }
@@ -398,7 +407,7 @@ public abstract class BattleHeroController : MonoBehaviour
             else
             {
                 _animator.SetFloat("speed", -1f);
-                if(_attackColliderEnabled == true)
+                if (_attackColliderEnabled == true)
                 {
                     WeaponSetActive(false);
                 }
@@ -413,11 +422,21 @@ public abstract class BattleHeroController : MonoBehaviour
         AfterAttack();
     }
 
-    protected abstract void AfterAttack();
+    protected virtual void AfterAttack()
+    {
+        _attacking = false;
+        _parried = false;
+    }
     #endregion
 
     #region RollProcess
-    protected abstract void BeforeRolling();
+    protected virtual void BeforeRolling()
+    {
+        _isRolling = true;
+        _battleData.CurrentStaminaPoint -= RollingStamina;
+
+        AnimationStart(Define.HeroState.Rolling);
+    }
     protected virtual IEnumerator RollingProcess()
     {
         BeforeRolling();
@@ -438,11 +457,54 @@ public abstract class BattleHeroController : MonoBehaviour
 
         AfterRolling();
     }
-    protected abstract void AfterRolling();
+    protected virtual void AfterRolling()
+    {
+        _isRolling = false;
+    }
     #endregion
 
     #region BlockProcess
-    protected abstract void BeforeBlocking();
+    public virtual void GetBlocked(BattleHeroController attacker)
+    {
+        float defense = 1f - _battleData.FinalDefense / (_battleData.FinalDefense + 50f);
+        float attack = _battleData.FinalPower * _battleData.DefenseAdvantage - attacker.BattleData.FinalPower;
+        if (attack < 0)
+        {
+            GetDamaged(attacker);
+            return;
+        }
+
+        float blockDamage = (attacker.BattleData.FinalPower * defense);
+
+        if (_justGuard == true)
+        {
+
+            _battleData.CurrentStaminaPoint -= blockDamage * 0.5f;
+            if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
+        }
+        else
+        {
+            if (blockDamage > _battleData.CurrentStaminaPoint * 0.5f)
+            {
+                GetDamaged(attacker);
+                return;
+            }
+            _battleData.CurrentStaminaPoint -= blockDamage;
+            if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
+        }
+
+        _blockHit = true;
+        _animator.Play("BlockHit");
+    }
+    protected virtual void BeforeBlocking()
+    {
+        _isBlock = true;
+        _justGuard = true;
+        _blockEnd = false;
+        _blockHit = false;
+        _battleData.CurrentStaminaPoint -= BlockStamina;
+        AnimationStart(Define.HeroState.Block);
+    }
 
     protected IEnumerator BlockProcess()
     {
@@ -495,10 +557,35 @@ public abstract class BattleHeroController : MonoBehaviour
         AfterBlocking();
     }
 
-    protected abstract void AfterBlocking();
+    protected virtual void AfterBlocking()
+    {
+        _justGuard = false;
+        _isBlock = false;
+        _blockEnd = false;
+        _blockHit = false;
+    }
     #endregion
 
     #region DamagedProcess
+    public virtual void GetDamaged(BattleHeroController attacker)
+    {
+        if (State == Define.HeroState.Damaged || State == Define.HeroState.Die || State == Define.HeroState.Rolling) return;
+        State = Define.HeroState.Damaged;
+        Managers.Resource.Instantiate("HitEffect", (go) => { _attached.Add(go); }, _transform);
+
+        float defense = 1 - _battleData.FinalDefense / (_battleData.FinalDefense + 50);
+        _battleData.CurrentHealthPoint -= (attacker.BattleData.FinalPower * defense);
+
+        if (_battleData.CurrentHealthPoint <= 0)
+        {
+            State = Define.HeroState.Die;
+            return;
+        }
+        StopAllCoroutines();
+        _transform.LookAt(attacker.transform);
+
+        StartCoroutine(DamagedProcess());
+    }
     protected virtual void ResetBooleanValues()
     {
         _attacking = false;
@@ -515,9 +602,15 @@ public abstract class BattleHeroController : MonoBehaviour
         _blockHit = false;
 
         _isDamaged = false;
-    } 
+    }
 
-    protected abstract void BeforeDamaged();
+    protected virtual void BeforeDamaged()
+    {
+        _isDamaged = true;
+
+        ResetBooleanValues();
+        AnimationStart(Define.HeroState.Damaged);
+    }
 
     protected IEnumerator DamagedProcess()
     {
@@ -535,7 +628,10 @@ public abstract class BattleHeroController : MonoBehaviour
         AfterDamaged();
     }
 
-    protected abstract void AfterDamaged();
+    protected virtual void AfterDamaged()
+    {
+        _isDamaged = false;
+    }
 
     #endregion
 }

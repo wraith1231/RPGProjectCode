@@ -57,7 +57,7 @@ namespace BehaviorTree
 
         public void AddEnemy(BattleHeroController enemy)
         {
-            int id = enemy.Data.HeroId;
+            int id = enemy.HeroId;
             _enemies.Add(id, enemy);
             _enemyKeys.Add(id);
         }

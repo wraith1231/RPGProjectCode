@@ -10,23 +10,37 @@ public class BattleGameManager
     private CameraController _camera;
     private bool _playerInit = false;
     private bool _cameraInit = false;
+
     public bool BothInit { get { return _playerInit == true && _cameraInit == true; } }
+
+    //player 체력, 스태미너용
     public PlayerHeroController Player { get { return _player; } }
+
+    //player가 나중에 init됐을때 카메라 세팅용
     public CameraController Camera { get { return _camera; } }
 
-    public List<List<BattleHeroController>> _groups = new List<List<BattleHeroController>>();
+    //release를 위한 데이터 모아두기용
     public List<GameObject> _objects = new List<GameObject>();
 
+    //인게임에 필요할 듯
+    public Dictionary<int, List<BattleHeroController>> _groups = new Dictionary<int, List<BattleHeroController>>();
+    //public List<List<BattleHeroController>> _groups = new List<List<BattleHeroController>>();
+
+    //캐릭터 생성용
     public List<CharacterData> _charList = new List<CharacterData>();
-
     public Dictionary<string, GlobalCharacterData> _charDataList = new Dictionary<string, GlobalCharacterData>();
+    private Dictionary<string, List<int>> _charIdList = new Dictionary<string, List<int>>();
 
+    //Loading Scene용
     private static int PROGRESS = 4;
     private int _progress = 0;
     public float CurrentProgress { get { return (float)_progress / (float)PROGRESS; } }
-    private int _id = 0;
+
+    private int _instantiatedChar = 0;
+
     //게임 클리어 조건용
     private int _livingChar = 0;
+
     public void AnotherOneBiteDust()
     {
         _livingChar--;
@@ -36,7 +50,7 @@ public class BattleGameManager
 
     public void BattleSceneInitialize()
     {
-        _id = 0;
+        _instantiatedChar = 0;
         _playerInit = false;
         _cameraInit = false;
         _progress = 0;
@@ -50,19 +64,13 @@ public class BattleGameManager
     {
         int listSize = _charList.Count;
         _livingChar = _charList.Count;
-        int max = -1;
-        int num = 0;
 
         for (int listNum = 0; listNum < listSize; listNum++)
         {
-            num = _charList[listNum].Group;
-            if (num > max)
-                max = num;
+            if (_groups.ContainsKey(_charList[listNum].Group) == false)
+                _groups[_charList[listNum].Group] = new List<BattleHeroController>();
         }
-
-        for (int i = 0; i <= max; i++)
-            _groups.Add(new List<BattleHeroController>());
-
+        
         _progress++;
     }
 
@@ -80,11 +88,16 @@ public class BattleGameManager
     private void CharacterInstantiate()
     {
         int listSize = _charList.Count;
+        string key = "";
         for(int listNum = 0; listNum < listSize; listNum++)
         {
             switch (_charList[listNum].Type)
             {
                 case Define.CharacterType.Human:
+                    key = "Human";
+                    if (_charIdList.ContainsKey(key) == false)
+                        _charIdList[key] = new List<int>();
+                    _charIdList[key].Add(listNum);
                     Managers.Resource.Instantiate("Human", HumanCharacterInstantiate);
                     break;
                 case Define.CharacterType.Animal:
@@ -92,9 +105,17 @@ public class BattleGameManager
                 case Define.CharacterType.Monster:
                     break;
                 case Define.CharacterType.Unknown:
+                    key = "Human";
+                    if (_charIdList.ContainsKey(key) == false)
+                        _charIdList[key] = new List<int>();
+                    _charIdList[key].Add(listNum);
                     Managers.Resource.Instantiate("Human", HumanCharacterInstantiate);
                     break;
                 default:
+                    key = "Human";
+                    if (_charIdList.ContainsKey(key) == false)
+                        _charIdList[key] = new List<int>();
+                    _charIdList[key].Add(listNum);
                     Managers.Resource.Instantiate("Human", HumanCharacterInstantiate);
                     break;
             }
@@ -104,8 +125,10 @@ public class BattleGameManager
     private void HumanCharacterInstantiate(GameObject go)
     {
         _objects.Add(go);
+        _instantiatedChar++;
         GameObject.DontDestroyOnLoad(go);
-        int id = _id++;
+        int id = _charIdList[go.name][0];
+        _charIdList[go.name].RemoveAt(0);
         BattleHeroController controller;
         if(_charList[id].Player == true)
         {
@@ -128,18 +151,20 @@ public class BattleGameManager
         outfit.SetOutfit(_charList[id].Outfit);
         controller.SetEquipWeapon(_charList[id].Left, _charList[id].Right);
         go.name = _charList[id].CharName;
-        _charList[id].HeroId = id;
-        controller.SetCharacterData(_charList[id]);
+
+        controller.HeroId = _charList[id].HeroId;
+        controller.Group = _charList[id].Group;
+
         if (_charDataList.ContainsKey(_charList[id].CharName))
             controller.SetBattleCharacterData(_charDataList[_charList[id].CharName]);
         else
             controller.SetBattleCharacterData(null);
-
+        
         _groups[_charList[id].Group].Add(controller);
 
-        controller.transform.position = controller.Data.StartPosition;
+        controller.transform.position = _charList[id].StartPosition;
 
-        if (_id == _charList.Count)
+        if (_instantiatedChar == _charList.Count)
             _progress++;
     }
 
@@ -180,7 +205,7 @@ public class BattleGameManager
             Managers.Resource.Release(_objects[i]);
         }
         _objects.Clear();
-
+        
         _groups.Clear();
     }
 

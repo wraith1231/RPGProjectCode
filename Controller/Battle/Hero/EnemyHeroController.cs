@@ -47,56 +47,9 @@ public abstract class EnemyHeroController : BattleHeroController
         for (int i = 0; i < (int)Define.HeroState.Unknown; i++)
             AnimationSpeedChange((Define.HeroState)i, 1.0f * ( 1 + _battleData.FinalDexterity));
     }
-    private void AnimationSpeedChange(Define.HeroState state, float speed)
-    {
-        _animationSpeed[(int)state] = speed;
-    }
-    private void AnimationStart(Define.HeroState state)
+    public void SetHeroState(Define.HeroState state)
     {
         _state = state;
-        _animator.SetFloat("speed", _animationSpeed[(int)state]);
-        switch (state)
-        {
-            case Define.HeroState.Idle:
-                _animator.SetFloat("Vertical", 0);
-                _animator.SetFloat("Horizontal", 0);
-                _animator.CrossFade("Idle", _fixedTime);
-                break;
-            case Define.HeroState.Strafe:
-                _animator.CrossFade("Strafe", _fixedTime);
-                break;
-            case Define.HeroState.Running:
-                _animator.CrossFade("Run", _fixedTime);
-                break;
-            case Define.HeroState.Rolling:
-                _animator.Play("Roll");
-                break;
-            case Define.HeroState.Attack:
-                int rand = Random.Range(0, 7);
-                if (rand == _prevAttack)
-                {
-                    rand = _prevAttack + 1;
-                    if (rand >= 7)
-                        rand = 0;
-
-                    _prevAttack = rand;
-                }
-                _animator.SetFloat("Attack", rand);
-                _animator.Play("Attack");
-                break;
-            case Define.HeroState.Block:
-                _animator.Play("Block");
-                break;
-            case Define.HeroState.Die:
-                _animator.SetFloat("Attack", Random.Range(0, 2));
-                _animator.Play("Death");
-                break;
-            case Define.HeroState.Damaged:
-                _animator.Play("Damaged");
-                break;
-            default:
-                break;
-        }
     }
 
     #region TriggerEvent
@@ -107,11 +60,11 @@ public abstract class EnemyHeroController : BattleHeroController
         if (controller == null || controller.State == Define.HeroState.Die)
             return;
 
-        int id = controller.Data.HeroId;
+        int id = controller.HeroId;
         if (_nearCharacter.ContainsKey(id) == false)
         {
-            int group = controller.Data.Group;
-            if (Data.Group != group)
+            int group = controller.Group;
+            if (Group != group)
             {
                 _charKeys.Add(id);
                 _nearCharacter[id] = controller;
@@ -127,7 +80,7 @@ public abstract class EnemyHeroController : BattleHeroController
         if (controller == null)
             return;
 
-        int id = controller.Data.HeroId;
+        int id = controller.HeroId;
         if (_nearCharacter.ContainsKey(id) == true)
         {
             if (State != Define.HeroState.Attack)
@@ -185,10 +138,6 @@ public abstract class EnemyHeroController : BattleHeroController
     }
 
 #endregion
-    public void SetHeroState(Define.HeroState state)
-    {
-        _state = state;
-    }
 
 #region Attack
     public bool PlayAttackAnimation()
@@ -202,17 +151,15 @@ public abstract class EnemyHeroController : BattleHeroController
     }
     protected override void BeforeAttack()
     {
-        _attacking = true;
-        _parried = false;
         _nearEnemyCollider.enabled = false;
         _battleData.CurrentStaminaPoint -= AttackStamina;
 
-        AnimationStart(Define.HeroState.Attack);
+        base.BeforeAttack();
     }
     protected override void AfterAttack()
     {
-        _attacking = false;
-        _parried = false;
+        base.AfterAttack();
+
         _nearEnemyCollider.enabled = true;
         InBattleTarget = false;
         NextState = Define.HeroState.Idle;
@@ -235,21 +182,13 @@ public abstract class EnemyHeroController : BattleHeroController
 
     protected override void BeforeBlocking()
     {
-        _isBlock = true;
-        _justGuard = true;
-        _blockEnd = true;
-        _blockHit = false;
-        _battleData.CurrentStaminaPoint -= BlockStamina;
-
-        AnimationStart(Define.HeroState.Block);
+        base.BeforeBlocking();
     }
 
     protected override void AfterBlocking()
     {
-        _justGuard = false;
-        _isBlock = false;
-        _blockEnd = false;
-        _blockHit = false;
+        base.AfterBlocking();
+
         InBattleTarget = false;
         NextState = Define.HeroState.Idle;
 
@@ -270,14 +209,11 @@ public abstract class EnemyHeroController : BattleHeroController
     protected override void BeforeRolling()
     {
         _transform.LookAt(RollingDirection);
-        _isRolling = true;
-        _battleData.CurrentStaminaPoint -= RollingStamina;
-
-        AnimationStart(Define.HeroState.Rolling);
+        base.BeforeRolling();
     }
     protected override void AfterRolling()
     {
-        _isRolling = false;
+        base.AfterRolling();
 
         NextState = Define.HeroState.Idle;
         InBattleTarget = false;
@@ -292,21 +228,20 @@ public abstract class EnemyHeroController : BattleHeroController
         base.GetDamaged(attacker);
 
         NextState = Define.HeroState.Damaged;
-        if(_nearCharacter.ContainsKey(attacker.Data.HeroId) == false)
-            _nearCharacter.Add(attacker.Data.HeroId, attacker);
+        if(_nearCharacter.ContainsKey(attacker.HeroId) == false)
+            _nearCharacter.Add(attacker.HeroId, attacker);
     }
 
     protected override void BeforeDamaged()
     {
-        ResetBooleanValues();
         InBattleTarget = false;
-        _isDamaged = true;
 
-        AnimationStart(Define.HeroState.Damaged);
+        base.BeforeDamaged();
     }
     protected override void AfterDamaged()
     {
-        _isDamaged = false;
+        base.AfterDamaged();
+
         NextState = Define.HeroState.Idle;
         InBattleTarget = false;
 

@@ -88,8 +88,10 @@ public class ResourceManager
         {
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
+                GameObject go = handle.Result as GameObject;
+                go.name = key;
                 if(foo != null)
-                    foo(handle.Result as GameObject);
+                    foo(go);
             }
         };
 
