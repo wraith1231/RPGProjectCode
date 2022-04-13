@@ -33,6 +33,7 @@ public class UIBackScreen : UIScene
 
     public void OnNewGameButton(PointerEventData data)
     {
+        Managers.General.GlobalPlayer.GlobalData.SetStatData(Managers.Data.PlayerStartStat);
         Managers.General.GlobalPlayer.Data.Group = 0;
         Managers.General.GlobalPlayer.Data.HeroId = 0;
         Managers.General.GlobalPlayer.Data.CharName = "Player";
@@ -40,10 +41,8 @@ public class UIBackScreen : UIScene
         mainPos.y = 0;
         Managers.General.GlobalPlayer.SetRightWeapon(Define.WeaponCategory.OneHand, "Sword1");
         Managers.General.GlobalPlayer.SetLeftWeapon(Define.WeaponCategory.Shield, "Buckler1");
-        Managers.General.GlobalPlayer.Data.Outfit.SetAllGenderData(Define.HumanOutfitAllGender.AllGenderBackAttachment, 2);
-        Managers.General.GlobalPlayer.Data.Outfit.SetOneGenderData(Define.HumanOutfitOneGender.HeadGear, 5);
-        Managers.General.GlobalPlayer.Data.Outfit.SetOneGenderData(Define.HumanOutfitOneGender.Torso, 9);
-        Managers.General.GlobalPlayer.Data.Outfit.SetOneGenderData(Define.HumanOutfitOneGender.Hips, 12);
+        Managers.General.GlobalPlayer.Data.Outfit.SetStatData(Managers.Data.PlayerStartStat);
+
         Managers.General.GlobalPlayer.Data.StartPosition = mainPos;
         
         EquipWeapon weapon = new EquipWeapon(Define.WeaponCategory.OneHand, "Sword1");

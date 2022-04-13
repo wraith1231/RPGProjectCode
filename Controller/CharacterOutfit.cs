@@ -137,6 +137,7 @@ public class CharacterOutfit : MonoBehaviour
         _genderParts[(int)_gender].SetActive(true);
     }
 
+
     public void SetOutfit(HumanOutfit outfit = null)
     {
         if (outfit == null)

@@ -12,8 +12,13 @@ public interface ILoader<Key, Value>
 
 public class DataManager 
 {
-    private Dictionary<int, Data.StatData> _statDict = new Dictionary<int, Data.StatData>();
-    public Dictionary<int, Data.StatData> StatDict { get { return _statDict; } private set { _statDict = value; } }
+    private Data.StatData _playerStartStat = new Data.StatData();
+    private Data.StatData _npcMinimumStat = new Data.StatData();
+    private Data.StatData _npcMaximumStat = new Data.StatData();
+    public Data.StatData PlayerStartStat { get { return _playerStartStat; } private set { _playerStartStat = value; } }
+    public Data.StatData NPCMinimumStat { get { return _npcMinimumStat; } private set { _npcMinimumStat = value; } }
+    public Data.StatData NPCMaximumStat { get { return _npcMaximumStat; } private set { _npcMaximumStat = value; } }
+
 
     private Dictionary<string, Data.WeaponData> _onehandDict = new Dictionary<string, Data.WeaponData>();
     private Dictionary<string, Data.WeaponData> _twohandDict = new Dictionary<string, Data.WeaponData>();
@@ -24,34 +29,19 @@ public class DataManager
 
     public void Init()
     {
-        //StatDataRead();
         LoadJson("StatData", StatDataLoad);
         LoadJson("WeaponList", WeaponDataLoad);
-        //WeaponDataRead();
     }
-
-    //private Loader LoadJson<Loader, Key, Value>(string path, Action<Loader> action) where Loader : ILoader<Key, Value>
-    //{
-    //    TextAsset textAsset = Managers.Resource.Load<TextAsset>($"Data/{path}", null).Result as TextAsset;
-    //    return JsonUtility.FromJson<Loader>(textAsset.text);
-    //}
 
     private void LoadJson(string key, Action<TextAsset> action)
     {
         Managers.Resource.Load<TextAsset>($"Data/{key}", action);
     }
-    //
-    //private void StatDataRead()
-    //{
-    //    Data.StatList list = LoadJson<Data.StatList, int, Data.StatData>("StatData");
-    //    list.MakeDict();
-    //    list.GetStatList(out _statDict);
-    //}
+
     private void StatDataLoad(TextAsset asset)
     {
         Data.StatList loader = JsonUtility.FromJson<Data.StatList>(asset.text);
-        loader.MakeDict();
-        loader.GetStatList(out _statDict);
+        loader.GetStatList(out _playerStartStat, out _npcMinimumStat, out _npcMaximumStat);
     }
     private void WeaponDataLoad(TextAsset asset)
     {

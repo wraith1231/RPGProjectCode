@@ -77,6 +77,9 @@ public abstract class BattleHeroController : MonoBehaviour
         _characterCollider = GetComponent<CapsuleCollider>();
         _rigidBody = GetComponent<Rigidbody>();
 
+        for (int i = 0; i < (int)Define.HeroState.Unknown; i++)
+            AnimationSpeedChange((Define.HeroState)i, 1.0f * (1 + _battleData.FinalAgility));
+
         CreateWeapon();
 
         Init();

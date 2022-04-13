@@ -44,8 +44,6 @@ public abstract class EnemyHeroController : BattleHeroController
         _nearEnemyCollider.radius = _detectRange;
         _nearEnemyCollider.enabled = false;
 
-        for (int i = 0; i < (int)Define.HeroState.Unknown; i++)
-            AnimationSpeedChange((Define.HeroState)i, 1.0f * ( 1 + _battleData.FinalDexterity));
     }
     public void SetHeroState(Define.HeroState state)
     {

@@ -26,6 +26,26 @@ public class HumanOutfit
         }
     }
 
+    public void SetStatData(Data.StatData data)
+    {
+        if (data.Gender == true)
+            Gender = Define.HumanGender.Female;
+        else
+            Gender = Define.HumanGender.Male;
+
+        int size = (int)Define.HumanOutfitAllGender.Unknown;
+        for (int i = 0; i < size; i++)
+        {
+            SetAllGenderData((Define.HumanOutfitAllGender)i, data.AllGenderOutfit[i]);
+        }
+
+        size = (int)Define.HumanOutfitOneGender.Unknown;
+        for (int i = 0; i < size; i++)
+        {
+            SetOneGenderData((Define.HumanOutfitOneGender)i, data.OneGenderOutfit[i]);
+        }
+    }
+
     public int GetAllGenderData(Define.HumanOutfitAllGender allGender)
     {
         return AllGender[(int)allGender];

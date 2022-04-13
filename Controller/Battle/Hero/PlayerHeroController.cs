@@ -95,9 +95,6 @@ public class PlayerHeroController : BattleHeroController
 
         currentState = UpdateIdle;
 
-        for (int i = 0; i < (int)Define.HeroState.Unknown; i++)
-            AnimationSpeedChange((Define.HeroState)i, 1.0f * (1 + _battleData.FinalDexterity));
-
         AnimationStart(State);
     }
     protected override void FixedUpdate()
