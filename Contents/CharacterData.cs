@@ -46,6 +46,30 @@ public class HumanOutfit
         }
     }
 
+    public void SetNPCBaseData()
+    {
+        Data.StatData min = Managers.Data.NPCMinimumStat;
+        Data.StatData max = Managers.Data.NPCMaximumStat;
+
+        int gender = Random.Range(0, 2);
+        if(gender == 0)
+            Gender = Define.HumanGender.Male;
+        else
+            Gender = Define.HumanGender.Female;
+
+        int size = (int)Define.HumanOutfitAllGender.Unknown;
+        for (int i = 0; i < size; i++)
+        {
+            SetAllGenderData((Define.HumanOutfitAllGender)i, Random.Range(min.AllGenderOutfit[i], max.AllGenderOutfit[i]));
+        }
+
+        size = (int)Define.HumanOutfitOneGender.Unknown;
+        for (int i = 0; i < size; i++)
+        {
+            SetOneGenderData((Define.HumanOutfitOneGender)i, Random.Range(min.OneGenderOutfit[i], max.OneGenderOutfit[i]));
+        }
+    }
+
     public int GetAllGenderData(Define.HumanOutfitAllGender allGender)
     {
         return AllGender[(int)allGender];

@@ -10,9 +10,7 @@ public class MapGameManager
     private bool _cameraInit = false;
     public bool BothInit { get { return _playerInit == true && _cameraInit == true; } }
 
-    private int _id = 0;
-
-    private List<AreaCharController> _charLists = new List<AreaCharController>(); //��ü ĳ���� ������
+    private List<GameObject> _charLists = new List<GameObject>(); //��ü ĳ���� ������
     private List<GameObject> _objects = new List<GameObject>();  //release ��
     private Dictionary<string, List<int>> _charIdList = new Dictionary<string, List<int>>();
 
@@ -24,15 +22,46 @@ public class MapGameManager
 
     private int _instantiatedChar = 0;
 
+    //둘이 한 세트
+    private Dictionary<int, List<int>> _groups;
+    private List<int> _keys;
+
     public void DataInstantiate()
     {
-        _id = 0;
         _playerInit = false;
         _cameraInit = false;
         _progress = 0;
         _instantiatedChar = 0;
+        Debug.Log("Data Instantiate");
 
         Managers.Resource.Instantiate("AreaTerrain", TerrainInstantiated);
+    }
+    public void GroupInitialize()
+    {
+        _groups = new Dictionary<int, List<int>>();
+        _keys = new List<int>();
+
+        _groups[0] = new List<int>();
+        _keys.Add(0);
+        _groups[0].Add(Managers.General.GlobalPlayer.Data.HeroId);
+
+        List<GlobalNPCController> data = Managers.General.GlobalCharacters;
+
+        int listSize = data.Count;
+        
+        for (int i = 0; i < listSize; i++)
+        {
+            if (data[i].Data.Type == Define.CharacterType.Human)
+            {
+                if (_groups.ContainsKey(data[i].Data.Group) == false)
+                {
+                    _keys.Add(data[i].Data.Group);
+                    _groups[data[i].Data.Group] = new List<int>();
+
+                }
+                _groups[data[i].Data.Group].Add(data[i].Data.HeroId);
+            }
+        }
     }
 
     private void TerrainInstantiated(GameObject go)
@@ -42,6 +71,7 @@ public class MapGameManager
 
         _areaTerrain = go.GetComponent<Terrain>();
         _progress++;
+        Debug.Log("Terrain Instantiated");
         CharacterInstantiate();
         CameraInstantiate();
     }
@@ -49,76 +79,77 @@ public class MapGameManager
     private void CharacterInstantiate()
     {
         //근데 이거 캐릭터 말고 카트로 바꿀 수 있음
-        Managers.Resource.Instantiate("Human", PlayerInstantiated);
+        Managers.Resource.Instantiate("AreaCart", PlayerInstantiated);
         NPCInstantiate();
 
     }
 
+    //수정할때 HumanCharInstantiated 확인
     private void PlayerInstantiated(GameObject go)
     {
         _objects.Add(go);
         GameObject.DontDestroyOnLoad(go);
-        int id = _id++;
 
-        AreaCharController controller = null;
+        _player = go.AddComponent<AreaPlayerController>();
+        _player.SetGroupMembers(_groups[0]);
+        _player.SetAppearance(go);
 
-        List<GlobalNPCController> data = Managers.General.GlobalCharacters;
-        controller = go.AddComponent<AreaPlayerController>();
-        _player = controller as AreaPlayerController;
+        go.name = Managers.General.GlobalPlayer.Data.CharName;
+        Vector3 pos = Managers.General.GlobalPlayer.Data.StartPosition;
+        pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x / _areaTerrain.terrainData.size.x, pos.z / _areaTerrain.terrainData.size.z);
+
+        _player.transform.position = pos;
+
+        _progress++;
+        Debug.Log("Player Instantiated");
         _playerInit = true;
         SetPlayerAndCameraIfInitialized();
-        //go.AddComponent<UnityEngine.AI.NavMeshAgent>();
-
-        controller.SetCharacterData(Managers.General.GlobalPlayer.Data);
-        CharacterOutfit outfit = go.GetComponent<CharacterOutfit>();
-        outfit.SetOutfit( controller.Data.Outfit);
-        go.name = controller.Data.CharName;
-
-        Vector3 pos = controller.Data.StartPosition;
-        pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x / _areaTerrain.terrainData.size.x, pos.z / _areaTerrain.terrainData.size.z);
-        controller.transform.position = pos;
-        _charLists.Add(controller);
-        _progress++;
     }
+
 
     private void NPCInstantiate()
     {
+        
         List<GlobalNPCController> data = Managers.General.GlobalCharacters;
-        int listSize = data.Count;
+        int listSize = _keys.Count;
         string key = "";
-        for (int listNum = 0; listNum < listSize; listNum++)
+
+        for (int listNum = 1; listNum < listSize; listNum++)
         {
-            switch (data[listNum].Data.Type)
+            int mainCharId = _groups[_keys[listNum]][0];
+            Debug.Log($"{_keys[listNum]} group  title {mainCharId}");
+            switch (data[mainCharId].Data.Type)
             {
                 case Define.CharacterType.Human:
-                    key = "Human";
+                    key = "AreaCart";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(listNum);
-                    Managers.Resource.Instantiate("Human", HumanCharInstantiated);
+                    _charIdList[key].Add(_keys[listNum]);
+                    Managers.Resource.Instantiate("AreaCart", HumanCharInstantiated);
                     break;
                 case Define.CharacterType.Animal:
                     break;
                 case Define.CharacterType.Monster:
                     break;
                 case Define.CharacterType.Unknown:
-                    key = "Human";
+                    key = "AreaCart";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
                     _charIdList[key].Add(listNum);
-                    Managers.Resource.Instantiate("Human", HumanCharInstantiated);
+                    Managers.Resource.Instantiate("AreaCart", HumanCharInstantiated);
                     break;
                 default:
-                    key = "Human";
+                    key = "Cart";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
                     _charIdList[key].Add(listNum);
-                    Managers.Resource.Instantiate("Human", HumanCharInstantiated);
+                    Managers.Resource.Instantiate("AreaCart", HumanCharInstantiated);
                     break;
             }
         }
     }
 
+    //수정할때 PlayerInstantiated도 확인
     private void HumanCharInstantiated(GameObject go)
     {
         _objects.Add(go);
@@ -127,23 +158,22 @@ public class MapGameManager
         int id = _charIdList[go.name][0];
         _charIdList[go.name].RemoveAt(0);
 
-        AreaCharController controller = null;
+        AreaGroupController controller = null;
+        controller = go.AddComponent<AreaGroupController>();
 
-        List<GlobalNPCController> data = Managers.General.GlobalCharacters;
-        controller = go.AddComponent<AreaNPCController>();
+        controller.SetGroupMembers(_groups[id]);
+        controller.SetAppearance(go);
 
-        CharacterOutfit outfit = go.GetComponent<CharacterOutfit>();
-
-        outfit.SetOutfit(data[id].Data.Outfit);
-        go.name = data[id].Data.CharName;
-        controller.SetCharacterData(data[id].Data);
-        
-        Vector3 pos = controller.Data.StartPosition;
+        go.name = Managers.General.GlobalCharacters[_groups[id][0]].Data.CharName;
+        Vector3 pos = Managers.General.GlobalCharacters[_groups[id][0]].Data.StartPosition;
         pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x / _areaTerrain.terrainData.size.x, pos.z / _areaTerrain.terrainData.size.z);
+
         controller.transform.position = pos;
-        _charLists.Add(controller);
-        
-        if (_charLists.Count == data.Count)
+        _charLists.Add(go);
+
+        Debug.Log($"{go.name} Instantiated");
+        _progress++;
+        if (_charLists.Count == _keys.Count)
             _progress++;
     }
 
@@ -157,11 +187,12 @@ public class MapGameManager
         _objects.Add(go);
         GameObject.DontDestroyOnLoad(go);
 
+        _camera = go.GetComponent<AreaCameraController>();
+
+        _progress++;
+        Debug.Log("Camera Instantiated");
         _cameraInit = true;
         SetPlayerAndCameraIfInitialized();
-
-        _camera = go.GetComponent<AreaCameraController>();
-        _progress++;
     }
 
     private void SetPlayerAndCameraIfInitialized()

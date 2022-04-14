@@ -74,12 +74,15 @@ public class UIManager
         _subItemList.Add( obj.GetComponent<UIPopup>());
     }
 
-    public void MakePopupUI<T>(string name = null) where T : UIPopup
+    public void MakePopupUI<T>(string name = null, Action<GameObject> foo = null) where T : UIPopup
     {
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        Managers.Resource.Instantiate($"Popup/{name}", PopupUIInstantiate, UIRoot.transform);
+        if(foo == null)
+            Managers.Resource.Instantiate($"Popup/{name}", PopupUIInstantiate, UIRoot.transform);
+        else
+            Managers.Resource.Instantiate($"Popup/{name}", (go) => { foo(go); PopupUIInstantiate(go); }, UIRoot.transform);
 
         return;
     }

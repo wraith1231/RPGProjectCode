@@ -12,7 +12,7 @@ public class AreaCameraController : MonoBehaviour
     void Start()
     {
         _tranform = GetComponent<Transform>();
-        _offset = new Vector3(0, 10, -3f);
+        _offset = new Vector3(0, 30, -10f);
     }
 
     // Update is called once per frame

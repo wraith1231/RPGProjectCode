@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AreaPlayerController : AreaCharController
+public class AreaPlayerController : AreaGroupController
 {
     private AreaCameraController _camera;
     public AreaCameraController Camera { get { return _camera; } set { _camera = value; } }
@@ -22,5 +22,10 @@ public class AreaPlayerController : AreaCharController
 
                 break;
         }
+    }
+
+    protected override void FixedUpdate()
+    {
+
     }
 }

@@ -18,10 +18,9 @@ public class TestScene : BaseScene
     {
         base.Init();
 
-        Managers.Resource.Instantiate("Popup/UIPlayerGauge", PlayerGaugeInstantiated);
+        Managers.UI.MakePopupUI<UIPlayerGauge>(foo: PlayerGaugeInstantiated);
+        //Managers.Resource.Instantiate("Popup/UIPlayerGauge", PlayerGaugeInstantiated);
         Managers.Battle.BattleSceneStart();
-        //Managers.Battle.GroupInitialize();
-        //Managers.Battle.LoadCharacterPrefab();
     }
 
     private void Update()

@@ -28,4 +28,16 @@ public class GlobalCharacterData
         Defense = data.Defense;
         Money = data.Money;
     }
+
+    public void SetNPCBaseData()
+    {
+        HealthPoint = Random.Range(Managers.Data.NPCMinimumStat.HealthPoint, Managers.Data.NPCMaximumStat.HealthPoint);
+        StaminaPoint = Random.Range(Managers.Data.NPCMinimumStat.StaminaPoint, Managers.Data.NPCMaximumStat.StaminaPoint);
+        HealthRecovery = Random.Range(Managers.Data.NPCMinimumStat.HealthRecovery, Managers.Data.NPCMaximumStat.HealthRecovery);
+        StaminaRecovery = Random.Range(Managers.Data.NPCMinimumStat.StaminaRecovery, Managers.Data.NPCMaximumStat.StaminaRecovery);
+        Power = Random.Range(Managers.Data.NPCMinimumStat.Power, Managers.Data.NPCMaximumStat.Power);
+        Agility = Random.Range(Managers.Data.NPCMinimumStat.Agility, Managers.Data.NPCMaximumStat.Agility);
+        Defense = Random.Range(Managers.Data.NPCMinimumStat.Defense, Managers.Data.NPCMaximumStat.Defense);
+        Money = Random.Range(Managers.Data.NPCMinimumStat.Money, Managers.Data.NPCMaximumStat.Money);
+    }
 }
