@@ -27,6 +27,11 @@ public class EquipWeapon
         ChangeWeapon(category, file);
     }
 
+    public EquipWeapon(Define.WeaponCategory category, Define.WeaponType type, int num)
+    {
+        SetDefault();
+    }
+
     private void SetDefault()
     {
         Category = Define.WeaponCategory.Unknown;
@@ -41,7 +46,6 @@ public class EquipWeapon
 
     public void ChangeWeapon(Define.WeaponCategory category, string file)
     {
-        Category = category;
         Data.WeaponData data;
         switch (category)
         {
@@ -83,6 +87,57 @@ public class EquipWeapon
                 break;
             default:
                 Debug.Log($"Category is unknown!!");
+                break;
+        }
+        Category = category;
+    }
+
+    public void ChangeWeapon(Define.WeaponCategory category, Define.WeaponType type, int num)
+    {
+        Category = category;
+        Data.WeaponData data;
+        switch (category)
+        {
+            case Define.WeaponCategory.OneHand:
+                if(Managers.Data.OnehandList[(int)type].Count > num)
+                {
+                    data = Managers.Data.OnehandList[(int)type][num];
+                    Type = data.Type;
+                    File = data.File;
+                    RPos = new Vector3(data.RPosX, data.RPosY, data.RPosZ);
+                    RRot = new Vector3(data.RRotX, data.RRotY, data.RRotZ);
+                    LPos = new Vector3(data.LPosX, data.LPosY, data.LPosZ);
+                    LRot = new Vector3(data.LRotX, data.LRotY, data.LRotZ);
+                    Size = new Vector3(data.SizeX, data.SizeY, data.SizeZ);
+                }
+                break;
+            case Define.WeaponCategory.TwoHand:
+                if (Managers.Data.TwohandList[(int)type].Count > num)
+                {
+                    data = Managers.Data.TwohandList[(int)type][num];
+                    Type = data.Type;
+                    File = data.File;
+                    RPos = new Vector3(data.RPosX, data.RPosY, data.RPosZ);
+                    RRot = new Vector3(data.RRotX, data.RRotY, data.RRotZ);
+                    LPos = new Vector3(data.LPosX, data.LPosY, data.LPosZ);
+                    LRot = new Vector3(data.LRotX, data.LRotY, data.LRotZ);
+                    Size = new Vector3(data.SizeX, data.SizeY, data.SizeZ);
+                }
+                break;
+            case Define.WeaponCategory.Shield:
+                if (Managers.Data.ShieldList[(int)type].Count > num)
+                {
+                    data = Managers.Data.ShieldList[(int)type][num];
+                    Type = data.Type;
+                    File = data.File;
+                    RPos = new Vector3(data.RPosX, data.RPosY, data.RPosZ);
+                    RRot = new Vector3(data.RRotX, data.RRotY, data.RRotZ);
+                    LPos = new Vector3(data.LPosX, data.LPosY, data.LPosZ);
+                    LRot = new Vector3(data.LRotX, data.LRotY, data.LRotZ);
+                    Size = new Vector3(data.SizeX, data.SizeY, data.SizeZ);
+                }
+                break;
+            case Define.WeaponCategory.Unknown:
                 break;
         }
     }

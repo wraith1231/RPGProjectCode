@@ -40,37 +40,6 @@ public class UIBackScreen : UIScene
 
         Managers.UI.MakePopupUI<UICreateCharacter>();
 
-        //Managers.General.GlobalPlayer.GlobalData.SetStatData(Managers.Data.PlayerStartStat);
-        //Managers.General.GlobalPlayer.Data.Group = 0;
-        //Managers.General.GlobalPlayer.Data.HeroId = 0;
-        //Managers.General.GlobalPlayer.Data.CharName = "Player";
-        //Vector3 mainPos = new Vector3(150, 0, 150);
-        //mainPos.y = 0;
-        //Managers.General.GlobalPlayer.SetRightWeapon(Define.WeaponCategory.OneHand, "Sword1");
-        //Managers.General.GlobalPlayer.SetLeftWeapon(Define.WeaponCategory.Shield, "Buckler1");
-        //Managers.General.GlobalPlayer.Data.Outfit.SetStatData(Managers.Data.PlayerStartStat);
-        //
-        //Managers.General.GlobalPlayer.Data.StartPosition = mainPos;
-        //
-        //EquipWeapon weapon = new EquipWeapon(Define.WeaponCategory.OneHand, "Sword1");
-        //
-        //for (int x = 0; x < 100; x++)
-        //{
-        //    HumanOutfit outfit = new HumanOutfit();
-        //    outfit.SetNPCBaseData();
-        //    int group = Random.Range(1, 30);
-        //    CharacterData cdata = new CharacterData(new Vector3(mainPos.x+ Random.Range(-30, 30), 0, mainPos.z + Random.Range(-30, 30)), group: group, outfit:outfit);
-        //    cdata.HeroId = x + 1;
-        //    cdata.CharName = $"NPC{x}";
-        //
-        //    GlobalNPCController controller = new GlobalNPCController();
-        //    controller.Data = cdata;
-        //    controller.GlobalData.SetNPCBaseData();
-        //    Managers.General.GlobalCharacters.Add(controller);
-        //    Debug.Log($"{cdata.CharName} added");
-        //}
-        //Managers.Map.GroupInitialize();
-        //Managers.Scene.LoadSceneAsync(Define.SceneType.AreaScene);
     }
 
     public void OnContinueButton(PointerEventData data)

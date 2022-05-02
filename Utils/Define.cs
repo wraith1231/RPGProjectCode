@@ -4,6 +4,47 @@ using UnityEngine;
 
 public class Define
 {
+    public enum VillageCondition
+    {
+        Idle,
+        Battle,
+        Unknown,
+    }
+
+    public enum AreaStatus
+    {
+        Idle,
+        Move,
+        Battle,
+        Unknown,
+    }
+
+    public enum GroupType
+    {
+        Mercenary,
+        Merchant,
+        Monster,
+        Unknown,
+    }
+
+    public enum QuestType
+    {
+        AttackCamp,
+        DefenseVillage,
+        Raid,
+        Unknown
+    }
+
+    public enum Facillities
+    {
+        Gate,
+        Market,
+        Workshop,
+        Square,
+        Guild,
+        Mayor,
+        Unknown
+    }
 
     public enum CharacterRelationship
     {
@@ -86,24 +127,24 @@ public class Define
 
     public enum WeaponCategory
     {
-        Unknown,
-        OneHand,
-        TwoHand,
-        Shield
+        OneHand = 0,
+        TwoHand = 1,
+        Shield = 2,
+        Unknown = 3,
     }
 
     public enum WeaponType
     {
-        Unknown = 0,
-        Sword = 1,
-        Axe = 2,
-        Dagger = 3,
-        Mace = 4,
-        Spear = 5,
-        Bow = 6,
-        Shield = 7,
-        TwoHandShield = 8,
-        Gauntlet = 9,
+        Sword = 0,
+        Axe = 1,
+        Dagger = 2,
+        Mace = 3,
+        Spear = 4,
+        Bow = 5,
+        Shield = 6,
+        TwoHandShield = 7,
+        Gauntlet = 8,
+        Unknown = 9,
     }
 
     public enum WorldObject

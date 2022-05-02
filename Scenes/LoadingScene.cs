@@ -25,6 +25,7 @@ public class LoadingScene : BaseScene
         _ui = obj.GetComponent<UILoadingScene>();
 
         StartCoroutine(LoadScene(Managers.Scene.NextSceneName));
+        
     }
 
     IEnumerator LoadScene(string sceneName)

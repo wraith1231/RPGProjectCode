@@ -65,5 +65,52 @@ namespace Data
             two = twohandDict;
             shie = shieldDict;
         }
+
+        public void GetOnehandList(out List<List<WeaponData>> list)
+        {
+            list = new List<List<WeaponData>>();
+            
+            int size = (int)Define.WeaponType.Unknown;
+            for (int i = 0; i < size; i++)
+            {
+                List<WeaponData> temp;
+                GetDictionary(onehandDict, (Define.WeaponType)i, out temp);
+                list.Insert(i, temp);
+            }
+        }
+
+        public void GetTwohandList(out List<List<WeaponData>> list)
+        {
+            list = new List<List<WeaponData>>();
+            int size = (int)Define.WeaponType.Unknown;
+            for (int i = 0; i < size; i++)
+            {
+                List<WeaponData> temp;
+                GetDictionary(twohandDict, (Define.WeaponType)i, out temp);
+                list.Insert(i, temp);
+            }
+        }
+
+        public void GetShieldList(out List<List<WeaponData>> list)
+        {
+            list = new List<List<WeaponData>>();
+            int size = (int)Define.WeaponType.Unknown;
+            for (int i = 0; i < size; i++)
+            {
+                List<WeaponData> temp;
+                GetDictionary(shieldDict, (Define.WeaponType)i, out temp);
+                list.Insert(i, temp);
+            }
+        }
+
+        private void GetDictionary(Dictionary<string, WeaponData> data, Define.WeaponType type , out List<WeaponData> list)
+        {
+            list = new List<WeaponData>();
+            foreach(KeyValuePair<string, WeaponData> weapon in data)
+            {
+                if (weapon.Value.Type == type)
+                    list.Add(weapon.Value);
+            }
+        }
     }
 }

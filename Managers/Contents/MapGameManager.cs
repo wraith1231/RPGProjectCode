@@ -1,24 +1,44 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class MapGameManager
 {
+    private static float DayChangeTime = 10f;
+
     private AreaPlayerController _player;
     private AreaCameraController _camera;
     private bool _playerInit = false;
     private bool _cameraInit = false;
     public bool BothInit { get { return _playerInit == true && _cameraInit == true; } }
 
+    private List<VillageStatus> _villageLists = new List<VillageStatus>();
+    public List<VillageStatus> VillageLists { get { return _villageLists; } }
+    private Dictionary<string, VillageStatus> _villages = new Dictionary<string, VillageStatus>();
+    public Dictionary<string, VillageStatus> Villages { get { return _villages; } }
+
+    private List<GameObject> _roads = new List<GameObject>();
+    public List<GameObject> Roads { get { return _roads; } }
+
     private List<GameObject> _charLists = new List<GameObject>(); //��ü ĳ���� ������
     private List<GameObject> _objects = new List<GameObject>();  //release ��
     private Dictionary<string, List<int>> _charIdList = new Dictionary<string, List<int>>();
+    private List<AreaGroupController> _controllers = new List<AreaGroupController>();
 
     private Terrain _areaTerrain;
+    public TerrainData MapData { get { return _areaTerrain.terrainData; } }
 
     private static int PROGRESS = 4;
     private int _progress = 0;
     public float CurrentProgress { get { return (float)_progress / (float)PROGRESS; } }
+
+    public bool AreaSceneNow = false;
+    private float _time = 0.0f;
+    private int _day = 0;
+    public int Day { get { return _day; } set { _day = value; } }
+
+    public Action<int> DayChangeUpdate;
 
     private int _instantiatedChar = 0;
 
@@ -26,6 +46,7 @@ public class MapGameManager
     private Dictionary<int, List<int>> _groups;
     private List<int> _keys;
 
+    #region Initialize
     public void DataInstantiate()
     {
         _playerInit = false;
@@ -71,7 +92,7 @@ public class MapGameManager
 
         _areaTerrain = go.GetComponent<Terrain>();
         _progress++;
-        Debug.Log("Terrain Instantiated");
+        Debug.Log($"Terrain Instantiated{_progress}");
         CharacterInstantiate();
         CameraInstantiate();
     }
@@ -91,8 +112,10 @@ public class MapGameManager
         GameObject.DontDestroyOnLoad(go);
 
         _player = go.AddComponent<AreaPlayerController>();
-        _player.SetGroupMembers(_groups[0]);
-        _player.SetAppearance(go);
+        _player.SetTerrainData(_areaTerrain.terrainData);
+        _player.GroupId = 0;
+        //_player.SetGroupMembers(_groups[0]);
+        //_player.SetAppearance(go);
 
         go.name = Managers.General.GlobalPlayer.Data.CharName;
         Vector3 pos = Managers.General.GlobalPlayer.Data.StartPosition;
@@ -101,52 +124,53 @@ public class MapGameManager
         _player.transform.position = pos;
 
         _progress++;
-        Debug.Log("Player Instantiated");
+        Debug.Log($"Player Instantiated{_progress}");
         _playerInit = true;
         SetPlayerAndCameraIfInitialized();
     }
 
-
     private void NPCInstantiate()
     {
-        
-        List<GlobalNPCController> data = Managers.General.GlobalCharacters;
-        int listSize = _keys.Count;
+        List<GlobalGroupController> data = Managers.General.GlobalGroups;
+        int listSize = data.Count;
         string key = "";
-
+        int count = 1;
         for (int listNum = 1; listNum < listSize; listNum++)
         {
-            int mainCharId = _groups[_keys[listNum]][0];
-            Debug.Log($"{_keys[listNum]} group  title {mainCharId}");
-            switch (data[mainCharId].Data.Type)
+            if (data[listNum].GroupMemberCount() == 0)
+                continue;
+
+            switch (data[listNum].Type)
             {
-                case Define.CharacterType.Human:
+                case Define.GroupType.Mercenary:
                     key = "AreaCart";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(_keys[listNum]);
+                    _charIdList[key].Add(_keys[count++]);
                     Managers.Resource.Instantiate("AreaCart", HumanCharInstantiated);
+                    
                     break;
-                case Define.CharacterType.Animal:
+                case Define.GroupType.Merchant:
                     break;
-                case Define.CharacterType.Monster:
+                case Define.GroupType.Monster:
                     break;
-                case Define.CharacterType.Unknown:
+                case Define.GroupType.Unknown:
                     key = "AreaCart";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(listNum);
+                    _charIdList[key].Add(_keys[count++]);
                     Managers.Resource.Instantiate("AreaCart", HumanCharInstantiated);
                     break;
                 default:
                     key = "Cart";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(listNum);
+                    _charIdList[key].Add(_keys[count++]);
                     Managers.Resource.Instantiate("AreaCart", HumanCharInstantiated);
                     break;
             }
         }
+        Debug.Log($"char id list : {_charIdList.Count}");
     }
 
     //수정할때 PlayerInstantiated도 확인
@@ -159,22 +183,25 @@ public class MapGameManager
         _charIdList[go.name].RemoveAt(0);
 
         AreaGroupController controller = null;
-        controller = go.AddComponent<AreaGroupController>();
+        controller = go.AddComponent<AreaNPCController>();
+        controller.SetTerrainData(_areaTerrain.terrainData);
+        //controller.SetAppearance(go);
 
-        controller.SetGroupMembers(_groups[id]);
-        controller.SetAppearance(go);
-
-        go.name = Managers.General.GlobalCharacters[_groups[id][0]].Data.CharName;
-        Vector3 pos = Managers.General.GlobalCharacters[_groups[id][0]].Data.StartPosition;
+        go.name = Managers.General.GlobalCharacters[_groups[id][0]-1].Data.CharName;
+        Vector3 pos = Managers.General.GlobalCharacters[_groups[id][0]-1].Data.StartPosition;
         pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x / _areaTerrain.terrainData.size.x, pos.z / _areaTerrain.terrainData.size.z);
 
         controller.transform.position = pos;
         _charLists.Add(go);
+        _controllers.Add(controller);
 
         Debug.Log($"{go.name} Instantiated");
         _progress++;
         if (_charLists.Count == _keys.Count)
+        {
             _progress++;
+            Debug.Log($"npc instantiated {_progress}");
+        }
     }
 
     private void CameraInstantiate()
@@ -190,7 +217,7 @@ public class MapGameManager
         _camera = go.GetComponent<AreaCameraController>();
 
         _progress++;
-        Debug.Log("Camera Instantiated");
+        Debug.Log($"Camera Instantiated {_progress}");
         _cameraInit = true;
         SetPlayerAndCameraIfInitialized();
     }
@@ -200,11 +227,47 @@ public class MapGameManager
         if (BothInit == true)
         {
             _camera.SetTarget(_player.transform);
-            _player.Camera = _camera;
+            _player.AreaCamera = _camera;
         }
     }
+
+    public void AreaInit()
+    {
+        GameObject[] objects = GameObject.FindGameObjectsWithTag("Village");
+
+        int size = objects.Length;
+        Debug.Log(size);
+        for(int i = 0; i < size; i++)
+        {
+            VillageStatus status = objects[i].GetComponent<VillageStatus>();
+            _villageLists.Add(status);
+            _villages.Add(status.Data.VillageName, status);
+        }
+
+        GameObject[] roads = GameObject.FindGameObjectsWithTag("Road");
+
+        size = roads.Length;
+        for(int i = 0; i < size; i++)
+        {
+            _roads.Add(roads[i]);
+        }
+    }
+
+    public void SceneInit()
+    {
+        _player.SceneInit();
+        int size = _controllers.Count;
+        for (int i = 0; i < size; i++)
+            _controllers[i].SceneInit();
+
+        AreaSceneNow = true;
+    }
+    #endregion
+
     public void Clear()
     {
+        AreaSceneNow = false;
+        _controllers.Clear();
         int size = _objects.Count;
         for (int i = 0; i < size; i++)
         {
@@ -213,5 +276,39 @@ public class MapGameManager
         }
         _objects.Clear();
         _charLists.Clear();
+
+        _villages.Clear();
+        _roads.Clear();
+    }
+
+    public void OnUpdate()
+    {
+        _time += Time.deltaTime;
+        if(_time >= DayChangeTime)
+        {
+            _time = 0;
+            _day++;
+            Debug.Log($"Day {_day}");
+            DayChangeUpdate(_day);
+        }
+    }
+
+    public AreaNode GetClosestNode(Vector3 pos)
+    {
+        float min = Vector3.Distance(pos, _roads[0].transform.position);
+        int size = _roads.Count;
+        int number = 0;
+        float distTemp = min;
+        for(int i = 1; i < size; i++)
+        {
+            distTemp = Vector3.Distance(_roads[i].transform.position, pos);
+            if(distTemp < min)
+            {
+                number = i;
+                min = distTemp;
+            }
+        }
+
+        return _roads[number].GetComponent<AreaNode>();
     }
 }

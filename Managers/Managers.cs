@@ -52,6 +52,8 @@ public class Managers : MonoBehaviour
     {
         if(_input != null)
             _input.OnUpdate();
+        if (_mapGame.AreaSceneNow == true)
+            _mapGame.OnUpdate();
     }
 
     static void Init()

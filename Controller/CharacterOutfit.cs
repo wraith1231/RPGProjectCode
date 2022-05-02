@@ -23,20 +23,46 @@ public class CharacterOutfit : MonoBehaviour
 
     #region All Gender
     [SerializeField] private List<GameObject> _headCoveringsBase;
+    public int HeadCoverBaseSizeCount() { return _headCoveringsBase.Count; }
+
     [SerializeField] private List<GameObject> _headCoveringsMask;
+    public int HeadCoverMaskSizeCount() { return _headCoveringsMask.Count; }
+
     [SerializeField] private List<GameObject> _headCoveringsNoHair;
+    public int HeadCoverNoHairCount() { return _headCoveringsNoHair.Count; }
 
     [SerializeField] private List<GameObject> _allGenderHair;
+    public int HairCount() { return _allGenderHair.Count; }
+
     [SerializeField] private List<GameObject> _allGenderHeadAttachment;
+    public int HeadAttachCount() { return _allGenderHeadAttachment.Count; }
+
     [SerializeField] private List<GameObject> _allGenderBackAttachment;
+    public int BackAttachCount() { return _allGenderBackAttachment.Count; }
+
     [SerializeField] private List<GameObject> _allGenderShoulderRight;
+    public int ShoulderRightCount() { return _allGenderShoulderRight.Count; }
+
     [SerializeField] private List<GameObject> _allGenderShoulderLeft;
+    public int ShoulderLeftCount() { return _allGenderShoulderLeft.Count; }
+
     [SerializeField] private List<GameObject> _allGenderElbowRight;
+    public int ElbowRightCount() { return _allGenderElbowRight.Count; }
+
     [SerializeField] private List<GameObject> _allGenderElbowLeft;
+    public int ElbowLeftCount() { return _allGenderElbowLeft.Count; }
+
     [SerializeField] private List<GameObject> _allGenderHips;
+    public int AllHipCount() { return _allGenderHips.Count; }
+
     [SerializeField] private List<GameObject> _allGenderKneeRight;
+    public int KneeRightCount() { return _allGenderKneeRight.Count; }
+
     [SerializeField] private List<GameObject> _allGenderKneeLeft;
+    public int KneeLeftCount() { return _allGenderKneeLeft.Count; }
+
     [SerializeField] private List<GameObject> _allGenderExtra;
+    public int ExtraCount() { return _allGenderExtra.Count; }
     #endregion
 
     #region Female
@@ -53,6 +79,20 @@ public class CharacterOutfit : MonoBehaviour
     [SerializeField] private List<GameObject> _femaleHips;
     [SerializeField] private List<GameObject> _femaleLegRight;
     [SerializeField] private List<GameObject> _femaleLegLeft;
+
+    public int FemaleHeadCount() { return _femaleHead.Count; }
+    public int FemaleHeadGearCount() { return _femaleHeadGear.Count; }
+    public int FemaleEyebrowsCount() { return _femaleEyebrows.Count; }
+    public int FemaleTorsoCount() { return _femaleTorso.Count; }
+    public int FemaleArmUpperRightCount() { return _femaleArmUpperRight.Count; }
+    public int FemaleArmUpperLeftCount() { return _femaleArmUpperLeft.Count; }
+    public int FemaleArmLowerRightCount() { return _femaleArmLowerRight.Count; }
+    public int FemaleArmLowerLeftCount() { return _femaleArmLowerLeft.Count; }
+    public int FemaleHandRightCount() { return _femaleHandRight.Count; }
+    public int FemaleHandLeftCount() { return _femaleHandLeft.Count; }
+    public int FemaleHipsCount() { return _femaleHips.Count; }
+    public int FemaleLegRightCount() { return _femaleLegRight.Count; }
+    public int FemaleLegLeftCount() { return _femaleLegLeft.Count; }
     #endregion
 
     #region Male
@@ -70,6 +110,21 @@ public class CharacterOutfit : MonoBehaviour
     [SerializeField] private List<GameObject> _maleHips;
     [SerializeField] private List<GameObject> _maleLegRight;
     [SerializeField] private List<GameObject> _maleLegLeft;
+
+    public int MaleHeadCount() { return _maleHead.Count; }
+    public int MaleHeadGearCount() { return _maleHeadGear.Count; }
+    public int MaleEyebrowsCount() { return _maleEyebrows.Count; }
+    public int MaleFaciallCount() { return _maleFacial.Count; }
+    public int MaleTorsoCount() { return _maleTorso.Count; }
+    public int MaleArmUpperRightCount() { return _maleArmUpperRight.Count; }
+    public int MaleArmUpperLeftCount() { return _maleArmUpperLeft.Count; }
+    public int MaleArmLowerRightCount() { return _maleArmLowerRight.Count; }
+    public int MaleArmLowerLeftCount() { return _maleArmLowerLeft.Count; }
+    public int MaleHandRightCount() { return _maleHandRight.Count; }
+    public int MaleHandLeftCount() { return _maleHandLeft.Count; }
+    public int MaleHipsCount() { return _maleHips.Count; }
+    public int MaleLegRightCount() { return _maleLegRight.Count; }
+    public int MaleLegLeftCount() { return _maleLegLeft.Count; }
     #endregion
 
     public CharacterOutfit()
@@ -162,7 +217,7 @@ public class CharacterOutfit : MonoBehaviour
     }
 
     #region AllGenderOutfit
-    private void ChangeAllGenderOutfit(Define.HumanOutfitAllGender part, int num)
+    public void ChangeAllGenderOutfit(Define.HumanOutfitAllGender part, int num)
     {
         //현재 착용한거 false
         SetActiveAllGenderParts(part, _currentAllGenderOutfit[(int)part], false);
@@ -291,9 +346,9 @@ public class CharacterOutfit : MonoBehaviour
                     _allGenderElbowRight[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderElbowLeft:
-                    if (num >= _allGenderElbowRight.Count)
-                        Debug.Log("_allGenderElbowRight Over");
-                    _allGenderElbowRight[num].SetActive(active);
+                    if (num >= _allGenderElbowLeft.Count)
+                        Debug.Log("_allGenderElbowLeft Over");
+                    _allGenderElbowLeft[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderHips:
                     if (num >= _allGenderHips.Count)
@@ -326,7 +381,7 @@ public class CharacterOutfit : MonoBehaviour
     #endregion
 
     #region Gender
-    private void ChangeGenderOutfit(Define.HumanOutfitOneGender part, int num)
+    public void ChangeGenderOutfit(Define.HumanOutfitOneGender part, int num)
     {
         if (_gender == Define.HumanGender.Male)
         {

@@ -326,6 +326,7 @@ public abstract class BattleHeroController : MonoBehaviour
     }
     protected void AnimationStart(Define.HeroState state)
     {
+        State = state;
         _animator.SetFloat("speed", _animationSpeed[(int)state]);
         switch (state)
         {
@@ -609,17 +610,24 @@ public abstract class BattleHeroController : MonoBehaviour
 
     protected virtual void BeforeDamaged()
     {
+        ResetBooleanValues();
         _isDamaged = true;
 
-        ResetBooleanValues();
         AnimationStart(Define.HeroState.Damaged);
     }
 
     protected IEnumerator DamagedProcess()
     {
-        BeforeDamaged();
         WeaponSetActive(false);
+        BeforeDamaged();
 
+        while (true)
+        {
+            if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Damaged") == true)
+                break;
+
+            yield return null;
+        }
         while (true)
         {
             if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)

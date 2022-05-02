@@ -26,6 +26,22 @@ public class HumanOutfit
         }
     }
 
+    public void CopyHumanOutfit(HumanOutfit outfit)
+    {
+        Gender = outfit.Gender;
+
+        int size = (int)Define.HumanOutfitAllGender.Unknown;
+        for (int i = 0; i < size; i++)
+        {
+            AllGender[i] = outfit.AllGender[i];
+        }
+        size = (int)Define.HumanOutfitOneGender.Unknown;
+        for (int i = 0; i < size; i++)
+        {
+            OneGender[i] = outfit.OneGender[i];
+        }
+    }
+
     public void SetStatData(Data.StatData data)
     {
         if (data.Gender == true)

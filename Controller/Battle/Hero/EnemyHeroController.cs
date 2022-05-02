@@ -181,6 +181,7 @@ public abstract class EnemyHeroController : BattleHeroController
     protected override void BeforeBlocking()
     {
         base.BeforeBlocking();
+        _blockEnd = true;
     }
 
     protected override void AfterBlocking()
@@ -265,10 +266,6 @@ public abstract class EnemyHeroController : BattleHeroController
         }
     }
 
-    //protected override void ResetBooleanValues()
-    //{
-    //    base.ResetBooleanValues();
-    //}
 
     protected override void FixedUpdate()
     {

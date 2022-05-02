@@ -13,7 +13,6 @@ public class GlobalCharacterData
     public int Agility { get; set; }
     public int Defense { get; set; }
 
-    public int Money { get; set; }
     public Vector3 Position { get; set; }
     public string CharacterName { get; set; }
 
@@ -26,7 +25,6 @@ public class GlobalCharacterData
         Power = data.Power;
         Agility = data.Agility;
         Defense = data.Defense;
-        Money = data.Money;
     }
 
     public void SetNPCBaseData()
@@ -38,6 +36,5 @@ public class GlobalCharacterData
         Power = Random.Range(Managers.Data.NPCMinimumStat.Power, Managers.Data.NPCMaximumStat.Power);
         Agility = Random.Range(Managers.Data.NPCMinimumStat.Agility, Managers.Data.NPCMaximumStat.Agility);
         Defense = Random.Range(Managers.Data.NPCMinimumStat.Defense, Managers.Data.NPCMaximumStat.Defense);
-        Money = Random.Range(Managers.Data.NPCMinimumStat.Money, Managers.Data.NPCMaximumStat.Money);
     }
 }

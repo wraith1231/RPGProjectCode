@@ -80,7 +80,8 @@ public class MoveTargetsSurround : HeroNode
         _parentController.SetHeroState(Define.HeroState.Idle);
         _animator.SetFloat("Horizontal", 0.0f);
         _animator.SetFloat("Vertical", 0.0f);
-        _animator.CrossFade("Idle", _fixedTime);
+        if(_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") == false)
+            _animator.CrossFade("Idle", _fixedTime);
         _isMoving = false;
         _state = NodeState.Failed;
         _moveTime = 0f;
