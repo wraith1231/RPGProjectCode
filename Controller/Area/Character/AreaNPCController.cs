@@ -17,14 +17,10 @@ public class AreaNPCController : AreaGroupController
         public AStarNode parent;
         public AreaNode currentNode;
     }
-    protected AreaNode _currentNode;
     
     protected override void FixedUpdate()
     {
-        if (_moveToDest == false)
-            _appearance.SetActive(false);
-        else
-            _appearance.SetActive(true);
+
     }
 
     protected override void Initialize()
@@ -32,8 +28,8 @@ public class AreaNPCController : AreaGroupController
         int size = Managers.Map.VillageLists.Count;
         int start = Random.Range(0, size);
 
-        _currentNode = Managers.Map.VillageLists[start].BaseAreaNode;
-        _transform.position = _currentNode.transform.position;
+        //_currentNode = Managers.Map.VillageLists[start].BaseAreaNode;
+        //_transform.position = _currentNode.transform.position;
 
     }
 
@@ -51,6 +47,7 @@ public class AreaNPCController : AreaGroupController
         int num = Random.Range(0, size);
         
         string villName = Managers.Map.VillageLists[num].Data.VillageName;
+        Debug.Log($"{gameObject.name} testrandommove");
         float dest = Vector3.Distance(_transform.position, Managers.Map.VillageLists[num].transform.position);
 
         AStarNode temp = new AStarNode();
@@ -113,7 +110,6 @@ public class AreaNPCController : AreaGroupController
                 {
                     if(qTemp.currentNode.Village.Data.VillageName == villName)
                     {
-                        _currentNode = qTemp.currentNode;
                         result = qTemp;
                         break;
                     }

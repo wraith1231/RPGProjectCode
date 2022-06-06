@@ -37,7 +37,27 @@ public class AreaPlayerController : AreaGroupController
             }
         }
     }
+    private void OnDestroy()
+    {
+        Managers.Map.DayChangeUpdate -= DayChangeUpdate;
 
+        Managers.Input.LeftMouseAction -= OnLeftMouseEvent;
+        Managers.Input.RightMouseAction -= OnRightMouseEvent;
+
+        GlobalGroupController controller = Managers.General.GlobalGroups[_groupId];
+
+        controller.Position = _transform.position;
+
+        controller.Status = _status;
+
+        if (_destination.Count > 0)
+        {
+            int size = _destination.Count;
+            for (int i = 0; i < size; i++)
+                controller.Destination.Enqueue(_destination.Dequeue());
+            //controller.Destination = _destination;
+        }
+    }
     protected override void Initialize()
     {
         Managers.Input.LeftMouseAction -= OnLeftMouseEvent;

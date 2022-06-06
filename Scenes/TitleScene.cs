@@ -14,6 +14,5 @@ public class TitleScene : BaseScene
     {
         base.Init();
 
-        //Managers.Resource.Load<GameObject>("Human", HumanResourcePooling);
     }
 }

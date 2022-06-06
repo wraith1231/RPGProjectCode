@@ -4,24 +4,25 @@ using UnityEngine;
 
 public class WeaponAttack : MonoBehaviour
 {
-    private BattleHeroController _parentController;
+    private BattleCharacterController _parentController;
 
-    public void SetHeroController(BattleHeroController controller)
+    public void SetHeroController(BattleCharacterController controller)
     {
         _parentController = controller;
     }
 
     private void OnTriggerStay(Collider other)
     {
-        BattleHeroController controller = other.GetComponent<BattleHeroController>();
+        BattleCharacterController controller = other.GetComponent<BattleCharacterController>();
 
         if (controller == null)
         {
             if(other.tag == "Weapon")
             {
-                controller = other.GetComponentInParent<BattleHeroController>();
-                _parentController.Parried = true;
-                controller.Parried = true;
+                controller = other.GetComponentInParent<BattleCharacterController>();
+
+                _parentController.GetParried();
+                controller.GetParried();
             }
 
             return;
@@ -29,26 +30,32 @@ public class WeaponAttack : MonoBehaviour
 
         if(controller.Group != _parentController.Group)
         {
-            if(controller.State == Define.HeroState.Block)
+            if (controller.IsHero == true)
             {
+                if (controller.State == Define.HeroState.Block)
+                {
 
-                float dot = Vector3.Dot(controller.transform.forward, _parentController.transform.forward);
-                bool isOpposite = dot < -0.7 ? true : false;
-                if (controller.State == Define.HeroState.Block && isOpposite == true)
-                {
-                    controller.GetBlocked(_parentController);
-                    _parentController.Parried = true;
+                    float dot = Vector3.Dot(controller.transform.forward, _parentController.transform.forward);
+                    bool isOpposite = dot < -0.7 ? true : false;
+                    if (controller.State == Define.HeroState.Block && isOpposite == true)
+                    {
+                        controller.GetBlocked(_parentController, transform.position);
+                        _parentController.GetParried();
+                    }
+                    else
+                    {
+                        controller.GetDamaged(_parentController, transform.position);
+                    }
                 }
-                else
+                else //hero.state != block
                 {
-                    controller.GetDamaged(_parentController);
+                    controller.GetDamaged(_parentController, transform.position);
                 }
             }
-            else
+            else    //controller.ishero == false
             {
-                controller.GetDamaged(_parentController);
+                controller.GetDamaged(_parentController, transform.position);
             }
-
         }
     }
 }

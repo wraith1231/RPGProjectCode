@@ -6,13 +6,19 @@ public class AreaCameraController : MonoBehaviour
 {
     private Transform _tranform;
     private Transform _target;
-    private Vector3 _offset;
+    private Camera _camera;
+
+    [SerializeField]
+    private Vector3 _offset = new Vector3(0, 100, -15f);
+    [SerializeField]
+    private float _orthoSize = 50f;
 
     // Start is called before the first frame update
     void Start()
     {
         _tranform = GetComponent<Transform>();
-        _offset = new Vector3(0, 100, -15f);
+        _camera = GetComponent<Camera>();
+        _camera.orthographicSize = _orthoSize;
     }
 
     // Update is called once per frame

@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class DefenseVillageQuest : QuestBase
 {
+    public DefenseVillageQuest()
+    {
+        Type = Define.QuestType.DefenseVillage;
+    }
+
     //마을 지키기
     //실패하면 마을이 아작남
     public override void Progress(GameObject go)
@@ -13,11 +18,12 @@ public class DefenseVillageQuest : QuestBase
 
     public override void QuestExpired()
     {
-
+        TargetVillage.Condition = Define.VillageCondition.Destroyed;
     }
 
-    public override void Reward(int groupId)
+    public override void Reward(params int[] groupId)
     {
+        base.Reward(groupId);
 
     }
 }

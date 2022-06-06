@@ -122,20 +122,25 @@ public class CharacterData
     [SerializeField] private Define.NPCPersonality _personality;
     public Define.NPCPersonality Personality { get { return _personality; } }
 
+    private Define.Facilities _currentFacillity = Define.Facilities.Unknown;
+    public Define.Facilities CurrentFacillity { get { return _currentFacillity; } set { _currentFacillity = value; } }
+
     private Vector3 _startPosition = new Vector3();
     public Vector3 StartPosition { get { return _startPosition; } set { _startPosition = value; } }
 
     private string _characterName;
     public string CharName { get { return _characterName; } set { _characterName = value; } }
 
+    private List<int> _charRelationList = new List<int>();
+    private Dictionary<int, float> _characterRelation = new Dictionary<int, float>();
+
     private HumanOutfit _outfit;
     private EquipWeapon _leftEquipWeapon;
     private EquipWeapon _rightEquipWeapon;
 
-    public CharacterData(Vector3 startPos, int group = -1, bool player = false, Define.NPCPersonality personality = Define.NPCPersonality.Normal, HumanOutfit outfit = null, EquipWeapon left = null,
+    public CharacterData(int group = -1, bool player = false, Define.NPCPersonality personality = Define.NPCPersonality.Normal, HumanOutfit outfit = null, EquipWeapon left = null,
         EquipWeapon right = null, string name = null)
     {
-        _startPosition = startPos;
         _heroGroup = group;
         _isPlayer = player;
         _personality = personality;
@@ -160,4 +165,23 @@ public class CharacterData
     public HumanOutfit Outfit { get { return _outfit; } }
     public EquipWeapon Left { get { return _leftEquipWeapon; } }
     public EquipWeapon Right { get { return _rightEquipWeapon; } }
+
+    public Define.CharacterRelationship GetCharacterRelation(int num)
+    {
+        if (_charRelationList.Contains(num) == false)
+            return Define.CharacterRelationship.Normal;
+
+        float relation = _characterRelation[num];
+        if (relation < -50)
+            return Define.CharacterRelationship.Baddess;
+
+        if (relation < -20)
+            return Define.CharacterRelationship.Bad;
+        if (relation < 20)
+            return Define.CharacterRelationship.Normal;
+        if (relation < 50)
+            return Define.CharacterRelationship.Good;
+
+        return Define.CharacterRelationship.Best;
+    }
 }

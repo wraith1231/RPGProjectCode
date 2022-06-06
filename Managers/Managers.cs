@@ -41,6 +41,11 @@ public class Managers : MonoBehaviour
     BattleGameManager _battleGame = new BattleGameManager();
     public static BattleGameManager Battle { get { return Instance._battleGame; } }
 
+    VFXManager _vfx = new VFXManager();
+    public static VFXManager VFX { get { return Instance._vfx; } }
+
+    QuestManager _quest = new QuestManager();
+    public static QuestManager Quest { get { return Instance._quest; } }
     #endregion
 
     void Start()
@@ -74,11 +79,15 @@ public class Managers : MonoBehaviour
             s_instance._sound.Init();
             s_instance._data.Init();
             s_instance._generalGame.Init();
+            s_instance._vfx.Init();
+            s_instance._quest.Init();
         }
     }
 
     public static void Clear()
     {
+        //VFX.Clear();
+        Resource.ReleaseStock();
         Input.Clear();
         Sound.Clear();
         Scene.Clear();

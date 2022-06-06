@@ -8,7 +8,7 @@ public class AttackCampQuest : QuestBase
     //보상만 있음
     public AttackCampQuest( )
     {
-
+        Type = Define.QuestType.AttackCamp;
     }
 
     public override void Progress(GameObject go)
@@ -21,8 +21,9 @@ public class AttackCampQuest : QuestBase
 
     }
 
-    public override void Reward(int groupId)
+    public override void Reward(params int[] groupId)
     {
+        base.Reward(groupId);
 
     }
 }

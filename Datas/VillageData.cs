@@ -8,11 +8,24 @@ namespace Data
     public class VillageData
     {
         public string Name;
+        public float PosX;
+        public float PosY;
+        public float PosZ;
 
         public float Growth;
         public float GrowthPerDay;
         public float Safety;
         public float SafetyPerDay;
+        public float DetectRange;
+
+        public float Endurance;
+        public float Power;
+        public float Foods;
+        public float Gold;
+
+        public List<int> Facilities;
+
+        public Vector3 Position { get { return new Vector3(PosX, PosY, PosZ); } }
     }
 
     [System.Serializable]
@@ -31,5 +44,6 @@ namespace Data
                 _villageDicts[VillageDatas[i].Name] = VillageDatas[i];
             }
         }
+
     }
 }

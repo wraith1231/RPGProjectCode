@@ -60,11 +60,12 @@ public class UIManager
 
     public void MakeSubItem<T>(Transform parent = null, string name = null) where T : UIBase
     {
+        string objectName = typeof(T).Name;
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
         //GameObject go = Managers.Resource.Instantiate($"SubItem/{name}", null).Result as GameObject;
-        Managers.Resource.Instantiate($"SubItem/{name}", SubItemInstantiate, parent);
+        Managers.Resource.Instantiate($"SubItem/{objectName}", (go) => { go.name = name; SubItemInstantiate(go); }, parent);
 
         return;
     }

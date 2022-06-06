@@ -8,6 +8,8 @@ public class Define
     {
         Idle,
         Battle,
+        Recontract,
+        Destroyed,
         Unknown,
     }
 
@@ -32,10 +34,11 @@ public class Define
         AttackCamp,
         DefenseVillage,
         Raid,
+        Hunt,
         Unknown
     }
 
-    public enum Facillities
+    public enum Facilities
     {
         Gate,
         Market,
@@ -43,6 +46,7 @@ public class Define
         Square,
         Guild,
         Mayor,
+        Inn,
         Unknown
     }
 

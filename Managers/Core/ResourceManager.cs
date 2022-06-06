@@ -17,7 +17,7 @@ public class ResourceManager
         for (int i = 0; i < size; i++)
         {
             if(_assets[_keys[i]] != null)
-            Addressables.Release(_assets[_keys[i]]);
+                Addressables.Release(_assets[_keys[i]]);
         }
 
         _keys.Clear();

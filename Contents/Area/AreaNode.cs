@@ -21,4 +21,22 @@ public class AreaNode : MonoBehaviour
     {
         return Vector3.Distance(_transform.position, node);
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        AreaGroupController controller = other.GetComponent<AreaGroupController>();
+        if (controller == null)
+            return;
+
+        controller.CurrentNode = this;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        AreaGroupController controller = other.GetComponent<AreaGroupController>();
+        if (controller == null)
+            return;
+
+        controller.CurrentNode = null;
+    }
 }

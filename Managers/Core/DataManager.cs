@@ -39,10 +39,12 @@ public class DataManager
 
     #region Village Data
     private List<Data.VillageData> _villageDataList = new List<Data.VillageData>();
+    public List<Data.VillageData> VillageDataList { get { return _villageDataList; } private set { _villageDataList = value; } }
     private Dictionary<string, Data.VillageData> _villageDatas = new Dictionary<string, Data.VillageData>();
     public Dictionary<string, Data.VillageData> VillageDatas { get { return _villageDatas; } private set { _villageDatas = value; } }
 
     private int _villageNumber = 0;
+    public int GetVillageNumber() { return _villageNumber; }
     #endregion
 
     public void Init()
@@ -93,7 +95,7 @@ public class DataManager
 
     public Data.VillageData GetVillageData()
     {
-        if(_villageDataList.Count < _villageNumber)
+        if(_villageDataList.Count > _villageNumber)
             return _villageDataList[_villageNumber++];
 
         return null;
@@ -102,5 +104,13 @@ public class DataManager
     public int GetVillageCount()
     {
         return _villageDataList.Count;
+    }
+
+    public Vector3 GetVillagePosition(int id)
+    {
+        if (id > _villageDataList.Count)
+            return Vector3.zero;
+
+        return _villageDataList[id].Position;
     }
 }

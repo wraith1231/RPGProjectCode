@@ -53,7 +53,7 @@ public class MapGameManager
         _cameraInit = false;
         _progress = 0;
         _instantiatedChar = 0;
-        Debug.Log("Data Instantiate");
+        //Debug.Log("Data Instantiate");
 
         Managers.Resource.Instantiate("AreaTerrain", TerrainInstantiated);
     }
@@ -66,7 +66,7 @@ public class MapGameManager
         _keys.Add(0);
         _groups[0].Add(Managers.General.GlobalPlayer.Data.HeroId);
 
-        List<GlobalNPCController> data = Managers.General.GlobalCharacters;
+        List<GlobalCharacterController> data = Managers.General.GlobalCharacters;
 
         int listSize = data.Count;
         
@@ -92,7 +92,7 @@ public class MapGameManager
 
         _areaTerrain = go.GetComponent<Terrain>();
         _progress++;
-        Debug.Log($"Terrain Instantiated{_progress}");
+        //Debug.Log($"Terrain Instantiated{_progress}");
         CharacterInstantiate();
         CameraInstantiate();
     }
@@ -105,6 +105,20 @@ public class MapGameManager
 
     }
 
+    private void ControllerSetting(GameObject go, AreaGroupController controller, int id)
+    {
+        controller.SetTerrainData(_areaTerrain.terrainData);
+        controller.GroupId = id;
+
+        go.name = Managers.General.GlobalGroups[id].GroupName;
+
+        Vector3 pos = Managers.General.GlobalGroups[id].Position;
+        pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x / _areaTerrain.terrainData.size.x, pos.z / _areaTerrain.terrainData.size.z);
+        go.transform.position = pos;
+
+        controller.PrevNode = Managers.General.GlobalGroups[id].Position;
+    }
+
     //수정할때 HumanCharInstantiated 확인
     private void PlayerInstantiated(GameObject go)
     {
@@ -112,19 +126,11 @@ public class MapGameManager
         GameObject.DontDestroyOnLoad(go);
 
         _player = go.AddComponent<AreaPlayerController>();
-        _player.SetTerrainData(_areaTerrain.terrainData);
-        _player.GroupId = 0;
-        //_player.SetGroupMembers(_groups[0]);
-        //_player.SetAppearance(go);
 
-        go.name = Managers.General.GlobalPlayer.Data.CharName;
-        Vector3 pos = Managers.General.GlobalPlayer.Data.StartPosition;
-        pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x / _areaTerrain.terrainData.size.x, pos.z / _areaTerrain.terrainData.size.z);
-
-        _player.transform.position = pos;
+        ControllerSetting(go, _player, 0);
 
         _progress++;
-        Debug.Log($"Player Instantiated{_progress}");
+        //Debug.Log($"Player Instantiated{_progress}");
         _playerInit = true;
         SetPlayerAndCameraIfInitialized();
     }
@@ -184,23 +190,17 @@ public class MapGameManager
 
         AreaGroupController controller = null;
         controller = go.AddComponent<AreaNPCController>();
-        controller.SetTerrainData(_areaTerrain.terrainData);
-        //controller.SetAppearance(go);
 
-        go.name = Managers.General.GlobalCharacters[_groups[id][0]-1].Data.CharName;
-        Vector3 pos = Managers.General.GlobalCharacters[_groups[id][0]-1].Data.StartPosition;
-        pos.y = _areaTerrain.terrainData.GetInterpolatedHeight(pos.x / _areaTerrain.terrainData.size.x, pos.z / _areaTerrain.terrainData.size.z);
-
-        controller.transform.position = pos;
+        ControllerSetting(go, controller, id);
         _charLists.Add(go);
         _controllers.Add(controller);
 
-        Debug.Log($"{go.name} Instantiated");
+        //Debug.Log($"{go.name} Instantiated");
         _progress++;
         if (_charLists.Count == _keys.Count)
         {
             _progress++;
-            Debug.Log($"npc instantiated {_progress}");
+            //Debug.Log($"npc instantiated {_progress}");
         }
     }
 
@@ -217,7 +217,7 @@ public class MapGameManager
         _camera = go.GetComponent<AreaCameraController>();
 
         _progress++;
-        Debug.Log($"Camera Instantiated {_progress}");
+        //Debug.Log($"Camera Instantiated {_progress}");
         _cameraInit = true;
         SetPlayerAndCameraIfInitialized();
     }
@@ -241,6 +241,7 @@ public class MapGameManager
         {
             VillageStatus status = objects[i].GetComponent<VillageStatus>();
             _villageLists.Add(status);
+            status.SceneInit();
             _villages.Add(status.Data.VillageName, status);
         }
 
@@ -260,6 +261,10 @@ public class MapGameManager
         for (int i = 0; i < size; i++)
             _controllers[i].SceneInit();
 
+        size = _villageLists.Count;
+        for (int i = 0; i < size; i++)
+            _villageLists[i].SceneInit();
+
         AreaSceneNow = true;
     }
     #endregion
@@ -268,6 +273,7 @@ public class MapGameManager
     {
         AreaSceneNow = false;
         _controllers.Clear();
+        _villageLists.Clear();
         int size = _objects.Count;
         for (int i = 0; i < size; i++)
         {

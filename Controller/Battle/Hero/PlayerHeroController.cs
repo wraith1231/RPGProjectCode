@@ -72,6 +72,12 @@ public class PlayerHeroController : BattleHeroController
     #endregion
 
     #region General
+    private void OnDestroy()
+    {
+        Managers.Input.KeyAction -= OnKeyboardEvent;
+        Managers.Input.LeftMouseAction -= OnLeftMouseEvent;
+        Managers.Input.RightMouseAction -= OnRightMouseEvent;
+    }
     public override void Init()
     {
         //manager¿¡ ¿¬°á
@@ -106,6 +112,7 @@ public class PlayerHeroController : BattleHeroController
 
         if (State == Define.HeroState.Running)
         {
+
             _battleData.CurrentStaminaPoint -= _battleData.StaminaRecovery * Time.deltaTime;
 
             if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
@@ -174,6 +181,7 @@ public class PlayerHeroController : BattleHeroController
         {
             _isDead = true;
             _characterCollider.enabled = false;
+            _rigidBody.useGravity = false;
             StopAllCoroutines();
 
             AnimationStart(Define.HeroState.Die);
@@ -287,18 +295,20 @@ public class PlayerHeroController : BattleHeroController
         _animator.SetFloat("Horizontal", _horizontal);
         _animator.SetFloat("Vertical", _vertical);
 
-        if (Input.GetAxisRaw("Run") > 0.5f)
+        if (Mathf.Abs(_horizontal) + Mathf.Abs(_vertical) > 0.1f)
         {
-            State = Define.HeroState.Running;
-            if (_animator.GetAnimatorTransitionInfo(0).anyState == false)
-                _animator.CrossFade("Run", _fixedTime);
+            if (Input.GetAxisRaw("Run") > 0.5f)
+            {
+                State = Define.HeroState.Running;
+                if (_animator.GetAnimatorTransitionInfo(0).anyState == false)
+                    _animator.CrossFade("Run", _fixedTime);
+            }
+            else
+            {
+                if (_animator.GetAnimatorTransitionInfo(0).anyState == false)
+                    _animator.CrossFade("Strafe", _fixedTime);
+            }
         }
-        else
-        {
-            if (_animator.GetAnimatorTransitionInfo(0).anyState == false)
-                _animator.CrossFade("Strafe", _fixedTime);
-        }
-
         if (Input.GetButtonDown("Roll") == true && IsEnoughToBehavior(RollingStamina))
         {
             Vector3 move = new Vector3(_vertical, 0, _horizontal);

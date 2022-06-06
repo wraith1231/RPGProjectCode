@@ -23,6 +23,7 @@ public class AreaScene : BaseScene
     {
         if(Input.GetKeyDown(KeyCode.K))
         {
+            Managers.Battle.AreaTerrainData = Managers.Map.MapData;
             Managers.Battle.AddCharList(Managers.General.GlobalPlayer.Data);
             Managers.Battle.AddCharList(Managers.General.GlobalCharacters[3].Data);
             Managers.Scene.LoadSceneAsync(Define.SceneType.TestScene);

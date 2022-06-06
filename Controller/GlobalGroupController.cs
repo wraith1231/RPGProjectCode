@@ -10,6 +10,9 @@ public class GlobalGroupController
     private string _groupName;
     public string GroupName { get { return _groupName; } set { _groupName = value; } }
 
+    private int _currentVillageNumber = -1;
+    public int CurrentVillageNumber { get { return _currentVillageNumber; } set { _currentVillageNumber = value; } }
+
     //퀘스트 목표물인지
     private bool _questObjective = false;
     public bool QuestObjective { get { return _questObjective; } set { _questObjective = value; } }
@@ -17,6 +20,7 @@ public class GlobalGroupController
     //그룹 멤버 관련
     [SerializeField]
     private List<int> _memberList = new List<int>();
+    public List<int> MemberList { get { return _memberList; } }
     public int GroupMemberCount() { return _memberList.Count; }
 
     //돈이 아니라 식량으로 쓴다
@@ -25,6 +29,18 @@ public class GlobalGroupController
 
     private Define.GroupType _type = Define.GroupType.Unknown;
     public Define.GroupType Type { get { return _type; } set { _type = value; } }
+
+    private Queue<Vector3> _destination = new Queue<Vector3>();
+    public Queue<Vector3> Destination { get { return _destination; } set { _destination = value; } }
+
+    private Define.AreaStatus _status = Define.AreaStatus.Idle;
+    public Define.AreaStatus Status { get { return _status; } set { _status = value; } }
+
+    private Vector3 _position = new Vector3();
+    public Vector3 Position { get { return _position; } set { _position = value; } }
+
+    private int _gold;
+    public int Gold { get { return _gold; } set { _gold = value; } }
 
     public GlobalGroupController(int groupId, string groupName, float foods)
     {

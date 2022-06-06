@@ -19,7 +19,7 @@ public class TestScene : BaseScene
         base.Init();
 
         Managers.UI.MakePopupUI<UIPlayerGauge>(foo: PlayerGaugeInstantiated);
-        //Managers.Resource.Instantiate("Popup/UIPlayerGauge", PlayerGaugeInstantiated);
+
         Managers.Battle.BattleSceneStart();
     }
 

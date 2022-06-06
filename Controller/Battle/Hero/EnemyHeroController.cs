@@ -6,46 +6,19 @@ using BehaviorTree;
 
 public abstract class EnemyHeroController : BattleHeroController
 {
-    protected HeroNode _root = null;
-    protected SphereCollider _nearEnemyCollider;
-    public Animator HeroAnimator { get { return _animator; } }
-
-    protected float _detectRange = 30f;
-
-    protected float _runRange = 10f;
-    public float RunRange { get { return _runRange; } set { _runRange = value; } }
-
-    protected float _attackRange = 1.5f;
-    public float AttackRange { get { return _attackRange; } set { _attackRange = value; } }
-
-    protected float _patrolDist = 2.0f;
-    public float PatrolDist { get { return _patrolDist; } set { _patrolDist = value; } }
-
-    public Vector3 RollingDirection { get { return _rollingDirection; } set { _rollingDirection = value; } }
-
-    public float AnimFixedTime { get { return _fixedTime; } }
+    protected NodeBase _root = null;
 
     public override Define.HeroState State { get { return _state; } protected set { _state = value; } }
 
-    protected List<int> _charKeys = new List<int>();
-    protected Dictionary<int, BattleHeroController> _nearCharacter = new Dictionary<int, BattleHeroController>();
-    protected BattleHeroController _currentNearCharacter = null;
-    public float TargetDistance { get; set; }
-    public bool InBattleTarget { get; set; }
-    public Define.HeroState NextState { get; set; }
-
     public override void Init()
     {
-        _transform = GetComponent<Transform>();
-        _animator = GetComponent<Animator>();
-
         _nearEnemyCollider = GetComponent<SphereCollider>();
         _nearEnemyCollider.isTrigger = true;
         _nearEnemyCollider.radius = _detectRange;
         _nearEnemyCollider.enabled = false;
 
     }
-    public void SetHeroState(Define.HeroState state)
+    public override void SetHeroState(Define.HeroState state)
     {
         _state = state;
     }
@@ -53,9 +26,11 @@ public abstract class EnemyHeroController : BattleHeroController
     #region TriggerEvent
     private void OnTriggerEnter(Collider other)
     {
-        BattleHeroController controller = other.GetComponent<BattleHeroController>();
+        BattleCharacterController controller = other.GetComponent<BattleCharacterController>();
 
         if (controller == null || controller.State == Define.HeroState.Die)
+            return;
+        if (controller.IsHero == false)
             return;
 
         int id = controller.HeroId;
@@ -92,7 +67,7 @@ public abstract class EnemyHeroController : BattleHeroController
     #endregion
 
     #region NearCharacter
-    public BattleHeroController CalculateNearestCharacter()
+    public override BattleCharacterController CalculateNearestCharacter()
     {
         _nearEnemyCollider.enabled = true;
         if (_charKeys.Count == 0)
@@ -130,7 +105,7 @@ public abstract class EnemyHeroController : BattleHeroController
         return _currentNearCharacter;
     }
 
-    public BattleHeroController GetNearestCharacter()
+    public override BattleCharacterController GetNearestCharacter()
     {
         return _currentNearCharacter;
     }
@@ -138,15 +113,6 @@ public abstract class EnemyHeroController : BattleHeroController
 #endregion
 
 #region Attack
-    public bool PlayAttackAnimation()
-    {
-        if(_attacking == false)
-        {
-            StartCoroutine(AttackProcess());
-        }
-
-        return _attacking;
-    }
     protected override void BeforeAttack()
     {
         _nearEnemyCollider.enabled = false;
@@ -168,16 +134,6 @@ public abstract class EnemyHeroController : BattleHeroController
 #endregion
 
 #region Block
-    public bool PlayBlockAnimation()
-    {
-        if (_isBlock == false)
-        {
-            StartCoroutine(BlockProcess());
-        }
-
-        return _isBlock;
-    }
-
     protected override void BeforeBlocking()
     {
         base.BeforeBlocking();
@@ -196,15 +152,6 @@ public abstract class EnemyHeroController : BattleHeroController
 #endregion
 
 #region Rolling
-    public bool PlayRollAnimation()
-    {
-        if (_isRolling == false)
-        {
-            StartCoroutine(RollingProcess());
-        }
-
-        return _isRolling;
-    }
     protected override void BeforeRolling()
     {
         _transform.LookAt(RollingDirection);
@@ -222,15 +169,6 @@ public abstract class EnemyHeroController : BattleHeroController
 #endregion
 
 #region Damaged
-    public override void GetDamaged(BattleHeroController attacker)
-    {
-        base.GetDamaged(attacker);
-
-        NextState = Define.HeroState.Damaged;
-        if(_nearCharacter.ContainsKey(attacker.HeroId) == false)
-            _nearCharacter.Add(attacker.HeroId, attacker);
-    }
-
     protected override void BeforeDamaged()
     {
         InBattleTarget = false;
@@ -254,6 +192,7 @@ public abstract class EnemyHeroController : BattleHeroController
         {
             _isDead = true;
             _characterCollider.enabled = false;
+            _rigidBody.useGravity = false;
             StopAllCoroutines();
 
             AnimationStart(Define.HeroState.Die);
@@ -269,6 +208,9 @@ public abstract class EnemyHeroController : BattleHeroController
 
     protected override void FixedUpdate()
     {
+        if (State == Define.HeroState.Idle)
+            _idleTime += Time.deltaTime;
+
         if (_battleData.CurrentHealthPoint <= 0 && State != Define.HeroState.Die)
         {
             State = Define.HeroState.Die;
@@ -294,6 +236,4 @@ public abstract class EnemyHeroController : BattleHeroController
             if (_battleData.CurrentStaminaPoint > _battleData.MaxStaminaPoint) _battleData.CurrentStaminaPoint = _battleData.MaxStaminaPoint;
         }
     }
-
-    public abstract Define.HeroState CheckNextState();
 }

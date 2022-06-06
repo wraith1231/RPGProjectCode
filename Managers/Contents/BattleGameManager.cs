@@ -38,6 +38,14 @@ public class BattleGameManager
 
     private int _instantiatedChar = 0;
 
+    private TerrainData _areaTerrainData;
+    public TerrainData AreaTerrainData { get { return _areaTerrainData; } set { _areaTerrainData = value; } }
+
+    private Vector3 _playerPos;
+    private Vector3 _startPos;
+
+    private TerrainData TerrainData { get { return BattleTerrain.terrainData; } }
+
     //게임 클리어 조건용
     private int _livingChar = 0;
 
@@ -57,7 +65,7 @@ public class BattleGameManager
 
         GroupInitialize();
 
-        InstantiateCharacterPrefab();
+        InstantiateTerrain();
     }
 
     private void GroupInitialize()
@@ -74,12 +82,95 @@ public class BattleGameManager
         _progress++;
     }
 
+    private void InstantiateTerrain()
+    {
+        Managers.Resource.Instantiate("BattleTerrain", TerrainInstantiate);
+    }
+
+    private void TerrainInstantiate(GameObject go)
+    {
+        _objects.Add(go);
+        GameObject.DontDestroyOnLoad(go);
+
+        BattleTerrain = go.GetComponent<Terrain>();
+
+        int heightmapResolution = TerrainData.heightmapResolution;
+        int alphamapResolution = TerrainData.alphamapResolution;
+
+        float[,] heights = new float[heightmapResolution, heightmapResolution];
+
+        //player position 기준 -15~15 사이의 값을 300 x 300에 맞게 불려야함
+
+        GlobalGroupController player = Managers.General.GlobalGroups[0];
+
+        Vector3 terrainSize = _areaTerrainData.size;
+        float startX = player.Position.x - heightmapResolution * 0.5f;
+        float startZ = player.Position.z - heightmapResolution * 0.5f;
+
+        float endX = player.Position.x + heightmapResolution * 0.5f;
+        float endZ = player.Position.z + heightmapResolution * 0.5f;
+
+        if (startX < 0)
+        {
+            startX = 0;
+            endX = startX + heightmapResolution;
+        }
+        if (startZ < 0)
+        { 
+            startZ = 0;
+            endZ = startZ + heightmapResolution; 
+        }
+
+        if (endX > _areaTerrainData.size.x)
+        {
+            endX = _areaTerrainData.size.x;
+            startX = endX - heightmapResolution;
+        }
+        if (endZ > _areaTerrainData.size.z)
+        {
+            endZ = _areaTerrainData.size.z;
+            startZ = endZ - heightmapResolution;
+        }
+        _playerPos = player.Position;
+        _startPos = new Vector3(startX , 0, startZ);
+        heights = _areaTerrainData.GetHeights((int)startX, (int)startZ, heightmapResolution, heightmapResolution);
+
+        int z = 0;
+        int x = 0;
+
+        float playerY = _playerPos.y / _areaTerrainData.heightmapResolution;
+        while(true)
+        {
+            float dist = heights[z, x] - playerY;
+
+            heights[z, x] = heights[z, x] + dist * 0.5f;
+            x++;
+            if (x >= heightmapResolution)
+            {
+                x = 0;
+                z++;
+            }
+
+            if (z >= heightmapResolution)
+                break;
+        }
+
+        float[,,] alphas = _areaTerrainData.GetAlphamaps((int)startX, (int)startZ, alphamapResolution, alphamapResolution);
+
+        TerrainData.SetHeightsDelayLOD(0, 0, heights);
+      
+        TerrainData.SetAlphamaps(0, 0, alphas);
+        
+        _progress++;
+
+        InstantiateCharacterPrefab();
+    }
+
     private void InstantiateCharacterPrefab()
     {
         Managers.Resource.Instantiate("Camera", (go) =>
         { _objects.Add(go); GameObject.DontDestroyOnLoad(go); _camera = go.GetComponent<CameraController>(); _progress++; });
 
-        Managers.Resource.Instantiate("BattleTerrain", TerrainInstantiate);
 
         CharacterInstantiate();
 
@@ -130,7 +221,11 @@ public class BattleGameManager
         int id = _charIdList[go.name][0];
         _charIdList[go.name].RemoveAt(0);
         BattleHeroController controller;
-        if(_charList[id].Player == true)
+        bool isPlayer = false;
+
+        if(isPlayer == false)
+            isPlayer = _charList[id].Player;
+        if(isPlayer)
         {
             controller = go.AddComponent<PlayerHeroController>();
             _player = controller as PlayerHeroController;
@@ -162,7 +257,22 @@ public class BattleGameManager
         
         _groups[_charList[id].Group].Add(controller);
 
-        controller.transform.position = _charList[id].StartPosition;
+        Vector3 pos = _charList[id].StartPosition;
+        if(isPlayer)
+        {
+            pos = _playerPos - _startPos;
+            pos.x = (pos.x / TerrainData.heightmapResolution) * TerrainData.size.x;
+            pos.z = (pos.z / TerrainData.heightmapResolution) * TerrainData.size.z;
+            Debug.Log($"{TerrainData.heightmapResolution}, {_playerPos}, {_startPos}");
+        }
+        else
+        {
+            pos = _player.transform.position;
+            pos.x += 10f;
+            pos.z += 10f;
+        }
+        pos.y = TerrainData.GetInterpolatedHeight(pos.x / TerrainData.size.x, pos.z / TerrainData.size.z);
+        controller.transform.position = pos;
 
         if (_instantiatedChar == _charList.Count)
             _progress++;
@@ -182,15 +292,6 @@ public class BattleGameManager
     public void AddCharList(CharacterData data)
     {
         _charList.Add(data);
-    }
-
-    private void TerrainInstantiate(GameObject go)
-    {
-        _objects.Add(go);
-        GameObject.DontDestroyOnLoad(go);
-
-        BattleTerrain = go.GetComponent<Terrain>();
-        _progress++;
     }
 
     public void Clear()
