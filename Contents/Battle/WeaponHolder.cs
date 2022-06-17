@@ -8,7 +8,7 @@ public class WeaponHolder : MonoBehaviour
     [SerializeField] private Collider[] _unarmColliders;
     private bool _currentActive = true;
 
-    public void CheckColliders(bool otherHand, BattleHeroController controller)
+    public void CheckColliders(bool otherHand, BattleCharacterController controller)
     {
         _colliders = GetComponentsInChildren<Collider>();
 

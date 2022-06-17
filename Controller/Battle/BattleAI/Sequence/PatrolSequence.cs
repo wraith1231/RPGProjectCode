@@ -7,11 +7,14 @@ public class PatrolSequence : SequenceNode
 {
     private BattleCharacterController _controller;
 
-    public PatrolSequence(BattleCharacterController controller, float waitTime) : base()
+    public PatrolSequence(BattleCharacterController controller) : base()
     {
-        Attach(new WaitUntilSetTime(controller, waitTime));
+        Attach(new WaitRandomTime(controller, 2f));
         Attach(new RotateAroundBasePos(controller));
-        Attach(new WalkForwardTime(controller));
+        Attach(new SetVerticalNode(controller, 1.0f));
+        Attach(new PlayStrafeNode(controller));
+        Attach(new WaitRandomTime(controller, 2f));
+        Attach(new PlayIdleNode(controller));
     }
 
     public override BTResult Evaluate()

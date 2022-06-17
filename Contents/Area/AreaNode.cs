@@ -5,7 +5,7 @@ using UnityEngine;
 public class AreaNode : MonoBehaviour
 {
     [SerializeField] private List<AreaNode> _connectedNodes = new List<AreaNode>();
-    public List<AreaNode> ConnectedNode { get { return _connectedNodes; } }
+    public List<AreaNode> ConnectedNode { get { return _connectedNodes; } set { _connectedNodes = value; } }
 
     [SerializeField] public VillageStatus Village = null;
     private Transform _transform;

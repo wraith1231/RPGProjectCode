@@ -8,7 +8,7 @@ namespace Data
     [System.Serializable]
     public class WeaponData
     {
-        public Define.WeaponType Type;
+        public string Type;
         public string File;
 
         public float RPosX;
@@ -108,7 +108,7 @@ namespace Data
             list = new List<WeaponData>();
             foreach(KeyValuePair<string, WeaponData> weapon in data)
             {
-                if (weapon.Value.Type == type)
+                if (weapon.Value.Type == type.ToString())
                     list.Add(weapon.Value);
             }
         }

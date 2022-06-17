@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BattleMonsterController : BattleCharacterController
+public abstract class BattleMonsterController : BattleCharacterController
 {
     protected NodeBase _root = null;
 
@@ -22,11 +22,10 @@ public class BattleMonsterController : BattleCharacterController
         _nearEnemyCollider.radius = _detectRange;
         _nearEnemyCollider.enabled = false;
 
-        Init();
-    }
+        for (int i = 0; i < (int)Define.HeroState.Unknown; i++)
+            AnimationSpeedChange((Define.HeroState)i, 1.0f * (1 + _battleData.FinalAgility));
 
-    public override void Init()
-    {
+        Init();
     }
 
     protected override void FixedUpdate()
@@ -34,7 +33,7 @@ public class BattleMonsterController : BattleCharacterController
         if (State == Define.HeroState.Idle)
             _idleTime += Time.deltaTime;
     }
-
+/*
 
     protected override void DyingProcess()
     {
@@ -93,5 +92,5 @@ public class BattleMonsterController : BattleCharacterController
     {
 
     }
-    #endregion
+    #endregion*/
 }

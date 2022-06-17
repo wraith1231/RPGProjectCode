@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,6 +31,33 @@ public class EquipWeapon
     public EquipWeapon(Define.WeaponCategory category, Define.WeaponType type, int num)
     {
         SetDefault();
+        if (category == Define.WeaponCategory.Unknown)
+            return;
+
+        string weaponFile = "";
+        switch (type)
+        {
+            case Define.WeaponType.Sword:
+            case Define.WeaponType.Axe:
+            case Define.WeaponType.Dagger:
+            case Define.WeaponType.Mace:
+            case Define.WeaponType.Spear:
+                if(category == Define.WeaponCategory.OneHand)
+                    weaponFile = Managers.Data.OnehandList[(int)type][num].File;
+                else if(category == Define.WeaponCategory.TwoHand)
+                    weaponFile = Managers.Data.TwohandList[(int)type][num].File;
+                break;
+            case Define.WeaponType.Bow:
+            case Define.WeaponType.Gauntlet:
+                weaponFile = Managers.Data.TwohandList[(int)type][num].File;
+                break;
+            case Define.WeaponType.Shield:
+                weaponFile = Managers.Data.ShieldList[(int)type][num].File;
+                break;
+            case Define.WeaponType.Unknown:
+                break;
+        }
+        ChangeWeapon(category, weaponFile);
     }
 
     private void SetDefault()
@@ -52,7 +80,7 @@ public class EquipWeapon
             case Define.WeaponCategory.OneHand:
                 if (Managers.Data.OnehandDict.TryGetValue(file, out data) != false)
                 {
-                    Type = data.Type;
+                    Type = (Define.WeaponType)Enum.Parse(typeof(Define.WeaponType), data.Type);
                     File = data.File;
                     RPos = new Vector3(data.RPosX, data.RPosY, data.RPosZ);
                     RRot = new Vector3(data.RRotX, data.RRotY, data.RRotZ);
@@ -64,7 +92,7 @@ public class EquipWeapon
             case Define.WeaponCategory.TwoHand:
                 if (Managers.Data.TwohandDict.TryGetValue(file, out data) != false)
                 {
-                    Type = data.Type;
+                    Type = (Define.WeaponType)Enum.Parse(typeof(Define.WeaponType), data.Type);
                     File = data.File;
                     RPos = new Vector3(data.RPosX, data.RPosY, data.RPosZ);
                     RRot = new Vector3(data.RRotX, data.RRotY, data.RRotZ);
@@ -76,7 +104,7 @@ public class EquipWeapon
             case Define.WeaponCategory.Shield:
                 if (Managers.Data.SheildDict.TryGetValue(file, out data) != false)
                 {
-                    Type = data.Type;
+                    Type = (Define.WeaponType)Enum.Parse(typeof(Define.WeaponType), data.Type);
                     File = data.File;
                     RPos = new Vector3(data.RPosX, data.RPosY, data.RPosZ);
                     RRot = new Vector3(data.RRotX, data.RRotY, data.RRotZ);
@@ -102,7 +130,7 @@ public class EquipWeapon
                 if(Managers.Data.OnehandList[(int)type].Count > num)
                 {
                     data = Managers.Data.OnehandList[(int)type][num];
-                    Type = data.Type;
+                    Type = (Define.WeaponType)Enum.Parse(typeof(Define.WeaponType), data.Type);
                     File = data.File;
                     RPos = new Vector3(data.RPosX, data.RPosY, data.RPosZ);
                     RRot = new Vector3(data.RRotX, data.RRotY, data.RRotZ);
@@ -115,7 +143,7 @@ public class EquipWeapon
                 if (Managers.Data.TwohandList[(int)type].Count > num)
                 {
                     data = Managers.Data.TwohandList[(int)type][num];
-                    Type = data.Type;
+                    Type = (Define.WeaponType)Enum.Parse(typeof(Define.WeaponType), data.Type);
                     File = data.File;
                     RPos = new Vector3(data.RPosX, data.RPosY, data.RPosZ);
                     RRot = new Vector3(data.RRotX, data.RRotY, data.RRotZ);
@@ -128,7 +156,7 @@ public class EquipWeapon
                 if (Managers.Data.ShieldList[(int)type].Count > num)
                 {
                     data = Managers.Data.ShieldList[(int)type][num];
-                    Type = data.Type;
+                    Type = (Define.WeaponType)Enum.Parse(typeof(Define.WeaponType), data.Type);
                     File = data.File;
                     RPos = new Vector3(data.RPosX, data.RPosY, data.RPosZ);
                     RRot = new Vector3(data.RRotX, data.RRotY, data.RRotZ);

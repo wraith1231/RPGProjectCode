@@ -71,6 +71,7 @@ public class UICreateCharacter : UIPopup
 
         Managers.Map.GroupInitialize();
         Managers.Scene.LoadSceneAsync(Define.SceneType.AreaScene);
+        Managers.UI.CloseAllPopup();
     }
 
 }

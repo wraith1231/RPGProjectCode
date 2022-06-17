@@ -28,6 +28,8 @@ public class MapGameManager
 
     private Terrain _areaTerrain;
     public TerrainData MapData { get { return _areaTerrain.terrainData; } }
+    public Vector3 TerrainSize { get { return _areaTerrain.terrainData.size; } }
+    public Vector3 TerrainSize2;
 
     private static int PROGRESS = 4;
     private int _progress = 0;
@@ -43,7 +45,6 @@ public class MapGameManager
     private int _instantiatedChar = 0;
 
     //둘이 한 세트
-    private Dictionary<int, List<int>> _groups;
     private List<int> _keys;
 
     #region Initialize
@@ -59,29 +60,15 @@ public class MapGameManager
     }
     public void GroupInitialize()
     {
-        _groups = new Dictionary<int, List<int>>();
         _keys = new List<int>();
 
-        _groups[0] = new List<int>();
-        _keys.Add(0);
-        _groups[0].Add(Managers.General.GlobalPlayer.Data.HeroId);
-
-        List<GlobalCharacterController> data = Managers.General.GlobalCharacters;
+        List<GlobalGroupController> data = Managers.General.GlobalGroups;
 
         int listSize = data.Count;
         
         for (int i = 0; i < listSize; i++)
         {
-            if (data[i].Data.Type == Define.CharacterType.Human)
-            {
-                if (_groups.ContainsKey(data[i].Data.Group) == false)
-                {
-                    _keys.Add(data[i].Data.Group);
-                    _groups[data[i].Data.Group] = new List<int>();
-
-                }
-                _groups[data[i].Data.Group].Add(data[i].Data.HeroId);
-            }
+            _keys.Add(data[i].Group);
         }
     }
 
@@ -91,6 +78,7 @@ public class MapGameManager
         GameObject.DontDestroyOnLoad(go);
 
         _areaTerrain = go.GetComponent<Terrain>();
+        TerrainSize2 = _areaTerrain.terrainData.size;
         _progress++;
         //Debug.Log($"Terrain Instantiated{_progress}");
         CharacterInstantiate();
@@ -110,6 +98,7 @@ public class MapGameManager
         controller.SetTerrainData(_areaTerrain.terrainData);
         controller.GroupId = id;
 
+        //Debug.Log($"{id} is start");
         go.name = Managers.General.GlobalGroups[id].GroupName;
 
         Vector3 pos = Managers.General.GlobalGroups[id].Position;
@@ -128,6 +117,8 @@ public class MapGameManager
         _player = go.AddComponent<AreaPlayerController>();
 
         ControllerSetting(go, _player, 0);
+        _charLists.Add(go);
+        _controllers.Add(_player);
 
         _progress++;
         //Debug.Log($"Player Instantiated{_progress}");
@@ -159,6 +150,11 @@ public class MapGameManager
                 case Define.GroupType.Merchant:
                     break;
                 case Define.GroupType.Monster:
+                    key = data[listNum].GroupName;
+                    if(_charIdList.ContainsKey(key) == false)
+                        _charIdList[key] = new List<int>();
+                    _charIdList[key].Add(_keys[count++]);
+                    Managers.Resource.Instantiate(key, MonsterCharInstantiated);
                     break;
                 case Define.GroupType.Unknown:
                     key = "AreaCart";
@@ -191,6 +187,35 @@ public class MapGameManager
         AreaGroupController controller = null;
         controller = go.AddComponent<AreaNPCController>();
 
+        //Debug.Log($"current :  {id}");
+        ControllerSetting(go, controller, id);
+        _charLists.Add(go);
+        _controllers.Add(controller);
+
+        //Debug.Log($"{go.name} Instantiated");
+        _progress++;
+        if (_charLists.Count == _keys.Count)
+        {
+            _progress++;
+            //Debug.Log($"npc instantiated {_progress}");
+        }
+    }
+
+    
+    private void MonsterCharInstantiated(GameObject go)
+    {
+        _objects.Add(go);
+        _instantiatedChar++;
+        GameObject.DontDestroyOnLoad(go);
+        int id = _charIdList[go.name][0];
+        _charIdList[go.name].RemoveAt(0);
+        AreaGroupController controller = null;
+        //string typeName = $"Area{go.name}Controller";
+        //Type type = Type.GetType(typeName);
+        controller = go.AddComponent<AreaMonsterController>();
+        
+
+        Debug.Log($"current :  {id}");
         ControllerSetting(go, controller, id);
         _charLists.Add(go);
         _controllers.Add(controller);
@@ -267,6 +292,11 @@ public class MapGameManager
 
         AreaSceneNow = true;
     }
+
+    public void SetGroupPopup(GameObject go)
+    {
+        _player.GroupPopup = go.GetComponent<UIGroupName>();
+    }
     #endregion
 
     public void Clear()
@@ -316,5 +346,10 @@ public class MapGameManager
         }
 
         return _roads[number].GetComponent<AreaNode>();
+    }
+
+    public void PlayerExitVillage()
+    {
+        _player.SetAppearanceVisible(true);
     }
 }

@@ -5,15 +5,10 @@ using UnityEngine;
 
 public abstract class BattleHeroController : BattleCharacterController
 {
-    //general
-    public static float AttackStamina = 30f;
-    public static float RollingStamina = 30f;
-    public static float BlockStamina = 20f;
 
     private List<UnityEngine.Object> _attached = new List<UnityEngine.Object>();
 
     //attack
-    protected bool _attackColliderEnabled = false;
     protected bool _isOneHand = false;
 
     //weapon
@@ -35,6 +30,7 @@ public abstract class BattleHeroController : BattleCharacterController
         _rightWeaponHolder = gameObject.GetComponentInChildren<RightWeaponHolder>();
         _characterCollider = GetComponent<CapsuleCollider>();
         _isHero = true;
+        _animationRootMotion = true;
 
         for (int i = 0; i < (int)Define.HeroState.Unknown; i++)
             AnimationSpeedChange((Define.HeroState)i, 1.0f * (1 + _battleData.FinalAgility));
@@ -46,6 +42,7 @@ public abstract class BattleHeroController : BattleCharacterController
 
     private void OnDestroy()
     {
+        _battleData.CurrentStaminaPoint = _battleData.MaxStaminaPoint;
         int size = _attached.Count;
         for (int i = 0; i < size; i++)
             Managers.Resource.Release(_attached[i]);

@@ -6,7 +6,6 @@ public class TestScene : BaseScene
 {
     public override void Clear()
     {
-        Cursor.lockState = CursorLockMode.Confined;
         Managers.Battle.Clear();
     }
 

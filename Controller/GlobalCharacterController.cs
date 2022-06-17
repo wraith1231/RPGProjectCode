@@ -10,6 +10,9 @@ public class GlobalCharacterController
     protected GlobalCharacterData _globalData = new GlobalCharacterData();
     public GlobalCharacterData GlobalData { get { return _globalData; } set { _globalData = value; } }
 
+    protected BattleCharacterData _battleData = new BattleCharacterData();
+    public BattleCharacterData BattleData { get { return _battleData; } set { _battleData = value; } }
+
     //0이면 Normal로, +면 좋은거 -면 나쁜거
     private Dictionary<int, float> _relations = new Dictionary<int, float>();
 

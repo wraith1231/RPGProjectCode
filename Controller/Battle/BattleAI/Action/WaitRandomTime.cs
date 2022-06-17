@@ -3,24 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 
-public class WaitUntilSetTime : NodeBase
+public class WaitRandomTime : NodeBase
 {
     private BattleCharacterController _controller;
     private float _setTime;
     private float _curTime;
+    private float _range;
 
-    public WaitUntilSetTime(BattleCharacterController controller, float time)
+    public WaitRandomTime(BattleCharacterController controller, float range)
     {
         _controller = controller;
-        _setTime = time;
+        _range = range;
+        _setTime = Random.Range(0, _range);
         _curTime = 0;
     }
     public override BTResult Evaluate()
     {
         _curTime += Time.deltaTime;
-        if(_curTime >= _setTime)
+        if (_curTime >= _setTime)
         {
             _curTime = 0;
+            _setTime = Random.Range(0, _range);
             return BTResult.SUCCESS;
         }
 

@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 
-public class AttackFront : NodeBase
+public class SetHorizontalNode : NodeBase
 {
     private BattleCharacterController _controller;
+    private float _value;
 
-    public AttackFront(BattleCharacterController controller)
+    public SetHorizontalNode(BattleCharacterController controller, float value)
     {
         _controller = controller;
+        _value = value;
     }
 
     public override BTResult Evaluate()
     {
-        if (_controller.PlayAnimation(Define.HeroState.Attack) == true)
-            return BTResult.RUNNING;
-
+        _controller.SetAnimatorHorizontal(_value);
         return BTResult.SUCCESS;
     }
 }

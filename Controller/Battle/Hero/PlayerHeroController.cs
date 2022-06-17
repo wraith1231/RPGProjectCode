@@ -297,7 +297,7 @@ public class PlayerHeroController : BattleHeroController
 
         if (Mathf.Abs(_horizontal) + Mathf.Abs(_vertical) > 0.1f)
         {
-            if (Input.GetAxisRaw("Run") > 0.5f)
+            if (Input.GetAxisRaw("Run") > 0.5f && _battleData.CurrentStaminaPoint >= 1f)
             {
                 State = Define.HeroState.Running;
                 if (_animator.GetAnimatorTransitionInfo(0).anyState == false)

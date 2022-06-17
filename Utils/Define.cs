@@ -139,16 +139,15 @@ public class Define
 
     public enum WeaponType
     {
-        Sword = 0,
-        Axe = 1,
-        Dagger = 2,
-        Mace = 3,
-        Spear = 4,
-        Bow = 5,
-        Shield = 6,
-        TwoHandShield = 7,
-        Gauntlet = 8,
-        Unknown = 9,
+        Sword,
+        Axe,
+        Dagger,
+        Mace,
+        Spear,
+        Bow,
+        Gauntlet,
+        Shield,
+        Unknown,
     }
 
     public enum WorldObject

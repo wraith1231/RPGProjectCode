@@ -16,6 +16,7 @@ public abstract class EnemyHeroController : BattleHeroController
         _nearEnemyCollider.isTrigger = true;
         _nearEnemyCollider.radius = _detectRange;
         _nearEnemyCollider.enabled = false;
+        AnimationStart(State);
 
     }
     public override void SetHeroState(Define.HeroState state)
@@ -116,7 +117,6 @@ public abstract class EnemyHeroController : BattleHeroController
     protected override void BeforeAttack()
     {
         _nearEnemyCollider.enabled = false;
-        _battleData.CurrentStaminaPoint -= AttackStamina;
 
         base.BeforeAttack();
     }
@@ -185,25 +185,6 @@ public abstract class EnemyHeroController : BattleHeroController
         AnimationStart(Define.HeroState.Idle);
     }
 #endregion
-    protected override void DyingProcess()
-    {
-        _deadTime += Time.deltaTime;
-        if (_isDead == false)
-        {
-            _isDead = true;
-            _characterCollider.enabled = false;
-            _rigidBody.useGravity = false;
-            StopAllCoroutines();
-
-            AnimationStart(Define.HeroState.Die);
-        }
-
-        if (_deadTime >= 5.0f)
-        {
-            Managers.Battle.AnotherOneBiteDust();
-            gameObject.SetActive(false);
-        }
-    }
 
 
     protected override void FixedUpdate()

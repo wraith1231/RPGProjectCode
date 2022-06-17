@@ -15,9 +15,11 @@ public class LoadingScene : BaseScene
     // Start is called before the first frame update
     void Start()
     {
+        Cursor.lockState = CursorLockMode.None;
         base.Init();
         Managers.UI.ShowSceneUI<UILoadingScene>(foo : EndUIInstantiate);
         Managers.Resource.ReleaseStock();
+
     }
 
     void EndUIInstantiate(GameObject obj)

@@ -136,7 +136,6 @@ public class SoundManager
 
     public void Clear()
     {
-        Debug.Log($"{_audioSources.Length}");
         foreach (AudioSource source in _audioSources)
         {
             if (source == null)

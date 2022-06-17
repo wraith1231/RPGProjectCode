@@ -30,6 +30,8 @@ public class UIBackScreen : UIScene
         GetButton((int)Buttons.NewGameButton).gameObject.BindUIEvent(OnNewGameButton);
         GetButton((int)Buttons.ContinueButton).gameObject.BindUIEvent(OnContinueButton);
         GetButton((int)Buttons.EndButton).gameObject.BindUIEvent(OnEndButton);
+
+
     }
 
     public void OnNewGameButton(PointerEventData data)

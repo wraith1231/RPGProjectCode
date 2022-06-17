@@ -33,6 +33,7 @@ public class VillageStatus : MonoBehaviour
         _transform = GetComponent<Transform>();
 
         _data = Managers.General.GetVillageData(_name);
+        _data.AreaTransfrom = _transform;
         _detectRadius = _data.DetectRange;
 
         Debug.Log($"{_data.VillageName} scene init");

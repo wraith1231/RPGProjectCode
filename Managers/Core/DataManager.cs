@@ -10,7 +10,7 @@ public interface ILoader<Key, Value>
     void MakeDict();
 }
 
-public class DataManager 
+public class DataManager
 {
     #region Stat Data
     private Data.StatData _playerStartStat = new Data.StatData();
@@ -47,13 +47,25 @@ public class DataManager
     public int GetVillageNumber() { return _villageNumber; }
     #endregion
 
+    #region Monster Data
+    private List<Data.MonsterData> _monsterDataList = new List<Data.MonsterData>();
+    public List<Data.MonsterData> MonsterDataList { get { return _monsterDataList; } private set { _monsterDataList = value; } }
+
+    private Dictionary<string, Data.MonsterData> _monsterDataDict = new Dictionary<string, Data.MonsterData>();
+    public Dictionary<string, Data.MonsterData> MonsterDataDict { get { return _monsterDataDict; } private set { _monsterDataDict = value; } }
+
+
+    #endregion
+
     public void Init()
     {
         LoadJson("StatData", StatDataLoad);
         LoadJson("WeaponList", WeaponDataLoad);
         LoadJson("VillageData", VillageDataLoad);
+        LoadJson("MonsterData", MonsterDataLoad);
     }
 
+    #region Load Json
     private void LoadJson(string key, Action<TextAsset> action)
     {
         Managers.Resource.Load<TextAsset>($"Data/{key}", action);
@@ -80,7 +92,13 @@ public class DataManager
         _villageDatas = loader.VillageDicts;
         _villageDataList = loader.VillageDatas;
     }
-
+    private void MonsterDataLoad(TextAsset asset)
+    {
+        Data.MonsterList loader = JsonUtility.FromJson<Data.MonsterList>(asset.text);
+        loader.MakeDict();
+        _monsterDataList = loader.MonsterDatas;
+    }
+    #endregion
     public int GetWeaponListSize(Define.WeaponCategory category, Define.WeaponType type)
     {
         if (category == Define.WeaponCategory.OneHand)
@@ -95,7 +113,7 @@ public class DataManager
 
     public Data.VillageData GetVillageData()
     {
-        if(_villageDataList.Count > _villageNumber)
+        if (_villageDataList.Count > _villageNumber)
             return _villageDataList[_villageNumber++];
 
         return null;
@@ -112,5 +130,27 @@ public class DataManager
             return Vector3.zero;
 
         return _villageDataList[id].Position;
+    }
+
+    public Vector3 GetVillagePosition(string name)
+    {
+        if (_villageDatas.ContainsKey(name) == false)
+            return Vector3.zero;
+
+        return _villageDatas[name].Position;
+    }
+
+    public Data.StatData GetRandomStatData()
+    {
+        Data.StatData result = new Data.StatData();
+        result.HealthPoint = UnityEngine.Random.Range(NPCMinimumStat.HealthPoint, NPCMaximumStat.HealthPoint);
+        result.StaminaPoint = UnityEngine.Random.Range(NPCMinimumStat.StaminaPoint, NPCMaximumStat.StaminaPoint);
+        result.HealthRecovery = UnityEngine.Random.Range(NPCMinimumStat.HealthRecovery, NPCMaximumStat.HealthRecovery);
+        result.StaminaRecovery = UnityEngine.Random.Range(NPCMinimumStat.StaminaRecovery, NPCMaximumStat.StaminaRecovery);
+        result.Power = UnityEngine.Random.Range(NPCMinimumStat.Power, NPCMaximumStat.Power);
+        result.Agility = UnityEngine.Random.Range(NPCMinimumStat.Agility, NPCMaximumStat.Agility);
+        result.Defense = UnityEngine.Random.Range(NPCMinimumStat.Defense, NPCMaximumStat.Defense);
+
+        return result;
     }
 }

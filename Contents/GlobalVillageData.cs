@@ -48,6 +48,9 @@ public class GlobalVillageData
     private Define.VillageCondition _condition = Define.VillageCondition.Idle;
     public Define.VillageCondition Condition { get { return _condition; } set { _condition = value; } }
 
+    private Transform _areaTranfrom;
+    public Transform AreaTransfrom { get { return _areaTranfrom; } set { _areaTranfrom = value; } }
+    
     public GlobalVillageData()
     {
         Data.VillageData data = Managers.Data.GetVillageData();

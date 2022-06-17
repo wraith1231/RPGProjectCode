@@ -30,8 +30,17 @@ public class GlobalGroupController
     private Define.GroupType _type = Define.GroupType.Unknown;
     public Define.GroupType Type { get { return _type; } set { _type = value; } }
 
+    //area move
     private Queue<Vector3> _destination = new Queue<Vector3>();
     public Queue<Vector3> Destination { get { return _destination; } set { _destination = value; } }
+
+    private string _targetType;
+    public string TargetType { get { return _targetType; } set { _targetType = value; } }
+    private int _target = -1;
+    public int MoveTarget { get { return _target; } set { _target = value; } }
+
+    private Transform _areaTranfrom;
+    public Transform AreaTransfrom { get { return _areaTranfrom; } set { _areaTranfrom = value; } }
 
     private Define.AreaStatus _status = Define.AreaStatus.Idle;
     public Define.AreaStatus Status { get { return _status; } set { _status = value; } }
@@ -42,11 +51,13 @@ public class GlobalGroupController
     private int _gold;
     public int Gold { get { return _gold; } set { _gold = value; } }
 
-    public GlobalGroupController(int groupId, string groupName, float foods)
+    public GlobalGroupController(int groupId, string groupName, float foods, int golds, Define.GroupType type)
     {
         _group = groupId;
         _groupName = groupName;
         _foods = foods;
+        _gold = golds;
+        _type = type;
     }
 
     #region Group Member Management

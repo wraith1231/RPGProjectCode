@@ -17,10 +17,30 @@ namespace Data
         public int Agility;
         public int Defense;
 
+        public float AttackAdvantage;
+        public float DefenseAdvantage;
+        public float AgilityAdvantage;
+
         public bool Gender;
 
         public List<int> AllGenderOutfit = new List<int>();
         public List<int> OneGenderOutfit = new List<int>();
+
+        public void MonsterDataInput(Data.MonsterData data)
+        {
+            HealthPoint = data.HealthPoint;
+            StaminaPoint = data.StaminaPoint;
+            HealthRecovery = data.HealthRecovery;
+            StaminaRecovery = data.StaminaRecovery;
+
+            Power = data.Power;
+            Agility = data.Agility;
+            Defense = data.Defense;
+
+            AttackAdvantage = data.AttackAdvantage;
+            DefenseAdvantage = data.DefenseAdvantage;
+            AgilityAdvantage = data.AgilityAdvantage;
+        }
     }
 
     [System.Serializable]

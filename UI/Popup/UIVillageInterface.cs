@@ -95,7 +95,7 @@ public class UIVillageInterface : UIPopup
 
     void CloseVillageInterface(PointerEventData eventData)
     {
-        Debug.Log("Close Popup!!");
+        Managers.Map.PlayerExitVillage();
         Managers.UI.ClosePopupUI(this);
     }
 

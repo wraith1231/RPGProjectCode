@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class AreaPlayerController : AreaGroupController
 {
+    private static int ObjectLayer = 1 << 8 | 1 << 9;
+
     private AreaCameraController _camera;
     public AreaCameraController AreaCamera { get { return _camera; } set { _camera = value; } }
 
@@ -11,9 +13,12 @@ public class AreaPlayerController : AreaGroupController
     private CurrentUpdate _currentUpdate;
 
     //terrain과 village만 일단
-    private int _mouseMask = 1 << 7 | 1 << 9;
+    private int _mouseMask = 1 << 6 | 1 << 7 | 1 << 9;
     private GameObject _currentObject = null;
     private Vector3 _currentPoint;
+
+    private UIGroupName _groupPopup;
+    public UIGroupName GroupPopup { set { _groupPopup = value; } }
 
     public override Define.AreaStatus Status {
         get => base.Status; 
@@ -43,6 +48,19 @@ public class AreaPlayerController : AreaGroupController
 
         Managers.Input.LeftMouseAction -= OnLeftMouseEvent;
         Managers.Input.RightMouseAction -= OnRightMouseEvent;
+
+        Vector3 boxSize = new Vector3(128, 128, 128);
+        Vector3 center = _transform.position;
+        if (center.x <= 64) center.x = 64;
+        if (center.x >= Managers.Map.TerrainSize2.x - 64) center.x = Managers.Map.TerrainSize2.x - 64;
+        if (center.z <= 64) center.z = 64;
+        if (center.z >= Managers.Map.TerrainSize2.z - 64) center.z = Managers.Map.TerrainSize2.z - 64;
+
+        //Physics.CheckBox(center, boxSize, Quaternion.identity, ObjectLayer);
+        Collider[] colliders = Physics.OverlapBox(center, boxSize, Quaternion.identity, ObjectLayer);
+        int cSize = colliders.Length;
+        for (int i = 0; i < cSize; i++)
+            Managers.Battle.AddAreaObject(colliders[i].name, colliders[i].transform.position);
 
         GlobalGroupController controller = Managers.General.GlobalGroups[_groupId];
 
@@ -86,20 +104,29 @@ public class AreaPlayerController : AreaGroupController
         switch (mouseEvent)
         {
             case Define.MouseEvent.PointerDown:
+                if (_currentObject != null)
+                {
+                    if (_currentObject.tag == "MoveBlock")
+                        break;
+                }
                 if(Input.GetKey(KeyCode.LeftShift) == true)
                 {
-                    if (_currentObject == null)
+                    if (_targetObject == null)
                     {
-                        _destination.Enqueue(_currentPoint);
-                    }
-                    else
-                    { 
-                        _destination.Enqueue(_currentObject.transform.position);
+                        if (_currentObject == null)
+                        {
+                            _destination.Enqueue(_currentPoint);
+                        }
+                        else
+                        {
+                            _destination.Enqueue(_currentObject.transform.position);
+                        }
                     }
                 }
                 else
                 {
                     _destination.Clear();
+                    _targetObject = null;
                     if (_currentObject == null)
                     {
                         if (Status == Define.AreaStatus.Move)
@@ -111,7 +138,8 @@ public class AreaPlayerController : AreaGroupController
                     {
                         if (Status == Define.AreaStatus.Move)
                             _moveInterrupted = true;
-                        _destination.Enqueue(_currentObject.transform.position);
+                        _targetObject = _currentObject.transform;
+                        //_destination.Enqueue(_currentObject.transform.position);
                         //_transform.LookAt(_currentPoint);
                     }
                 }
@@ -136,12 +164,32 @@ public class AreaPlayerController : AreaGroupController
         if(rayHit.collider == null)
         {
             _currentObject = null;
+            if(_groupPopup != null)
+                _groupPopup.TheresNoGroup();
             return;
         }
-        if (rayHit.collider.tag != "Terrain")
-            _currentObject = rayHit.collider.gameObject;
-        else
+        else if(rayHit.collider.tag == "Terrain")
+        {
             _currentObject = null;
+            if (_groupPopup != null)
+                _groupPopup.TheresNoGroup();
+            return;
+        }
+        else
+        {
+            _currentObject = rayHit.collider.gameObject;
+            string tag = rayHit.collider.tag;
+            if (_groupPopup != null)
+            {
+                if (tag == "AreaCharacter" || tag == "Monster")
+                {
+                    AreaGroupController controller = rayHit.transform.GetComponent<AreaGroupController>();
+                    _groupPopup.ChangeName(controller.GroupId, _currentPoint);
+                }
+                if (tag == "Village")
+                    _groupPopup.ChangeName(rayHit.transform.GetComponent<VillageStatus>().Name, _currentPoint);
+            }
+        }
     }
 
     private void UpdateIdle()

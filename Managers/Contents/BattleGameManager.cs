@@ -6,6 +6,12 @@ using UnityEngine;
 
 public class BattleGameManager
 {
+    private struct AreaObjects
+    {
+        public string Name;
+        public Vector3 Position;
+    }
+
     private PlayerHeroController _player;
     private CameraController _camera;
     private bool _playerInit = false;
@@ -23,7 +29,7 @@ public class BattleGameManager
     public List<GameObject> _objects = new List<GameObject>();
 
     //인게임에 필요할 듯
-    public Dictionary<int, List<BattleHeroController>> _groups = new Dictionary<int, List<BattleHeroController>>();
+    public Dictionary<int, List<BattleCharacterController>> _groups = new Dictionary<int, List<BattleCharacterController>>();
     //public List<List<BattleHeroController>> _groups = new List<List<BattleHeroController>>();
 
     //캐릭터 생성용
@@ -31,8 +37,21 @@ public class BattleGameManager
     public Dictionary<string, GlobalCharacterData> _charDataList = new Dictionary<string, GlobalCharacterData>();
     private Dictionary<string, List<int>> _charIdList = new Dictionary<string, List<int>>();
 
+    //오브젝트 생성용
+    private Dictionary<string, AreaObjects> _areaObjectInstantiateData = new Dictionary<string, AreaObjects>();
+    private List<AreaObjects> _areaObjects = new List<AreaObjects>();
+    private int _areaObjectCount = 0;
+    public void AddAreaObject(string name, Vector3 pos) 
+    {
+        AreaObjects temp = new AreaObjects();
+        temp.Name = name;
+        temp.Position = pos;
+        _areaObjects.Add(temp);
+    }
+
     //Loading Scene용
-    private static int PROGRESS = 4;
+    //terrain, player, npc, group, areaObject
+    private static int PROGRESS = 5;
     private int _progress = 0;
     public float CurrentProgress { get { return (float)_progress / (float)PROGRESS; } }
 
@@ -52,6 +71,11 @@ public class BattleGameManager
     public void AnotherOneBiteDust()
     {
         _livingChar--;
+
+        if(_livingChar == _groups[0].Count)
+        {
+            Managers.Scene.LoadSceneAsync(Define.SceneType.AreaScene);
+        }
     }
 
     public Terrain BattleTerrain { get; set; }
@@ -62,6 +86,7 @@ public class BattleGameManager
         _playerInit = false;
         _cameraInit = false;
         _progress = 0;
+        _areaObjectCount = 0;
 
         GroupInitialize();
 
@@ -76,7 +101,7 @@ public class BattleGameManager
         for (int listNum = 0; listNum < listSize; listNum++)
         {
             if (_groups.ContainsKey(_charList[listNum].Group) == false)
-                _groups[_charList[listNum].Group] = new List<BattleHeroController>();
+                _groups[_charList[listNum].Group] = new List<BattleCharacterController>();
         }
         
         _progress++;
@@ -138,12 +163,12 @@ public class BattleGameManager
         int z = 0;
         int x = 0;
 
-        float playerY = _playerPos.y / _areaTerrainData.heightmapResolution;
+        float playerY = _playerPos.y / _areaTerrainData.heightmapScale.y;
         while(true)
         {
             float dist = heights[z, x] - playerY;
 
-            heights[z, x] = heights[z, x] + dist * 0.5f;
+            heights[z, x] = heights[z, x] + dist * 2f;
             x++;
             if (x >= heightmapResolution)
             {
@@ -173,7 +198,7 @@ public class BattleGameManager
 
 
         CharacterInstantiate();
-
+        AreaObjectInstantiate();
     }
 
     private void CharacterInstantiate()
@@ -194,6 +219,11 @@ public class BattleGameManager
                 case Define.CharacterType.Animal:
                     break;
                 case Define.CharacterType.Monster:
+                    key = _charList[listNum].CharName;
+                    if (_charIdList.ContainsKey(key) == false)
+                        _charIdList[key] = new List<int>();
+                    _charIdList[key].Add(listNum);
+                    Managers.Resource.Instantiate(key, MonsterCharacterInstantiate);
                     break;
                 case Define.CharacterType.Unknown:
                     key = "Human";
@@ -211,6 +241,16 @@ public class BattleGameManager
                     break;
             }
         }
+    }
+
+    private Vector3 GetScalingPosition(Vector3 pos)
+    {
+        Vector3 ret = pos - _startPos;
+        ret.x = (ret.x / TerrainData.heightmapResolution) * TerrainData.size.x;
+        ret.z = (ret.z / TerrainData.heightmapResolution) * TerrainData.size.z;
+        ret.y = TerrainData.GetInterpolatedHeight(ret.x / TerrainData.size.x, ret.z / TerrainData.size.z);
+
+        return ret;
     }
 
     private void HumanCharacterInstantiate(GameObject go)
@@ -250,31 +290,81 @@ public class BattleGameManager
         controller.HeroId = _charList[id].HeroId;
         controller.Group = _charList[id].Group;
 
-        if (_charDataList.ContainsKey(_charList[id].CharName))
-            controller.SetBattleCharacterData(_charDataList[_charList[id].CharName]);
-        else
-            controller.SetBattleCharacterData(null);
-        
-        _groups[_charList[id].Group].Add(controller);
+        GlobalCharacterController con = Managers.General.GlobalCharacters[_charList[id].HeroId];
+        //GlobalCharacterData data = Managers.General.GlobalCharacters[_charList[id].HeroId].GlobalData;
+        controller.SetBattleCharacterData(con.BattleData);
 
-        Vector3 pos = _charList[id].StartPosition;
-        if(isPlayer)
-        {
-            pos = _playerPos - _startPos;
-            pos.x = (pos.x / TerrainData.heightmapResolution) * TerrainData.size.x;
-            pos.z = (pos.z / TerrainData.heightmapResolution) * TerrainData.size.z;
-            Debug.Log($"{TerrainData.heightmapResolution}, {_playerPos}, {_startPos}");
-        }
-        else
-        {
-            pos = _player.transform.position;
-            pos.x += 10f;
-            pos.z += 10f;
-        }
-        pos.y = TerrainData.GetInterpolatedHeight(pos.x / TerrainData.size.x, pos.z / TerrainData.size.z);
+        _groups[_charList[id].Group].Add(controller);
+        GlobalGroupController groupCon = Managers.General.GlobalGroups[controller.Group];
+
+        Vector3 pos = groupCon.Position;
+        pos = GetScalingPosition(pos);
         controller.transform.position = pos;
 
         if (_instantiatedChar == _charList.Count)
+            _progress++;
+    }
+    private void MonsterCharacterInstantiate(GameObject go)
+    {
+        _objects.Add(go);
+        _instantiatedChar++;
+        GameObject.DontDestroyOnLoad(go);
+        int id = _charIdList[go.name][0];
+        _charIdList[go.name].RemoveAt(0);
+        BattleCharacterController controller;
+
+        controller = go.AddComponent<BattleMonsterController>();
+    
+        go.name = _charList[id].CharName;
+
+        controller.HeroId = _charList[id].HeroId;
+        controller.Group = _charList[id].Group;
+
+        GlobalCharacterController con = Managers.General.GlobalCharacters[_charList[id].HeroId];
+        //GlobalCharacterData data = Managers.General.GlobalCharacters[_charList[id].HeroId].GlobalData;
+        controller.SetBattleCharacterData(con.BattleData);
+
+        _groups[_charList[id].Group].Add(controller);
+
+        GlobalGroupController groupCon = Managers.General.GlobalGroups[controller.Group];
+
+        Vector3 pos = groupCon.Position;
+        pos = GetScalingPosition(pos);
+        controller.transform.position = pos;
+
+        if (_instantiatedChar == _charList.Count)
+            _progress++;
+    }
+
+    private void AreaObjectInstantiate()
+    {
+        int size = _areaObjects.Count;
+        if(size == 0)
+        {
+            _progress++;
+        }
+
+        for (int i = 0; i < size; i++)
+        {
+            _areaObjectInstantiateData[_areaObjects[i].Name] = _areaObjects[i];
+            Managers.Resource.Instantiate("Battle/" + _areaObjects[i].Name, AreaObjectInstantiated);
+        }
+    }
+
+    private void AreaObjectInstantiated(GameObject go)
+    {
+        _objects.Add(go);
+        GameObject.DontDestroyOnLoad(go);
+        string[] name =go.name.Split('/');
+        //Debug.Log($"{name[0]}, {name[1]}");
+        AreaObjects data = _areaObjectInstantiateData[name[1]];
+
+        Vector3 pos = data.Position;
+        go.transform.position = GetScalingPosition(pos);
+        
+        _areaObjectCount++;
+
+        if (_areaObjectCount >= _areaObjects.Count)
             _progress++;
     }
 
@@ -293,9 +383,18 @@ public class BattleGameManager
     {
         _charList.Add(data);
     }
+    public void AddGroup(GlobalGroupController group)
+    {
+        List<int> members = group.MemberList;
+        int size = members.Count;
+        for (int i = 0; i < size; i++)
+            AddCharList(Managers.General.GlobalCharacters[members[i]].Data);
+    }
 
     public void Clear()
     {
+        _areaObjectInstantiateData.Clear();
+        _areaObjects.Clear();
         _charDataList.Clear();
         _charList.Clear();
 

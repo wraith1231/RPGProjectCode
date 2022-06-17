@@ -20,34 +20,9 @@ public class TestEnemyController : EnemyHeroController
          * s2 - 적이 거리 안에 있는가? -> success 뜨면 다음으로, fail이면 적에게 다가감
          * s3 - 적에 대한 행동 정의
          */
-        NodeBase action = new PatrolSequence(this, 3f);
+        NodeBase action = new PatrolSequence(this);
         SelectorNode selector = new SelectorNode(action);
         _root = selector;
-        PlayAnimation(Define.HeroState.Idle);
-        //List<HeroNode> actions1 = new List<HeroNode>();
-        //actions1.Add(new CheckEnemyFovRange(this));
-        //actions1.Add(new PatrolAround(this));
-        //
-        //List<HeroNode> actions2 = new List<HeroNode>();
-        //actions2.Add(new CheckEnemyDistance(this));
-        //actions2.Add(new HeadToTarget(this));
-        //
-        //List<HeroNode> actions3 = new List<HeroNode>();
-        //actions3.Add(new CheckBehaviorNearTarget(this));
-        //actions3.Add(new AttackTarget(this));
-        //actions3.Add(new BlockHeadToTarget(this));
-        //actions3.Add(new MoveTargetsSurround(this));
-        //actions3.Add(new RollTargetsSurround(this));
-        //
-        //List<HeroNode> sequences = new List<HeroNode>();
-        //sequences.Add( new Sequence(this, actions1));
-        //sequences.Add(new Sequence(this, actions2));
-        //sequences.Add(new Sequence(this, actions3));
-        //
-        //Selector selector = new Selector(this, sequences);
-        //selector._parentController = this;
-        //
-        //_root = selector;
     }
 
     public override Define.HeroState CheckNextState()

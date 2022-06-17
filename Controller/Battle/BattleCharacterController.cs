@@ -4,15 +4,22 @@ using UnityEngine;
 
 public abstract class BattleCharacterController : MonoBehaviour
 {
+    //general
+    public static float AttackStamina = 30f;
+    public static float RollingStamina = 30f;
+    public static float BlockStamina = 20f;
+
     protected Transform _transform;
     protected Transform _target = null;
     protected CapsuleCollider _characterCollider;
     protected SphereCollider _nearEnemyCollider;
     protected Rigidbody _rigidBody;
-    protected int _attackAnimCount = 1;
 
-    //애니메이션 스피드
+    protected int _attackAnimCount = 1;
+    protected bool _attackColliderEnabled = false;
+
     protected float[] _animationSpeed = new float[(int)Define.HeroState.Unknown];
+    protected bool _animationRootMotion = false;
 
     protected Animator _animator;
     public Animator Animator { get { return _animator; } }
@@ -101,6 +108,10 @@ public abstract class BattleCharacterController : MonoBehaviour
     {
         _battleData = new BattleCharacterData(data);
     }
+    public void SetBattleCharacterData(BattleCharacterData data)
+    {
+        _battleData = data;
+    }
 
     public void HeadToDestination(Vector2 destination)
     {
@@ -148,6 +159,22 @@ public abstract class BattleCharacterController : MonoBehaviour
     #endregion
 
     #region General Protected Function Zone
+    protected virtual void ResetGeneralBooleanValues()
+    {
+        _attacking = false;
+        _parried = false;
+        _prevAttack = -1;
+
+        _isRolling = false;
+
+        //block
+        _isBlock = false;
+        _justGuard = false;
+        _blockEnd = false;
+        _blockHit = false;
+
+        _isDamaged = false;
+    }
     protected void AnimationSpeedChange(Define.HeroState state, float speed)
     {
         _animationSpeed[(int)state] = speed;
@@ -204,7 +231,25 @@ public abstract class BattleCharacterController : MonoBehaviour
     #region Abstract zone
     public abstract void Init();
     protected abstract void FixedUpdate();
-    protected abstract void DyingProcess();
+    protected virtual void DyingProcess()
+    {
+        _deadTime += Time.deltaTime;
+        if (_isDead == false)
+        {
+            _isDead = true;
+            _characterCollider.enabled = false;
+            _rigidBody.useGravity = false;
+            StopAllCoroutines();
+
+            AnimationStart(Define.HeroState.Die);
+        }
+
+        if (_deadTime >= 5.0f)
+        {
+            Managers.Battle.AnotherOneBiteDust();
+            gameObject.SetActive(false);
+        }
+    }
 
     protected abstract void BeforeAttack();
     protected abstract bool AttackPlaying();

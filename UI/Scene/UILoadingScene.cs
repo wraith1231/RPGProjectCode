@@ -29,6 +29,9 @@ public class UILoadingScene : UIScene
     {
         base.Init();
 
+        Canvas canvas = Util.GetOrAddComponent<Canvas>(gameObject);
+        canvas.sortingOrder = 1;
+
         Bind<GameObject>(typeof(GameObjects));
         Bind<Slider>(typeof(Sliders));
         Bind<Button>(typeof(Buttons));

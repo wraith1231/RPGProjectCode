@@ -17,8 +17,8 @@ public class RotateAroundBasePos : NodeBase
     public override BTResult Evaluate()
     {
         Vector2 temp = new Vector2();
-        float x = Random.Range(-5, 5);
-        float z = Random.Range(-5, 5);
+        float x = Random.Range(-1f, 1f);
+        float z = Random.Range(-1f, 1f);
         temp.x = _basePosition.x + x;
         temp.y = _basePosition.y + z;
 
