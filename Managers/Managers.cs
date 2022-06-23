@@ -80,7 +80,6 @@ public class Managers : MonoBehaviour
             s_instance._data.Init();
             s_instance._generalGame.Init();
             s_instance._vfx.Init();
-            s_instance._quest.Init();
         }
     }
 

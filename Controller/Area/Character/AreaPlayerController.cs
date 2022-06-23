@@ -184,7 +184,16 @@ public class AreaPlayerController : AreaGroupController
                 if (tag == "AreaCharacter" || tag == "Monster")
                 {
                     AreaGroupController controller = rayHit.transform.GetComponent<AreaGroupController>();
-                    _groupPopup.ChangeName(controller.GroupId, _currentPoint);
+                    if (tag == "Monster")
+                    {
+                        string[] temp = controller.name.Split('/');
+                        _groupPopup.ChangeName(temp[1], _currentPoint);
+                    }
+                    else
+                    {
+                        _groupPopup.ChangeName(controller.GroupId, _currentPoint);
+                    }
+
                 }
                 if (tag == "Village")
                     _groupPopup.ChangeName(rayHit.transform.GetComponent<VillageStatus>().Name, _currentPoint);

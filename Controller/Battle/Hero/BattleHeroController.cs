@@ -417,6 +417,29 @@ public abstract class BattleHeroController : BattleCharacterController
     #endregion
 
     #region DamagedProcess
+    public override void HitByOther(BattleCharacterController attack, Vector3 hitPoint)
+    {
+        if (State == Define.HeroState.Block)
+        {
+            float dot = Vector3.Dot(attack.transform.forward, _transform.forward);
+            bool isOpposite = dot < -0.7 ? true : false;
+            if (State == Define.HeroState.Block && isOpposite == true)
+            {
+                GetBlocked(attack, hitPoint);
+                attack.GetParried();
+            }
+            else
+            {
+                GetDamaged(attack, transform.position);
+            }
+        }
+        else //hero.state != block
+        {
+            GetDamaged(attack, transform.position);
+        }
+
+    }
+
     protected virtual void ResetBooleanValues()
     {
         _attacking = false;

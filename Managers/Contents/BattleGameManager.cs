@@ -30,6 +30,7 @@ public class BattleGameManager
 
     //인게임에 필요할 듯
     public Dictionary<int, List<BattleCharacterController>> _groups = new Dictionary<int, List<BattleCharacterController>>();
+    private List<int> _groupKeys;
     //public List<List<BattleHeroController>> _groups = new List<List<BattleHeroController>>();
 
     //캐릭터 생성용
@@ -65,6 +66,8 @@ public class BattleGameManager
 
     private TerrainData TerrainData { get { return BattleTerrain.terrainData; } }
 
+    private int _generated = 0;
+
     //게임 클리어 조건용
     private int _livingChar = 0;
 
@@ -74,6 +77,17 @@ public class BattleGameManager
 
         if(_livingChar == _groups[0].Count)
         {
+            GlobalGroupController controller = Managers.General.GlobalGroups[0];
+            List<GlobalGroupController> list = Managers.General.GlobalGroups;
+            int size = _groupKeys.Count;
+            for(int i = 0; i < size; i++)
+            {
+                if(list[_groupKeys[i]].QuestObjective == true)
+                {
+                    
+                }
+
+            }
             Managers.Scene.LoadSceneAsync(Define.SceneType.AreaScene);
         }
     }
@@ -87,6 +101,7 @@ public class BattleGameManager
         _cameraInit = false;
         _progress = 0;
         _areaObjectCount = 0;
+        _generated = 0;
 
         GroupInitialize();
 
@@ -97,11 +112,15 @@ public class BattleGameManager
     {
         int listSize = _charList.Count;
         _livingChar = _charList.Count;
+        _groupKeys = new List<int>();
 
         for (int listNum = 0; listNum < listSize; listNum++)
         {
             if (_groups.ContainsKey(_charList[listNum].Group) == false)
+            {
+                _groupKeys.Add(_charList[listNum].Group);
                 _groups[_charList[listNum].Group] = new List<BattleCharacterController>();
+            }
         }
         
         _progress++;
@@ -207,13 +226,14 @@ public class BattleGameManager
         string key = "";
         for(int listNum = 0; listNum < listSize; listNum++)
         {
+            _generated++;
             switch (_charList[listNum].Type)
             {
                 case Define.CharacterType.Human:
                     key = "Human";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(listNum);
+                    _charIdList[key].Add(_charList[listNum].HeroId);
                     Managers.Resource.Instantiate("Human", HumanCharacterInstantiate);
                     break;
                 case Define.CharacterType.Animal:
@@ -222,25 +242,26 @@ public class BattleGameManager
                     key = _charList[listNum].CharName;
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(listNum);
+                    _charIdList[key].Add(_charList[listNum].HeroId);
                     Managers.Resource.Instantiate(key, MonsterCharacterInstantiate);
                     break;
                 case Define.CharacterType.Unknown:
                     key = "Human";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(listNum);
+                    _charIdList[key].Add(_charList[listNum].HeroId);
                     Managers.Resource.Instantiate("Human", HumanCharacterInstantiate);
                     break;
                 default:
                     key = "Human";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(listNum);
+                    _charIdList[key].Add(_charList[listNum].HeroId);
                     Managers.Resource.Instantiate("Human", HumanCharacterInstantiate);
                     break;
             }
         }
+        _charList.Clear();
     }
 
     private Vector3 GetScalingPosition(Vector3 pos)
@@ -263,8 +284,11 @@ public class BattleGameManager
         BattleHeroController controller;
         bool isPlayer = false;
 
+        GlobalCharacterController cont = Managers.General.GlobalCharacters[id];
+
         if(isPlayer == false)
-            isPlayer = _charList[id].Player;
+            isPlayer = cont.Data.Player;
+
         if(isPlayer)
         {
             controller = go.AddComponent<PlayerHeroController>();
@@ -283,27 +307,29 @@ public class BattleGameManager
 
         CharacterOutfit outfit = go.GetComponent<CharacterOutfit>();
 
-        outfit.SetOutfit(_charList[id].Outfit);
-        controller.SetEquipWeapon(_charList[id].Left, _charList[id].Right);
-        go.name = _charList[id].CharName;
+        outfit.SetOutfit(cont.Data.Outfit);
+        controller.SetEquipWeapon(cont.Data.Left, cont.Data.Right);
+        BattleControllerSetting(cont, go, controller);
 
-        controller.HeroId = _charList[id].HeroId;
-        controller.Group = _charList[id].Group;
+        if (_instantiatedChar == _generated)
+            _progress++;
+    }
 
-        GlobalCharacterController con = Managers.General.GlobalCharacters[_charList[id].HeroId];
-        //GlobalCharacterData data = Managers.General.GlobalCharacters[_charList[id].HeroId].GlobalData;
-        controller.SetBattleCharacterData(con.BattleData);
+    private void BattleControllerSetting(GlobalCharacterController gc, GameObject go, BattleCharacterController controller)
+    {
+        go.name = gc.Data.CharName;
+        controller.HeroId = gc.Data.HeroId;
+        controller.Group = gc.Data.Group;
+        controller.SetBattleCharacterData(gc.BattleData);
+        _groups[gc.Data.Group].Add(controller);
 
-        _groups[_charList[id].Group].Add(controller);
         GlobalGroupController groupCon = Managers.General.GlobalGroups[controller.Group];
 
         Vector3 pos = groupCon.Position;
         pos = GetScalingPosition(pos);
         controller.transform.position = pos;
-
-        if (_instantiatedChar == _charList.Count)
-            _progress++;
     }
+
     private void MonsterCharacterInstantiate(GameObject go)
     {
         _objects.Add(go);
@@ -312,27 +338,14 @@ public class BattleGameManager
         int id = _charIdList[go.name][0];
         _charIdList[go.name].RemoveAt(0);
         BattleCharacterController controller;
+        GlobalCharacterController con = Managers.General.GlobalCharacters[id];
 
-        controller = go.AddComponent<BattleMonsterController>();
+        controller = go.GetComponent<BattleMonsterController>();
+
+        BattleControllerSetting(con, go, controller);
     
-        go.name = _charList[id].CharName;
 
-        controller.HeroId = _charList[id].HeroId;
-        controller.Group = _charList[id].Group;
-
-        GlobalCharacterController con = Managers.General.GlobalCharacters[_charList[id].HeroId];
-        //GlobalCharacterData data = Managers.General.GlobalCharacters[_charList[id].HeroId].GlobalData;
-        controller.SetBattleCharacterData(con.BattleData);
-
-        _groups[_charList[id].Group].Add(controller);
-
-        GlobalGroupController groupCon = Managers.General.GlobalGroups[controller.Group];
-
-        Vector3 pos = groupCon.Position;
-        pos = GetScalingPosition(pos);
-        controller.transform.position = pos;
-
-        if (_instantiatedChar == _charList.Count)
+        if (_instantiatedChar == _generated)
             _progress++;
     }
 
@@ -405,7 +418,8 @@ public class BattleGameManager
             Managers.Resource.Release(_objects[i]);
         }
         _objects.Clear();
-        
+
+        _groupKeys.Clear();
         _groups.Clear();
     }
 

@@ -28,6 +28,8 @@ public class HumanOutfit
 
     public void CopyHumanOutfit(HumanOutfit outfit)
     {
+        if (outfit == null)
+            return;
         Gender = outfit.Gender;
 
         int size = (int)Define.HumanOutfitAllGender.Unknown;

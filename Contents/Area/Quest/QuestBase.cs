@@ -15,6 +15,7 @@ public struct Rewards
 
 public abstract class QuestBase
 {
+    public int ID;
     //target은 type에 따라서 villlage id, hero id 등 맞춰서 넣어야함
     public Define.QuestType Type;
     //마을 방어전은 TargetVillage 설정

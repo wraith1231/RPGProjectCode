@@ -30,32 +30,7 @@ public class WeaponAttack : MonoBehaviour
 
         if(controller.Group != _parentController.Group)
         {
-            if (controller.IsHero == true)
-            {
-                if (controller.State == Define.HeroState.Block)
-                {
-
-                    float dot = Vector3.Dot(controller.transform.forward, _parentController.transform.forward);
-                    bool isOpposite = dot < -0.7 ? true : false;
-                    if (controller.State == Define.HeroState.Block && isOpposite == true)
-                    {
-                        controller.GetBlocked(_parentController, transform.position);
-                        _parentController.GetParried();
-                    }
-                    else
-                    {
-                        controller.GetDamaged(_parentController, transform.position);
-                    }
-                }
-                else //hero.state != block
-                {
-                    controller.GetDamaged(_parentController, transform.position);
-                }
-            }
-            else    //controller.ishero == false
-            {
-                controller.GetDamaged(_parentController, transform.position);
-            }
+            controller.HitByOther(_parentController, transform.position);
         }
     }
 }

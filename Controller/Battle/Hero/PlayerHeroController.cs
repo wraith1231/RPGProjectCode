@@ -112,14 +112,13 @@ public class PlayerHeroController : BattleHeroController
 
         if (State == Define.HeroState.Running)
         {
-
-            _battleData.CurrentStaminaPoint -= _battleData.StaminaRecovery * Time.deltaTime;
+            _battleData.CurrentStaminaPoint -= RunningStamina * Time.deltaTime;
 
             if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
         }
         else if (State != Define.HeroState.Block)
         {
-            _battleData.CurrentStaminaPoint += _battleData.HealthRecovery * Time.deltaTime;
+            _battleData.CurrentStaminaPoint += _battleData.StaminaRecovery * Time.deltaTime;
 
             if (_battleData.CurrentStaminaPoint > _battleData.MaxStaminaPoint) _battleData.CurrentStaminaPoint = _battleData.MaxStaminaPoint;
         }
@@ -297,7 +296,7 @@ public class PlayerHeroController : BattleHeroController
 
         if (Mathf.Abs(_horizontal) + Mathf.Abs(_vertical) > 0.1f)
         {
-            if (Input.GetAxisRaw("Run") > 0.5f && _battleData.CurrentStaminaPoint >= 1f)
+            if (Input.GetAxisRaw("Run") > 0.5f && _battleData.CurrentStaminaPoint >= RunningStamina)
             {
                 State = Define.HeroState.Running;
                 if (_animator.GetAnimatorTransitionInfo(0).anyState == false)

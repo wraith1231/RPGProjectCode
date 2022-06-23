@@ -25,6 +25,7 @@ public class AreaScene : BaseScene
 
         Managers.UI.ShowSceneUI<UIAreaSceneInterface>();
         Managers.Resource.Instantiate("Popup/UIGroupName", GroupNamePopup);
+        Managers.Battle.AreaTerrainData = Managers.Map.MapData;
         //Managers.UI.MakePopupUI<UIGroupName>(foo:GroupNamePopup);
     }
 
@@ -38,7 +39,6 @@ public class AreaScene : BaseScene
 #if UNITY_EDITOR
         if(Input.GetKeyDown(KeyCode.K))
         {
-            Managers.Battle.AreaTerrainData = Managers.Map.MapData;
             Managers.Battle.AddCharList(Managers.General.GlobalPlayer.Data);
             for(int i =1; i < 3;i++)
                 Managers.Battle.AddGroup(Managers.General.GlobalGroups[i]);

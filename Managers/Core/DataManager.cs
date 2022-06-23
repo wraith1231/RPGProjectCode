@@ -97,6 +97,7 @@ public class DataManager
         Data.MonsterList loader = JsonUtility.FromJson<Data.MonsterList>(asset.text);
         loader.MakeDict();
         _monsterDataList = loader.MonsterDatas;
+        _monsterDataDict = loader.MonsterDict;
     }
     #endregion
     public int GetWeaponListSize(Define.WeaponCategory category, Define.WeaponType type)

@@ -81,10 +81,11 @@ public class GeneralGameManager
         }
 
         int count = 1;
-        int groupId = 0;
-        while(count < groupCount)
+        groupCount = mercenaryGroupMemberCount.Count;
+        //int groupId = 0;
+        while(count <= groupCount)
         {
-            for(int i = 0; i < mercenaryGroupMemberCount[count]; i++)
+            for(int i = 0; i < mercenaryGroupMemberCount[count-1]; i++)
             {
                 HumanOutfit outfit = new HumanOutfit();
                 outfit.SetNPCBaseData();
@@ -93,10 +94,10 @@ public class GeneralGameManager
                 EquipWeapon right;
                 NPCWeaponRandomize(out left, out right);
 
-                groupId = count + 1;
-                CharacterData cdata = new CharacterData(group: groupId, outfit: outfit, left: left, right: right);
+                //groupId = count + 1;
+                CharacterData cdata = new CharacterData(group: count, outfit: outfit, left: left, right: right);
                 
-                MakeCharacter(groupId, $"NPC {_maxCharCount}", Managers.Data.GetRandomStatData(), Define.NPCPersonality.Normal, outfit, left, right);
+                MakeCharacter(count, $"NPC {_maxCharCount}", Managers.Data.GetRandomStatData(), Define.NPCPersonality.Normal, outfit, left, right);
             }
             count++;
         }
@@ -115,7 +116,7 @@ public class GeneralGameManager
         return id;
     }
 
-    public int MakeCharacter(int groupId, string charName, Data.StatData statData, Define.NPCPersonality personality, HumanOutfit outfit, EquipWeapon left, EquipWeapon right)
+    public int MakeCharacter(int groupId, string charName, Data.StatData statData, Define.NPCPersonality personality, HumanOutfit outfit, EquipWeapon left, EquipWeapon right, Define.CharacterType type = Define.CharacterType.Human)
     {
         int id = _maxCharCount++;
         bool isPlayer = false;
@@ -123,6 +124,7 @@ public class GeneralGameManager
             isPlayer = true;
 
         CharacterData cdata = new CharacterData(groupId, isPlayer, personality, outfit, left, right, charName);
+        cdata.Type = type;
         cdata.HeroId = id;
         cdata.CharName = charName;
 

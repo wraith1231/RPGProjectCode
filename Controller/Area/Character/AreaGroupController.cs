@@ -77,6 +77,14 @@ public abstract class AreaGroupController : MonoBehaviour
 
     void Start()
     {
+        StartInit();
+    }
+
+    private void StartInit()
+    {
+        if (_transform != null)
+            return;
+        
         _transform = GetComponent<Transform>();
         _rigidBody = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
@@ -101,8 +109,6 @@ public abstract class AreaGroupController : MonoBehaviour
             switch(controller.TargetType)
             {
                 case "AreaCharacter":
-                    _targetObject = Managers.General.GlobalGroups[targetId].AreaTransfrom;
-                    break;
                 case "Monster":
                     _targetObject = Managers.General.GlobalGroups[targetId].AreaTransfrom;
                     break;
@@ -128,6 +134,8 @@ public abstract class AreaGroupController : MonoBehaviour
         }
         else
         {
+            if (_transform == null)
+                StartInit();
             _transform.position = _prevNode;
         }
     }
@@ -331,12 +339,14 @@ public abstract class AreaGroupController : MonoBehaviour
             temp.currentNode = _currentNode;
         else
         {
-            temp.currentNode = new AreaNode();
-            temp.currentNode.ConnectedNode.Add(Managers.Map.GetClosestNode(_transform.position));
+            //temp.currentNode = new AreaNode();
+            temp.currentNode= Managers.Map.GetClosestNode(_transform.position);
+            _currentNode = temp.currentNode;
         }
         temp.parent = null;
 
         List<AStarNode> queue = new List<AStarNode>();
+
         int size = _currentNode.ConnectedNode.Count;
         for (int i = 0; i < size; i++)
         {

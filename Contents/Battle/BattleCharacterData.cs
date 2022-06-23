@@ -39,10 +39,11 @@ public class BattleCharacterData
         }
         else
         {
+            Debug.Log("global character data not found");
             MaxHealthPoint = CurrentHealthPoint = 100;
             MaxStaminaPoint = CurrentStaminaPoint = 100;
             HealthRecovery = 10;
-            StaminaRecovery = 10;
+            StaminaRecovery = 50;
             Power = 10;
             Agility = 5;
             Defense = 5;

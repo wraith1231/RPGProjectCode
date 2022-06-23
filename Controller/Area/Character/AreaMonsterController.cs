@@ -15,14 +15,38 @@ public class AreaMonsterController : AreaGroupController
 
         _root = sequence;
     }
-    protected void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
+        AreaGroupController group = other.transform.GetComponent<AreaGroupController>();
 
+        if (group == null)
+        {
+
+            return;
+        }
+
+        if (other.transform.tag == "Monster")
+        {
+
+            return;
+        }
+
+        if (group.GroupId == 0)
+        {
+            if (group.Status != Define.AreaStatus.Battle)
+            {
+                group.Status = Define.AreaStatus.Battle;
+                Managers.Battle.AddCharList(Managers.General.GlobalPlayer.Data);
+                Managers.Battle.AddGroup(Managers.General.GlobalGroups[_groupId]);
+                Managers.Scene.LoadSceneAsync(Define.SceneType.TestScene);
+            }
+        }
     }
-    protected void OnCollisionExit(Collision collision)
+    private void OnTriggerExit(Collider other)
     {
-
+        
     }
+
 
     public override void EnterVillage(List<Define.Facilities> facilities, GlobalVillageData village)
     {

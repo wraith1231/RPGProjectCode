@@ -69,7 +69,6 @@ public class UICreateCharacter : UIPopup
 
         Managers.General.EnterNewGame(text, _baseOutfit);
 
-        Managers.Map.GroupInitialize();
         Managers.Scene.LoadSceneAsync(Define.SceneType.AreaScene);
         Managers.UI.CloseAllPopup();
     }

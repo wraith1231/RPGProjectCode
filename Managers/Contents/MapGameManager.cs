@@ -31,7 +31,8 @@ public class MapGameManager
     public Vector3 TerrainSize { get { return _areaTerrain.terrainData.size; } }
     public Vector3 TerrainSize2;
 
-    private static int PROGRESS = 4;
+    // terrain char cam
+    private static int PROGRESS = 3;
     private int _progress = 0;
     public float CurrentProgress { get { return (float)_progress / (float)PROGRESS; } }
 
@@ -45,7 +46,11 @@ public class MapGameManager
     private int _instantiatedChar = 0;
 
     //둘이 한 세트
-    private List<int> _keys;
+    private int _generated = 0;
+    
+    private List<int> _needToInstantiateChar = new List<int>();
+
+    private bool _initialized = false;
 
     #region Initialize
     public void DataInstantiate()
@@ -54,22 +59,10 @@ public class MapGameManager
         _cameraInit = false;
         _progress = 0;
         _instantiatedChar = 0;
-        //Debug.Log("Data Instantiate");
+        _generated = 0;
+        
 
         Managers.Resource.Instantiate("AreaTerrain", TerrainInstantiated);
-    }
-    public void GroupInitialize()
-    {
-        _keys = new List<int>();
-
-        List<GlobalGroupController> data = Managers.General.GlobalGroups;
-
-        int listSize = data.Count;
-        
-        for (int i = 0; i < listSize; i++)
-        {
-            _keys.Add(data[i].Group);
-        }
     }
 
     private void TerrainInstantiated(GameObject go)
@@ -79,18 +72,11 @@ public class MapGameManager
 
         _areaTerrain = go.GetComponent<Terrain>();
         TerrainSize2 = _areaTerrain.terrainData.size;
+        Debug.Log("terrain end");
         _progress++;
-        //Debug.Log($"Terrain Instantiated{_progress}");
-        CharacterInstantiate();
+
+        CharInstantiate();
         CameraInstantiate();
-    }
-
-    private void CharacterInstantiate()
-    {
-        //근데 이거 캐릭터 말고 카트로 바꿀 수 있음
-        Managers.Resource.Instantiate("AreaCart", PlayerInstantiated);
-        NPCInstantiate();
-
     }
 
     private void ControllerSetting(GameObject go, AreaGroupController controller, int id)
@@ -98,7 +84,6 @@ public class MapGameManager
         controller.SetTerrainData(_areaTerrain.terrainData);
         controller.GroupId = id;
 
-        //Debug.Log($"{id} is start");
         go.name = Managers.General.GlobalGroups[id].GroupName;
 
         Vector3 pos = Managers.General.GlobalGroups[id].Position;
@@ -108,34 +93,16 @@ public class MapGameManager
         controller.PrevNode = Managers.General.GlobalGroups[id].Position;
     }
 
-    //수정할때 HumanCharInstantiated 확인
-    private void PlayerInstantiated(GameObject go)
+    private void InstantitateCharacter(List<GlobalGroupController> data)
     {
-        _objects.Add(go);
-        GameObject.DontDestroyOnLoad(go);
-
-        _player = go.AddComponent<AreaPlayerController>();
-
-        ControllerSetting(go, _player, 0);
-        _charLists.Add(go);
-        _controllers.Add(_player);
-
-        _progress++;
-        //Debug.Log($"Player Instantiated{_progress}");
-        _playerInit = true;
-        SetPlayerAndCameraIfInitialized();
-    }
-
-    private void NPCInstantiate()
-    {
-        List<GlobalGroupController> data = Managers.General.GlobalGroups;
         int listSize = data.Count;
         string key = "";
-        int count = 1;
-        for (int listNum = 1; listNum < listSize; listNum++)
+
+        for (int listNum = 0; listNum < listSize; listNum++)
         {
             if (data[listNum].GroupMemberCount() == 0)
                 continue;
+            _generated++;
 
             switch (data[listNum].Type)
             {
@@ -143,39 +110,43 @@ public class MapGameManager
                     key = "AreaCart";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(_keys[count++]);
+                    _charIdList[key].Add(data[listNum].Group);
                     Managers.Resource.Instantiate("AreaCart", HumanCharInstantiated);
-                    
+
                     break;
                 case Define.GroupType.Merchant:
                     break;
                 case Define.GroupType.Monster:
                     key = data[listNum].GroupName;
-                    if(_charIdList.ContainsKey(key) == false)
+                    if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(_keys[count++]);
+                    _charIdList[key].Add(data[listNum].Group);
                     Managers.Resource.Instantiate(key, MonsterCharInstantiated);
                     break;
                 case Define.GroupType.Unknown:
                     key = "AreaCart";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(_keys[count++]);
+                    _charIdList[key].Add(data[listNum].Group);
                     Managers.Resource.Instantiate("AreaCart", HumanCharInstantiated);
                     break;
                 default:
                     key = "Cart";
                     if (_charIdList.ContainsKey(key) == false)
                         _charIdList[key] = new List<int>();
-                    _charIdList[key].Add(_keys[count++]);
+                    _charIdList[key].Add(data[listNum].Group);
                     Managers.Resource.Instantiate("AreaCart", HumanCharInstantiated);
                     break;
             }
         }
-        Debug.Log($"char id list : {_charIdList.Count}");
     }
 
-    //수정할때 PlayerInstantiated도 확인
+    private void CharInstantiate()
+    {
+        List<GlobalGroupController> data = Managers.General.GlobalGroups;
+        InstantitateCharacter(data);
+    }
+
     private void HumanCharInstantiated(GameObject go)
     {
         _objects.Add(go);
@@ -185,23 +156,27 @@ public class MapGameManager
         _charIdList[go.name].RemoveAt(0);
 
         AreaGroupController controller = null;
-        controller = go.AddComponent<AreaNPCController>();
+        if (id == 0)
+        {
+            _player = go.AddComponent<AreaPlayerController>();
+            controller = _player;
+        }
+        else
+            controller = go.AddComponent<AreaNPCController>();
 
-        //Debug.Log($"current :  {id}");
         ControllerSetting(go, controller, id);
         _charLists.Add(go);
         _controllers.Add(controller);
 
-        //Debug.Log($"{go.name} Instantiated");
-        _progress++;
-        if (_charLists.Count == _keys.Count)
+        if(id == 0)
         {
-            _progress++;
-            //Debug.Log($"npc instantiated {_progress}");
+            _playerInit = true;
+            SetPlayerAndCameraIfInitialized();
         }
+
+        CheckInstantiateEnd();
     }
 
-    
     private void MonsterCharInstantiated(GameObject go)
     {
         _objects.Add(go);
@@ -210,22 +185,26 @@ public class MapGameManager
         int id = _charIdList[go.name][0];
         _charIdList[go.name].RemoveAt(0);
         AreaGroupController controller = null;
-        //string typeName = $"Area{go.name}Controller";
-        //Type type = Type.GetType(typeName);
         controller = go.AddComponent<AreaMonsterController>();
         
-
-        Debug.Log($"current :  {id}");
         ControllerSetting(go, controller, id);
         _charLists.Add(go);
         _controllers.Add(controller);
 
-        //Debug.Log($"{go.name} Instantiated");
-        _progress++;
-        if (_charLists.Count == _keys.Count)
+        if (_initialized == true)
+            controller.SceneInit();
+
+        CheckInstantiateEnd();
+    }
+
+    private void CheckInstantiateEnd()
+    {
+        if (_instantiatedChar == _generated)
         {
+            _instantiatedChar = 0;
+            _generated = 0;
             _progress++;
-            //Debug.Log($"npc instantiated {_progress}");
+            _charIdList.Clear();
         }
     }
 
@@ -242,7 +221,7 @@ public class MapGameManager
         _camera = go.GetComponent<AreaCameraController>();
 
         _progress++;
-        //Debug.Log($"Camera Instantiated {_progress}");
+        
         _cameraInit = true;
         SetPlayerAndCameraIfInitialized();
     }
@@ -291,6 +270,7 @@ public class MapGameManager
             _villageLists[i].SceneInit();
 
         AreaSceneNow = true;
+        _initialized = true;
     }
 
     public void SetGroupPopup(GameObject go)
@@ -301,6 +281,8 @@ public class MapGameManager
 
     public void Clear()
     {
+        _initialized = false;
+        _needToInstantiateChar.Clear();
         AreaSceneNow = false;
         _controllers.Clear();
         _villageLists.Clear();
@@ -326,6 +308,7 @@ public class MapGameManager
             _day++;
             Debug.Log($"Day {_day}");
             DayChangeUpdate(_day);
+            QueuedCharInstantiate();
         }
     }
 
@@ -352,4 +335,24 @@ public class MapGameManager
     {
         _player.SetAppearanceVisible(true);
     }
+
+    public void AddInstantiateChar(int groupId)
+    {
+        _needToInstantiateChar.Add(groupId);
+    }
+
+    private void QueuedCharInstantiate()
+    {
+        List<GlobalGroupController> list = new List<GlobalGroupController>();
+        int size = _needToInstantiateChar.Count;
+        for (int i = 0; i < size; i++)
+        {
+            list.Add(Managers.General.GlobalGroups[_needToInstantiateChar[i]]);
+        }
+
+        _needToInstantiateChar.Clear();
+
+        InstantitateCharacter(list);
+    }
+
 }

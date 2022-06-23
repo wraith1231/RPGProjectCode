@@ -8,6 +8,7 @@ public abstract class BattleCharacterController : MonoBehaviour
     public static float AttackStamina = 30f;
     public static float RollingStamina = 30f;
     public static float BlockStamina = 20f;
+    public static float RunningStamina = 20f;
 
     protected Transform _transform;
     protected Transform _target = null;
@@ -38,7 +39,7 @@ public abstract class BattleCharacterController : MonoBehaviour
 
     protected BattleCharacterData _battleData;
     public BattleCharacterData BattleData { get { return _battleData; } set { _battleData = value; } }
-
+    
     protected Define.HeroState _state = Define.HeroState.Idle;
     public virtual Define.HeroState State { get; protected set; }
 
@@ -247,6 +248,7 @@ public abstract class BattleCharacterController : MonoBehaviour
         if (_deadTime >= 5.0f)
         {
             Managers.Battle.AnotherOneBiteDust();
+            Managers.General.GlobalGroups[_group].RemoveMember(_heroId);
             gameObject.SetActive(false);
         }
     }
@@ -419,6 +421,11 @@ public abstract class BattleCharacterController : MonoBehaviour
         }
 
         AfterRolling();
+    }
+
+    public virtual void HitByOther(BattleCharacterController attack, Vector3 hitPoint)
+    {
+        GetDamaged(attack, hitPoint);
     }
 
     public virtual void GetDamaged(BattleCharacterController attacker, Vector3 hitPoint)

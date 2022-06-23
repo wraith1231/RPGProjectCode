@@ -16,6 +16,10 @@ public class GlobalGroupController
     //퀘스트 목표물인지
     private bool _questObjective = false;
     public bool QuestObjective { get { return _questObjective; } set { _questObjective = value; } }
+    private int _relatedQuest;
+    public int RelatedQuest { get { return _relatedQuest; } set { _relatedQuest = value; } }
+    private QuestBase _currentQuest = null;
+    public QuestBase CurrentQuest { get { return _currentQuest; } set { _currentQuest = value; } }
 
     //그룹 멤버 관련
     [SerializeField]

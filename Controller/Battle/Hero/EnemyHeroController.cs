@@ -206,7 +206,7 @@ public abstract class EnemyHeroController : BattleHeroController
 
         if (_state == Define.HeroState.Running)
         {
-            _battleData.CurrentStaminaPoint -= _battleData.StaminaRecovery * Time.deltaTime;
+            _battleData.CurrentStaminaPoint -= RunningStamina * Time.deltaTime;
 
             if (_battleData.CurrentStaminaPoint < 0) _battleData.CurrentStaminaPoint = 0;
         }

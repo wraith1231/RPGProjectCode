@@ -10,7 +10,7 @@ public class GlobalCharacterController
     protected GlobalCharacterData _globalData = new GlobalCharacterData();
     public GlobalCharacterData GlobalData { get { return _globalData; } set { _globalData = value; } }
 
-    protected BattleCharacterData _battleData = new BattleCharacterData();
+    protected BattleCharacterData _battleData;
     public BattleCharacterData BattleData { get { return _battleData; } set { _battleData = value; } }
 
     //0이면 Normal로, +면 좋은거 -면 나쁜거

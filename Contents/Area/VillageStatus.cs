@@ -18,6 +18,7 @@ public class VillageStatus : MonoBehaviour
 
     private Transform _transform;
 
+    private int _layerMask = 1 << 6;
 
     private void OnDestroy()
     {
@@ -35,8 +36,6 @@ public class VillageStatus : MonoBehaviour
         _data = Managers.General.GetVillageData(_name);
         _data.AreaTransfrom = _transform;
         _detectRadius = _data.DetectRange;
-
-        Debug.Log($"{_data.VillageName} scene init");
     }
 
     private void OnTriggerEnter(Collider other)
@@ -117,11 +116,11 @@ public class VillageStatus : MonoBehaviour
 
         _data.VillageDayChange();
 
-        Collider[] colliders = Physics.OverlapSphere(_transform.position, _detectRadius);
+        Collider[] colliders = Physics.OverlapSphere(_transform.position, _detectRadius, _layerMask);
         int size = colliders.Length;
         for(int i = 0;  i < size; i++)
         {
-            if(colliders[i].CompareTag("Monster"))
+            if(colliders[i].tag == "Monster")
             {
                 AreaGroupController controller = colliders[i].GetComponent<AreaGroupController>();
                 if (Managers.General.GlobalGroups[controller.GroupId].QuestObjective == true)
