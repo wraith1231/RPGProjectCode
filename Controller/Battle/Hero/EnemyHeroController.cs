@@ -108,6 +108,7 @@ public abstract class EnemyHeroController : BattleHeroController
 
     public override BattleCharacterController GetNearestCharacter()
     {
+        if (_currentNearCharacter == null) CalculateNearestCharacter();
         return _currentNearCharacter;
     }
 

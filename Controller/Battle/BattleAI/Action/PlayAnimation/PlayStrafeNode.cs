@@ -12,7 +12,8 @@ public class PlayStrafeNode : NodeBase
     }
     public override BTResult Evaluate()
     {
-        _controller.PlayAnimation(Define.HeroState.Strafe);
+        if (_controller.PlayAnimation(Define.HeroState.Strafe) == true) return BTResult.RUNNING;
+
         return BTResult.SUCCESS;
     }
 }

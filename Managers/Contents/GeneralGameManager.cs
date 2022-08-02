@@ -87,17 +87,18 @@ public class GeneralGameManager
         {
             for(int i = 0; i < mercenaryGroupMemberCount[count-1]; i++)
             {
-                HumanOutfit outfit = new HumanOutfit();
-                outfit.SetNPCBaseData();
-
-                EquipWeapon left;
-                EquipWeapon right;
-                NPCWeaponRandomize(out left, out right);
-
-                //groupId = count + 1;
-                CharacterData cdata = new CharacterData(group: count, outfit: outfit, left: left, right: right);
-                
-                MakeCharacter(count, $"NPC {_maxCharCount}", Managers.Data.GetRandomStatData(), Define.NPCPersonality.Normal, outfit, left, right);
+                MakeRandomCharacter(count, $"NPC {_maxCharCount}");
+                //HumanOutfit outfit = new HumanOutfit();
+                //outfit.SetNPCBaseData();
+                //
+                //EquipWeapon left;
+                //EquipWeapon right;
+                //NPCWeaponRandomize(out left, out right);
+                //
+                ////groupId = count + 1;
+                //CharacterData cdata = new CharacterData(group: count, outfit: outfit, left: left, right: right);
+                //
+                //MakeCharacter(count, $"NPC {_maxCharCount}", Managers.Data.GetRandomStatData(), Define.NPCPersonality.Normal, outfit, left, right);
             }
             count++;
         }
@@ -149,6 +150,21 @@ public class GeneralGameManager
         _globalGroups[groupId].AddGroupMember(id);
 
         return id;
+    }
+
+    public void MakeRandomCharacter(int groupId, string name)
+    {
+        HumanOutfit outfit = new HumanOutfit();
+        outfit.SetNPCBaseData();
+
+        EquipWeapon left;
+        EquipWeapon right;
+        NPCWeaponRandomize(out left, out right);
+
+        //groupId = count + 1;
+        CharacterData cdata = new CharacterData(group: groupId, outfit: outfit, left: left, right: right);
+
+        MakeCharacter(groupId, name, Managers.Data.GetRandomStatData(), Define.NPCPersonality.Normal, outfit, left, right);
     }
 
     private void NPCWeaponRandomize(out EquipWeapon left, out EquipWeapon right)

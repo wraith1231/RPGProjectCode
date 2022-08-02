@@ -32,9 +32,10 @@ public class UICreateCharacter : UIPopup
     private CharacterOutfit _outfit;
     private HumanOutfit _baseOutfit;
 
-    // Start is called before the first frame update
-    void Start()
+    public override void Init()
     {
+        base.Init();
+
         _baseOutfit = new HumanOutfit();
         _baseOutfit.SetStatData(Managers.Data.PlayerStartStat);
 

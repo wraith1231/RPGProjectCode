@@ -17,7 +17,8 @@ public class TestScene : BaseScene
     {
         base.Init();
 
-        Managers.UI.MakePopupUI<UIPlayerGauge>(foo: PlayerGaugeInstantiated);
+        Managers.UI.ShowSceneUI<UIPlayerGauge>(foo: PlayerGaugeInstantiated);
+        //Managers.UI.MakePopupUI<UIPlayerGauge>(foo: PlayerGaugeInstantiated);
 
         Managers.Battle.BattleSceneStart();
     }

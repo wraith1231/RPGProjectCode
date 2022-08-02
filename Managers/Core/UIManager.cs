@@ -12,16 +12,16 @@ public class UIManager
     UIScene _scene = null;
     UIBase _worldSpaceUI = null;
 
+
     public void SetCanvas(GameObject go, bool sort = true)
     {
         Canvas canvas = Util.GetOrAddComponent<Canvas>(go);
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        //canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.overrideSorting = true;
         
         if(sort)
         {
-            canvas.sortingOrder = _order;
-            _order++;
+            canvas.sortingOrder = _order++;
         }
         else
         {
@@ -58,14 +58,16 @@ public class UIManager
         obj.transform.SetParent(UIRoot.transform);
     }
 
-    public void MakeSubItem<T>(Transform parent = null, string name = null) where T : UIBase
+    public void MakeSubItem<T>(Transform parent = null, string name = null, Action<T> foo = null) where T : UIBase
     {
         string objectName = typeof(T).Name;
         if (string.IsNullOrEmpty(name))
             name = typeof(T).Name;
 
-        //GameObject go = Managers.Resource.Instantiate($"SubItem/{name}", null).Result as GameObject;
-        Managers.Resource.Instantiate($"SubItem/{objectName}", (go) => { go.name = name; SubItemInstantiate(go); }, parent);
+        if(foo != null)
+            Managers.Resource.Instantiate($"SubItem/{objectName}", (go) => { go.name = name; SubItemInstantiate(go); foo(go.GetComponent<T>()); }, parent);
+        else
+            Managers.Resource.Instantiate($"SubItem/{objectName}", (go) => { go.name = name; SubItemInstantiate(go); }, parent);
 
         return;
     }
@@ -91,6 +93,7 @@ public class UIManager
     private void PopupUIInstantiate(GameObject obj)
     {
         UIPopup popup = Util.GetOrAddComponent<UIPopup>(obj);
+        
         _popupStack.Push(popup);
     }
 

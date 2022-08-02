@@ -81,6 +81,13 @@ public abstract class BattleCharacterController : MonoBehaviour
     protected Vector3 _rollingDirection;
     public Vector3 RollingDirection { get { return _rollingDirection; } set { _rollingDirection = value; } }
 
+    protected int _tempInt;
+    public int TempInt { get { return _tempInt; } set { _tempInt = value; } }
+    protected float _tempFloat;
+    public float TempFloat { get { return _tempFloat; } set { _tempFloat = value; } }
+    protected Vector2 _tempValue;
+    public Vector2 TempValue { get { return _tempValue; } set { _tempValue = value; } }
+
     public float TargetDistance { get; set; }
     public bool InBattleTarget { get; set; }
     public Define.HeroState NextState { get; set; }
@@ -88,6 +95,11 @@ public abstract class BattleCharacterController : MonoBehaviour
     protected List<int> _charKeys = new List<int>();
     protected Dictionary<int, BattleCharacterController> _nearCharacter = new Dictionary<int, BattleCharacterController>();
     protected BattleCharacterController _currentNearCharacter = null;
+
+    public BattleCharacterController GetTarget() 
+    {
+        return _currentNearCharacter;
+    }
     #endregion
 
     #region General Public Function Zone
@@ -103,6 +115,11 @@ public abstract class BattleCharacterController : MonoBehaviour
     {
         SetAnimatorVertical(vertical);
         SetAnimatorHorizontal(horizontal);
+    }
+    public void SetAnimatorDirection(Vector2 value)
+    {
+        SetAnimatorVertical(value.x);
+        SetAnimatorHorizontal(value.y);
     }
 
     public void SetBattleCharacterData(GlobalCharacterData data)

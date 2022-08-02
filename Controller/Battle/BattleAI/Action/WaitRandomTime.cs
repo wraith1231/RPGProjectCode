@@ -5,28 +5,30 @@ using BehaviorTree;
 
 public class WaitRandomTime : NodeBase
 {
-    private BattleCharacterController _controller;
     private float _setTime;
     private float _curTime;
     private float _range;
 
-    public WaitRandomTime(BattleCharacterController controller, float range)
+    public WaitRandomTime( float range)
     {
-        _controller = controller;
         _range = range;
-        _setTime = Random.Range(0, _range);
-        _curTime = 0;
+        Initialize();
     }
     public override BTResult Evaluate()
     {
         _curTime += Time.deltaTime;
         if (_curTime >= _setTime)
         {
-            _curTime = 0;
-            _setTime = Random.Range(0, _range);
+            Initialize();
             return BTResult.SUCCESS;
         }
 
         return BTResult.RUNNING;
+    }
+
+    private void Initialize()
+    {
+        _curTime = 0;
+        _setTime = Random.Range(0, _range);
     }
 }

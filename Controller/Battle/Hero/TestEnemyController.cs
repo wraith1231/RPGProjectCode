@@ -20,7 +20,7 @@ public class TestEnemyController : EnemyHeroController
          * s2 - 적이 거리 안에 있는가? -> success 뜨면 다음으로, fail이면 적에게 다가감
          * s3 - 적에 대한 행동 정의
          */
-        NodeBase action = new PatrolSequence(this);
+        NodeBase action = new PatrolSequence(this, 5);
         SelectorNode selector = new SelectorNode(action);
         _root = selector;
     }

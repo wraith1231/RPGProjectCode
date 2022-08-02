@@ -33,11 +33,16 @@ public class UIVillageInterface : UIPopup
     GlobalVillageData _currentVillage;
 
     // Start is called before the first frame update
-    void Start()
+    public override void Init()
     {
+        base.Init();
+
         Bind<GameObject>(typeof(GameObjects));
         Bind<Button>(typeof(Buttons));
         Bind<TMP_Text>(typeof(Texts));
+
+        GetComponent<Canvas>().worldCamera = Camera.main;
+        GetComponent<Canvas>().planeDistance = GetComponent<Canvas>().sortingOrder;
 
         GameObject panel = Get<GameObject>((int)GameObjects.SubMenuPanel);
         foreach (Transform child in panel.transform)
@@ -133,7 +138,7 @@ public class UIVillageInterface : UIPopup
         DeleteAllSubItem();
 
         GameObject panel = Get<GameObject>((int)GameObjects.SubMenuPanel);
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Guard");
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Guard", TalkToGuard);
 
         panel = Get<GameObject>((int)GameObjects.CharacterPanel);
         MakeCharacters(panel.transform, Define.Facilities.Gate);
@@ -143,10 +148,10 @@ public class UIVillageInterface : UIPopup
         DeleteAllSubItem();
 
         GameObject panel = Get<GameObject>((int)GameObjects.SubMenuPanel);
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Marchant");
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Buy Something");
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Sell Something");
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Change looks");
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Marchant", TalkToMerchant);
+        //Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Buy Something");
+        //Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Sell Something");
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Change looks", OpenChangeOutfit);
 
         panel = Get<GameObject>((int)GameObjects.CharacterPanel);
         MakeCharacters(panel.transform, Define.Facilities.Market);
@@ -157,8 +162,8 @@ public class UIVillageInterface : UIPopup
         DeleteAllSubItem();
 
         GameObject panel = Get<GameObject>((int)GameObjects.SubMenuPanel);
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Blacksmith");
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Change Weapon");
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Blacksmith", TalkToMaster);
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Change Weapon", OpenBlacksmith);
 
         panel = Get<GameObject>((int)GameObjects.CharacterPanel);
         MakeCharacters(panel.transform, Define.Facilities.Workshop);
@@ -168,7 +173,7 @@ public class UIVillageInterface : UIPopup
         DeleteAllSubItem();
 
         GameObject panel = Get<GameObject>((int)GameObjects.SubMenuPanel);
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Person");
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Person", TalkToPerson);
 
         panel = Get<GameObject>((int)GameObjects.CharacterPanel);
         MakeCharacters(panel.transform, Define.Facilities.Square);
@@ -178,8 +183,8 @@ public class UIVillageInterface : UIPopup
         DeleteAllSubItem();
 
         GameObject panel = Get<GameObject>((int)GameObjects.SubMenuPanel);
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Listen to Sound Arounds");
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Accept Quest");
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Worker", TalkToGuild);
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Accept Quest", OpenQuest);
         Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Check Quest");
 
         panel = Get<GameObject>((int)GameObjects.CharacterPanel);
@@ -190,8 +195,8 @@ public class UIVillageInterface : UIPopup
         DeleteAllSubItem();
 
         GameObject panel = Get<GameObject>((int)GameObjects.SubMenuPanel);
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Mayor");
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Enchant");
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Mayor", TalkToMayer);
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Enchant", OpenEnchant);
 
         panel = Get<GameObject>((int)GameObjects.CharacterPanel);
         MakeCharacters(panel.transform, Define.Facilities.Mayor);
@@ -202,9 +207,59 @@ public class UIVillageInterface : UIPopup
         DeleteAllSubItem();
 
         GameObject panel = Get<GameObject>((int)GameObjects.SubMenuPanel);
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Owner");
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Owner", TalkToMaster);
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Rest", OpenRest);
 
         panel = Get<GameObject>((int)GameObjects.CharacterPanel);
         MakeCharacters(panel.transform, Define.Facilities.Inn);
+    }
+
+    void TalkToGuard(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.TalkGuard;
+    }
+    void TalkToPerson(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.TalkPerson;
+    }
+    void TalkToMaster(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.TalkMaster;
+    }
+    void TalkToMayer(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.TalkMayer;
+    }
+    void TalkToGuild(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.TalkGuild;
+    }
+    void TalkToMerchant(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.TalkMerchant;
+    }
+    void OpenChangeOutfit(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.OpenChangeOutfit;
+    }
+    void OpenBlacksmith(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.OpenBlacksmith;
+    }
+    void OpenEnchant(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.OpenEnchant;
+    }
+    void OpenQuest(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.OpenQuest;
+    }
+    void CheckCurrentQuest(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.CheckQuest;
+    }
+    void OpenRest(UIVillageSubButton sub)
+    {
+        sub.ButtonType = Define.VillageSubButtonType.OpenRest;
     }
 }

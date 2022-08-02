@@ -207,7 +207,8 @@ public class BattleGameManager
         
         _progress++;
 
-        InstantiateCharacterPrefab();
+        AreaObjectInstantiate();
+        
     }
 
     private void InstantiateCharacterPrefab()
@@ -217,7 +218,7 @@ public class BattleGameManager
 
 
         CharacterInstantiate();
-        AreaObjectInstantiate();
+        //AreaObjectInstantiate();
     }
 
     private void CharacterInstantiate()
@@ -326,8 +327,21 @@ public class BattleGameManager
         GlobalGroupController groupCon = Managers.General.GlobalGroups[controller.Group];
 
         Vector3 pos = groupCon.Position;
-        pos = GetScalingPosition(pos);
+        while(true)
+        {
+            pos = GetScalingPosition(pos);
+            if (Physics.OverlapSphere(pos + Vector3.up, 0.5f).Length == 0)
+                break;
+            pos.x += 1f;
+            pos.z += 1f;
+            Debug.Log(pos);
+        }
+        //pos.x += UnityEngine.Random.Range(-30, 31);
+        //pos.z += UnityEngine.Random.Ra
+        Debug.Log(pos);
         controller.transform.position = pos;
+
+        Debug.Log(controller.transform.position);
     }
 
     private void MonsterCharacterInstantiate(GameObject go)
@@ -354,7 +368,8 @@ public class BattleGameManager
         int size = _areaObjects.Count;
         if(size == 0)
         {
-            _progress++;
+            _progress++; 
+            InstantiateCharacterPrefab();
         }
 
         for (int i = 0; i < size; i++)
@@ -369,7 +384,7 @@ public class BattleGameManager
         _objects.Add(go);
         GameObject.DontDestroyOnLoad(go);
         string[] name =go.name.Split('/');
-        //Debug.Log($"{name[0]}, {name[1]}");
+
         AreaObjects data = _areaObjectInstantiateData[name[1]];
 
         Vector3 pos = data.Position;
@@ -378,7 +393,10 @@ public class BattleGameManager
         _areaObjectCount++;
 
         if (_areaObjectCount >= _areaObjects.Count)
+        {
             _progress++;
+            InstantiateCharacterPrefab();
+        }
     }
 
     public void BattleSceneStart()

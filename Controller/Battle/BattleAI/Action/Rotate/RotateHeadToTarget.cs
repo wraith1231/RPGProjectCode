@@ -6,17 +6,15 @@ using BehaviorTree;
 public class RotateHeadToTarget : NodeBase
 {
     private BattleCharacterController _controller;
-    private BattleCharacterController _target;
 
-    public RotateHeadToTarget(BattleCharacterController controller, BattleCharacterController target)
+    public RotateHeadToTarget(BattleCharacterController controller)
     {
         _controller = controller;
-        _target = target;
     }
 
     public override BTResult Evaluate()
     {
-        _controller.HeadToDestination(_target.transform);
+        _controller.HeadToDestination(_controller.GetTarget().transform);
 
         return BTResult.SUCCESS;
     }

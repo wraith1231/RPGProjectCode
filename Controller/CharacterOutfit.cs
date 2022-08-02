@@ -18,8 +18,10 @@ public class CharacterOutfit : MonoBehaviour
 
     private int _prevHeadGear = -1;
     private int _prevHead = -1;
+    private int _prevFacial = -1;
 
     [SerializeField] private List<GameObject> _genderParts;
+
 
     #region All Gender
     [SerializeField] private List<GameObject> _headCoveringsBase;
@@ -226,6 +228,84 @@ public class CharacterOutfit : MonoBehaviour
         SetActiveAllGenderParts(part, num, true);
     }
 
+    public void ChangeAllGenderOutfit(string type, int num)
+    {
+        Define.HumanOutfitAllGender part = Define.HumanOutfitAllGender.Unknown;
+        int size = (int)part;
+        for(int i = 0; i < size; i++)
+        {
+            if(type == ((Define.HumanOutfitAllGender)i).ToString())
+            {
+                part = (Define.HumanOutfitAllGender)i;
+                break;
+            }
+        }
+
+        ChangeAllGenderOutfit(part, num);
+    }
+
+    private void SetActiveFalse()
+    {
+        _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
+        if (_prevAllGenderHeadBase >= 0)
+            _headCoveringsBase[_prevAllGenderHeadBase].SetActive(false);
+
+        _prevAllGenderMask = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringMask];
+        if (_prevAllGenderMask >= 0)
+            _headCoveringsMask[_prevAllGenderMask].SetActive(false);
+
+        _prevAllGenderNoHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair];
+        if (_prevAllGenderNoHair >= 0)
+            _headCoveringsNoHair[_prevAllGenderNoHair].SetActive(false);
+
+        _prevAllGenderHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderHair];
+        if (_prevAllGenderHair >= 0)
+            _allGenderHair[_prevAllGenderHair].SetActive(false);
+
+        _prevExtra = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderExtra];
+        if (_prevExtra >= 0)
+            _allGenderExtra[_prevExtra].SetActive(false);
+
+        _prevHeadGear = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.HeadGear];
+        if (_prevHeadGear >= 0)
+            ChangeGenderOutfit(Define.HumanOutfitOneGender.HeadGear, -1);
+
+        _prevHead = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.Head];
+        if (_prevHead >= 0)
+            ChangeGenderOutfit(Define.HumanOutfitOneGender.Head, -1);
+
+        if(_gender == Define.HumanGender.Male)
+        {
+            _prevFacial = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.Facial];
+            if (_prevFacial >= 0)
+                ChangeGenderOutfit(Define.HumanOutfitOneGender.Facial, -1);
+        }
+            //_maleHead[_prevHead].SetActive(false);
+    }
+
+    private void ActiveDefaultGenderHeads(params Define.HumanOutfitOneGender[] ones)
+    {
+        int size = ones.Length;
+        for(int i = 0; i < size; i++)
+        {
+            if (ones[i] == Define.HumanOutfitOneGender.Head)
+                ChangeGenderOutfit(Define.HumanOutfitOneGender.Head, _prevHead);
+            if (ones[i] == Define.HumanOutfitOneGender.Facial)
+                ChangeGenderOutfit(Define.HumanOutfitOneGender.Facial, _prevFacial);
+        }
+    }
+    private void ActiveDefaultAllHeads(params Define.HumanOutfitAllGender[] alls)
+    {
+        int size = alls.Length;
+        for(int i = 0; i < size; i++)
+        {
+            if (alls[i] == Define.HumanOutfitAllGender.AllGenderHair)
+                ChangeAllGenderOutfit(Define.HumanOutfitAllGender.AllGenderHair, _prevAllGenderHair);
+            if (alls[i] == Define.HumanOutfitAllGender.AllGenderExtra)
+                ChangeAllGenderOutfit(Define.HumanOutfitAllGender.AllGenderExtra, _prevExtra);
+        }
+    }
+
     private void SetActiveAllGenderParts(Define.HumanOutfitAllGender part, int num, bool active)
     {
         if (num >= 0)
@@ -233,142 +313,88 @@ public class CharacterOutfit : MonoBehaviour
             switch (part)
             {
                 case Define.HumanOutfitAllGender.HeadCoveringBase:
-                    //mask, nohair, Nohair, headgear false
-                    _prevAllGenderMask = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringMask];
-                    if(_prevAllGenderMask >= 0)
-                        _headCoveringsMask[_prevAllGenderMask].SetActive(false);
+                    if (active == true)
+                        SetActiveFalse();
 
-                    _prevAllGenderNoHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair];
-                    if (_prevAllGenderNoHair >= 0)
-                        _headCoveringsNoHair[_prevAllGenderNoHair].SetActive(false);
-
-                    _prevAllGenderHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderHair];
-                    if (_prevAllGenderHair >= 0)
-                        _allGenderHair[_prevAllGenderHair].SetActive(false);
-
-                    _prevHeadGear = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.HeadGear];
-                    if (_prevHeadGear >= 0)
-                        ChangeGenderOutfit(Define.HumanOutfitOneGender.HeadGear, -1);
-
-                    if (num >= _headCoveringsBase.Count)
-                        Debug.Log("HeadCoveringBase Over");
                     _headCoveringsBase[num].SetActive(active);
+
+                    ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderExtra);
+                    ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
+
+                    if (active == false)
+                    {
+                        ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair);
+                    }
                     break;
                 case Define.HumanOutfitAllGender.HeadCoveringMask:
-                    //base, nohair, headgear false
-                    _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
-                    if (_prevAllGenderHeadBase >= 0)
-                        _headCoveringsBase[_prevAllGenderHeadBase].SetActive(false);
+                    if (active == true)
+                        SetActiveFalse();
 
-                    _prevAllGenderNoHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair];
-                    if (_prevAllGenderNoHair >= 0)
-                        _headCoveringsNoHair[_prevAllGenderNoHair].SetActive(false);
-
-                    _prevHeadGear = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.HeadGear];
-                    if (_prevHeadGear >= 0)
-                        ChangeGenderOutfit(Define.HumanOutfitOneGender.HeadGear, -1);
-
-                    if (num >= _headCoveringsMask.Count)
-                        Debug.Log("_headCoveringsMask Over");
                     _headCoveringsMask[num].SetActive(active);
+
+                    ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair, Define.HumanOutfitAllGender.AllGenderExtra);
+                    ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head);
+                    if (active == false)
+                    {
+                        ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Facial);
+                    }
                     break;
                 case Define.HumanOutfitAllGender.HeadCoveringNoHair:
-                    //base, mask, hair, extra, headgear false
-                    _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
-                    if (_prevAllGenderHeadBase >= 0)
-                        _headCoveringsBase[_prevAllGenderHeadBase].SetActive(false);
+                    if (active == true)
+                        SetActiveFalse();
 
-                    _prevAllGenderMask = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringMask];
-                    if (_prevAllGenderMask >= 0)
-                        _headCoveringsMask[_prevAllGenderMask].SetActive(false);
-
-                    _prevAllGenderHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderHair];
-                    if (_prevAllGenderHair >= 0)
-                        _allGenderHair[_prevAllGenderHair].SetActive(false);
-
-                    _prevExtra = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderExtra];
-                    if (_prevExtra >= 0)
-                        _allGenderExtra[_prevExtra].SetActive(false);
-
-                    _prevHeadGear = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.HeadGear];
-                    if (_prevHeadGear >= 0)
-                        ChangeGenderOutfit(Define.HumanOutfitOneGender.HeadGear, -1);
-
-                    if (num >= _headCoveringsNoHair.Count)
-                        Debug.Log("_headCoveringsNoHair Over");
                     _headCoveringsNoHair[num].SetActive(active);
+
+                    ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
+                    if (active == false)
+                    {
+                        ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair, Define.HumanOutfitAllGender.AllGenderExtra);
+                    }
                     break;
                 case Define.HumanOutfitAllGender.AllGenderHair:
-                    //base, mask, nohair, headgear false
-                    _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
-                    if (_prevAllGenderHeadBase >= 0)
-                        _headCoveringsBase[_prevAllGenderHeadBase].SetActive(false);
+                    if (active == true)
+                        SetActiveFalse();
 
-                    _prevAllGenderMask = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringMask];
-                    if (_prevAllGenderMask >= 0)
-                        _headCoveringsMask[_prevAllGenderMask].SetActive(false);
-
-                    _prevAllGenderNoHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair];
-                    if (_prevAllGenderNoHair >= 0)
-                        _headCoveringsNoHair[_prevAllGenderNoHair].SetActive(false);
-
-                    _prevHeadGear = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.HeadGear];
-                    if (_prevHeadGear >= 0)
-                        ChangeGenderOutfit(Define.HumanOutfitOneGender.HeadGear, -1);
-
-                    if (num >= _allGenderHair.Count)
-                        Debug.Log("_allGenderHair Over");
                     _allGenderHair[num].SetActive(active);
+
+                    ActiveDefaultAllHeads( Define.HumanOutfitAllGender.AllGenderExtra);
+                    ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderHeadAttachment:
-                    if (num >= _allGenderHeadAttachment.Count)
-                        Debug.Log("_allGenderHeadAttachment Over");
                     _allGenderHeadAttachment[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderBackAttachment:
-                    if (num >= _allGenderBackAttachment.Count)
-                        Debug.Log("_allGenderBackAttachment Over");
                     _allGenderBackAttachment[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderShoulderRight:
-                    if (num >= _allGenderShoulderRight.Count)
-                        Debug.Log("_allGenderShoulderRight Over");
                     _allGenderShoulderRight[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderShoulderLeft:
-                    if (num >= _allGenderShoulderLeft.Count)
-                        Debug.Log("_allGenderShoulderLeft Over");
                     _allGenderShoulderLeft[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderElbowRight:
-                    if (num >= _allGenderElbowRight.Count)
-                        Debug.Log("_allGenderElbowRight Over");
                     _allGenderElbowRight[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderElbowLeft:
-                    if (num >= _allGenderElbowLeft.Count)
-                        Debug.Log("_allGenderElbowLeft Over");
                     _allGenderElbowLeft[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderHips:
-                    if (num >= _allGenderHips.Count)
-                        Debug.Log("_allGenderHips Over");
                     _allGenderHips[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderKneeRight:
-                    if (num >= _allGenderKneeRight.Count)
-                        Debug.Log("_allGenderKneeRight Over");
                     _allGenderKneeRight[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderKneeLeft:
-                    if (num >= _allGenderKneeLeft.Count)
-                        Debug.Log("_allGenderKneeLeft Over");
                     _allGenderKneeLeft[num].SetActive(active);
                     break;
                 case Define.HumanOutfitAllGender.AllGenderExtra:
-                    if (num >= _allGenderExtra.Count)
-                        Debug.Log("_allGenderExtra Over");
+                    if (active == true)
+                        SetActiveFalse();
+
                     _allGenderExtra[num].SetActive(active);
+
+                    ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair);
+                    ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
                     break;
                 case Define.HumanOutfitAllGender.Unknown:
                     break;
@@ -401,6 +427,22 @@ public class CharacterOutfit : MonoBehaviour
         }
     }
 
+    public void ChangeGenderOutfit(string type, int num)
+    {
+        Define.HumanOutfitOneGender part = Define.HumanOutfitOneGender.Unknown;
+        int size = (int)Define.HumanOutfitOneGender.Unknown;
+        for(int i = 0; i < size; i++)
+        {
+            if(type == ((Define.HumanOutfitOneGender)i).ToString())
+            {
+                part = (Define.HumanOutfitOneGender)i;
+                break;
+            }
+        }
+        //Debug.Log(part);
+        ChangeGenderOutfit(part, num);
+    }
+
     private void SetActiveMaleParts(Define.HumanOutfitOneGender part, int num, bool active)
     {
         if(num >= 0)
@@ -408,104 +450,65 @@ public class CharacterOutfit : MonoBehaviour
             switch (part)
             {
                 case Define.HumanOutfitOneGender.Head:
-                    _prevHeadGear = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.HeadGear];
-                    if (_prevHeadGear >= 0)
-                        _maleHeadGear[_prevHeadGear].SetActive(false);
-
-                    if (num >= _maleHead.Count)
-                        Debug.Log("Head Over");
+                    if (active == true)
+                        SetActiveFalse();
 
                     _maleHead[num].SetActive(active);
+
+                    ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair, Define.HumanOutfitAllGender.AllGenderExtra);
+                    ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Facial);
                     break;
                 case Define.HumanOutfitOneGender.HeadGear:
-                    _prevHead = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.Head];
-                    if (_prevHead >= 0)
-                        _maleHead[_prevHead].SetActive(false);
-                    _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
-                    if (_prevAllGenderHeadBase >= 0)
-                        _headCoveringsBase[_prevAllGenderHeadBase].SetActive(false);
+                    if (active == true)
+                        SetActiveFalse();
 
-                    _prevAllGenderMask = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringMask];
-                    if (_prevAllGenderMask >= 0)
-                        _headCoveringsMask[_prevAllGenderMask].SetActive(false);
-
-                    _prevAllGenderHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderHair];
-                    if (_prevAllGenderHair >= 0)
-                        _allGenderHair[_prevAllGenderHair].SetActive(false);
-
-                    _prevExtra = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderExtra];
-                    if (_prevExtra >= 0)
-                        _allGenderExtra[_prevExtra].SetActive(false);
-
-                    _prevAllGenderNoHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair];
-                    if (_prevAllGenderNoHair >= 0)
-                        _headCoveringsNoHair[_prevAllGenderNoHair].SetActive(false);
-
-                    if (num >= _maleHeadGear.Count)
-                        Debug.Log("HeadGear Over");
                     _maleHeadGear[num].SetActive(active);
 
-                    if (_prevHead >= 0 && active == false)
-                        _maleHead[_prevHead].SetActive(true);
+                    if (active == false)
+                    {
+                        ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair, Define.HumanOutfitAllGender.AllGenderExtra);
+                        ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
+                    }
                     break;
                 case Define.HumanOutfitOneGender.Eyebrows:
-                    if (num >= _maleEyebrows.Count)
-                        Debug.Log("Eyebrows Over");
                     _maleEyebrows[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.Facial:
-                    if (num >= _maleFacial.Count)
-                        Debug.Log("Facial Over");
+                    if (active == true)
+                        SetActiveFalse();
+
                     _maleFacial[num].SetActive(active);
+
+
                     break;
                 case Define.HumanOutfitOneGender.Torso:
-                    if (num >= _maleTorso.Count)
-                        Debug.Log("Torso Over");
                     _maleTorso[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.ArmUpperRight:
-                    if (num >= _maleArmUpperRight.Count)
-                        Debug.Log("ArmUpperRight Over");
                     _maleArmUpperRight[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.ArmUpperLeft:
-                    if (num >= _maleArmUpperLeft.Count)
-                        Debug.Log("ArmUpperLeft Over");
                     _maleArmUpperLeft[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.ArmLowerRight:
-                    if (num >= _maleArmLowerRight.Count)
-                        Debug.Log("ArmLowerRight Over");
                     _maleArmLowerRight[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.ArmLowerLeft:
-                    if (num >= _maleArmLowerLeft.Count)
-                        Debug.Log("ArmLowerLeft Over");
                     _maleArmLowerLeft[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.HandRight:
-                    if (num >= _maleHandRight.Count)
-                        Debug.Log("HandRight Over");
                     _maleHandRight[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.HandLeft:
-                    if (num >= _maleHandLeft.Count)
-                        Debug.Log("HandLeft Over");
                     _maleHandLeft[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.Hips:
-                    if (num >= _maleHips.Count)
-                        Debug.Log("Hips Over");
                     _maleHips[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.LegRight:
-                    if (num >= _maleLegRight.Count)
-                        Debug.Log("LegRight Over");
                     _maleLegRight[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.LegLeft:
-                    if (num >= _maleLegLeft.Count)
-                        Debug.Log("LegLeft Over");
                     _maleLegLeft[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.Unknown:
@@ -525,44 +528,22 @@ public class CharacterOutfit : MonoBehaviour
             switch (part)
             {
                 case Define.HumanOutfitOneGender.Head:
-                    _prevHeadGear = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.HeadGear];
-                    if(_prevHeadGear >= 0)
-                        _femaleHeadGear[_prevHeadGear].SetActive(false);
+                    if (active == true)
+                        SetActiveFalse();
 
-                    if (num >= _femaleHead.Count)
-                        Debug.Log("Head Over");
                     _femaleHead[num].SetActive(active);
                     break;
                 case Define.HumanOutfitOneGender.HeadGear:
-                    _prevHead = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.Head];
-                    if(_prevHead >= 0)
-                        _femaleHead[_prevHead].SetActive(false);
-                    _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
-                    if (_prevAllGenderHeadBase >= 0)
-                        _headCoveringsBase[_prevAllGenderHeadBase].SetActive(false);
+                    if (active == true)
+                        SetActiveFalse();
 
-                    _prevAllGenderMask = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringMask];
-                    if (_prevAllGenderMask >= 0)
-                        _headCoveringsMask[_prevAllGenderMask].SetActive(false);
-
-                    _prevAllGenderHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderHair];
-                    if (_prevAllGenderHair >= 0)
-                        _allGenderHair[_prevAllGenderHair].SetActive(false);
-
-                    _prevExtra = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderExtra];
-                    if (_prevExtra >= 0)
-                        _allGenderExtra[_prevExtra].SetActive(false);
-
-                    _prevAllGenderNoHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair];
-                    if (_prevAllGenderNoHair >= 0)
-                        _headCoveringsNoHair[_prevAllGenderNoHair].SetActive(false);
-
-                    if (num >= _femaleHeadGear.Count)
-                        Debug.Log("HeadGear Over");
                     _femaleHeadGear[num].SetActive(active);
 
-                    if (_prevHead >= 0 && active == false)
-                        _femaleHead[_prevHead].SetActive(true);
+                    if (active == false)
+                    {
+                        ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair, Define.HumanOutfitAllGender.AllGenderExtra);
+                        ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
+                    }
                     break;
                 case Define.HumanOutfitOneGender.Eyebrows:
                     if (num >= _femaleEyebrows.Count)

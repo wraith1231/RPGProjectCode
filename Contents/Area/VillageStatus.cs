@@ -51,7 +51,6 @@ public class VillageStatus : MonoBehaviour
         if (controller.DestinationClosed(_transform.position) == false)
             return;
 
-        controller.SetAppearanceVisible(false);
         controller.CurrentNode = _baseAreaNode;
         Managers.General.GlobalGroups[controller.GroupId].CurrentVillageNumber = _data.VillageId;
         
@@ -66,6 +65,7 @@ public class VillageStatus : MonoBehaviour
                 Managers.UI.MakePopupUI<UIVillageInterface>();
 
                 controller.EnterVillage(_data.FacilityLists, _data);
+                _data.CurrentGroups.Add(controller.GroupId);
             }
         }
         else
@@ -76,7 +76,16 @@ public class VillageStatus : MonoBehaviour
             }
             else
             {
-                controller.EnterVillage(_data.FacilityLists, _data);
+                if (controller.CharacterType == Define.GroupType.Monster)
+                {
+                    _data.Condition = Define.VillageCondition.Battle;
+                    controller.InBattle(this);
+                }
+                else
+                {
+                    controller.EnterVillage(_data.FacilityLists, _data);
+                    _data.CurrentGroups.Add(controller.GroupId);
+                }
             }
         }
     }
@@ -87,7 +96,6 @@ public class VillageStatus : MonoBehaviour
         if (controller == null)
             return;
 
-        controller.SetAppearanceVisible(true);
         controller.CurrentNode = null;
 
         Managers.General.GlobalGroups[controller.GroupId].CurrentVillageNumber = -1;
@@ -97,10 +105,12 @@ public class VillageStatus : MonoBehaviour
             Managers.UI.CloseAllPopup();
 
             controller.ExitViilage(_data);
+            _data.CurrentGroups.Remove(controller.GroupId);
         }
         else
         {
             controller.ExitViilage(_data);
+            _data.CurrentGroups.Remove(controller.GroupId);
         }
     }
 
@@ -111,10 +121,10 @@ public class VillageStatus : MonoBehaviour
 
     public void DayChangeUpdate(int day)
     {
-        if (_data.Condition == Define.VillageCondition.Battle)
-            return;
-
         _data.VillageDayChange();
+
+        if (_data.IsVillageConditionOK == false)
+            return;
 
         Collider[] colliders = Physics.OverlapSphere(_transform.position, _detectRadius, _layerMask);
         int size = colliders.Length;

@@ -92,10 +92,32 @@ public class HumanOutfit
     {
         return AllGender[(int)allGender];
     }
+    public int GetAllGenderData(string type)
+    {
+        int size = (int)Define.HumanOutfitAllGender.Unknown;
+        for(int i = 0; i < size; i++)
+        {
+            if (((Define.HumanOutfitAllGender)i).ToString() == type)
+                return GetAllGenderData((Define.HumanOutfitAllGender)i);
+        }
+
+        return -1;
+    }
 
     public int GetOneGenderData(Define.HumanOutfitOneGender oneGender)
     {
         return OneGender[(int)oneGender];
+    }
+    public int GetOneGenderData(string type)
+    {
+        int size = (int)Define.HumanOutfitOneGender.Unknown;
+        for (int i = 0; i < size; i++)
+        {
+            if (((Define.HumanOutfitOneGender)i).ToString() == type)
+                return GetOneGenderData((Define.HumanOutfitOneGender)i);
+        }
+
+        return -1;
     }
 
     public void SetAllGenderData(Define.HumanOutfitAllGender allGender, int data)
@@ -105,6 +127,32 @@ public class HumanOutfit
     public void SetOneGenderData(Define.HumanOutfitOneGender oneGender, int data)
     {
         OneGender[(int)oneGender] = data;
+    }
+
+    public void SetAllGenderData(string type, int data)
+    {
+        int size = (int)Define.HumanOutfitAllGender.Unknown;
+        for(int i=0;i < size; i++)
+        {
+            if(type == ((Define.HumanOutfitAllGender)i).ToString())
+            {
+                AllGender[i] = data;
+                break;
+            }
+        }
+    }
+
+    public void SetOneGenderData(string type, int data)
+    {
+        int size = (int)Define.HumanOutfitOneGender.Unknown;
+        for (int i = 0; i < size; i++)
+        {
+            if (type == ((Define.HumanOutfitOneGender)i).ToString())
+            {
+                OneGender[i] = data;
+                break;
+            }
+        }
     }
 }
 

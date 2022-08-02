@@ -13,6 +13,9 @@ public class GlobalCharacterController
     protected BattleCharacterData _battleData;
     public BattleCharacterData BattleData { get { return _battleData; } set { _battleData = value; } }
 
+    protected int _currentGroup;
+    public int CurrentGroup { get { return _currentGroup; } set { _currentGroup = value; } }
+
     //0이면 Normal로, +면 좋은거 -면 나쁜거
     private Dictionary<int, float> _relations = new Dictionary<int, float>();
 

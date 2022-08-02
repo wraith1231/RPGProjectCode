@@ -12,9 +12,11 @@ public class UIGroupName : UIPopup
 
     private Transform _transform;
     private Transform _camPos;
-    // Start is called before the first frame update
-    void Start()
+
+    public override void Init()
     {
+        base.Init();
+
         Bind<TMP_Text>(typeof(Texts));
         _transform = GetComponent<Transform>();
         _camPos = Camera.main.transform;
@@ -23,6 +25,7 @@ public class UIGroupName : UIPopup
     public void ChangeName(int number, Vector3 hitPoint)
     {
         string name = Managers.General.GlobalGroups[number].GroupName;
+        name += Managers.General.GlobalGroups[number].GroupPower;
         ChangeName(name, hitPoint);
     }
     public void ChangeName(string name, Vector3 hitPoint)

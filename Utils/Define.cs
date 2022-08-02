@@ -4,6 +4,37 @@ using UnityEngine;
 
 public class Define
 {
+    public enum VillageSubButtonType
+    {
+        TalkPerson,
+        TalkMaster,
+        TalkMayer,
+        TalkGuard,
+        TalkGuild,
+        TalkMerchant,
+        OpenChangeOutfit,
+        OpenBlacksmith,
+        OpenEnchant,
+        OpenQuest,
+        CheckQuest,
+        OpenRest,
+        Unknown,
+    }
+
+    public enum InteractionEvent
+    {
+        End,
+        Context,
+        Question,
+        Reward,
+        Quest,
+        Outfit,
+        Blacksmith,
+        Enchant,
+        Rest,
+        Unknown,
+    }
+
     public enum VillageCondition
     {
         Idle,

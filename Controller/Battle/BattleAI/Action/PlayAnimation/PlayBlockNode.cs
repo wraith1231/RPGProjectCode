@@ -3,20 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 
-public class SetVerticalNode : NodeBase
+public class PlayBlockNode : NodeBase
 {
     private BattleCharacterController _controller;
-    private float _value;
-
-    public SetVerticalNode(BattleCharacterController controller, float value)
+    public PlayBlockNode(BattleCharacterController con)
     {
-        _controller = controller;
-        _value = value;
+        _controller = con;
     }
 
     public override BTResult Evaluate()
     {
-        _controller.SetAnimatorVertical(_value);
+        _controller.PlayAnimation(Define.HeroState.Block);
+
         return BTResult.SUCCESS;
     }
 }

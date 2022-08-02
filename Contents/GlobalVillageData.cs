@@ -37,6 +37,9 @@ public class GlobalVillageData
     private float _detectRange;
     public float DetectRange { get { return _detectRange; } set { _detectRange = value; } }
 
+    private List<int> _currentGroups = new List<int>();
+    public List<int> CurrentGroups { get { return _currentGroups; } set { _currentGroups = value; } }
+
     private List<Define.Facilities> _facilities = new List<Define.Facilities>();
     public List<Define.Facilities> FacilityLists { get { return _facilities; } }
     private Dictionary<Define.Facilities, List<int>> _facilityMembers = new Dictionary<Define.Facilities, List<int>>();
@@ -51,6 +54,8 @@ public class GlobalVillageData
     private Transform _areaTranfrom;
     public Transform AreaTransfrom { get { return _areaTranfrom; } set { _areaTranfrom = value; } }
     
+    public bool IsVillageConditionOK { get { return _condition == Define.VillageCondition.Idle; } }
+
     public GlobalVillageData()
     {
         Data.VillageData data = Managers.Data.GetVillageData();
@@ -117,5 +122,23 @@ public class GlobalVillageData
         {
             _charFavorites[id] = value;
         }
+    }
+
+    public void BattlePhase(GlobalGroupController cont)
+    {
+        List<int> members = cont.MemberList;
+        List<GlobalCharacterController> charContList = Managers.General.GlobalCharacters;
+        int size = members.Count;
+        for(int i =0; i < size; i++)
+        {
+            BattleCharacterData data = charContList[members[i]].BattleData;
+
+            //vill -> char
+            data.BattlePhaseVillage(this);
+        }
+
+        float damage = (cont.GroupPower - _power) / _safety;
+        _currentEndurance -= damage;
+
     }
 }

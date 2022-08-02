@@ -46,6 +46,9 @@ public class Managers : MonoBehaviour
 
     QuestManager _quest = new QuestManager();
     public static QuestManager Quest { get { return Instance._quest; } }
+
+    ContextManager _context = new ContextManager();
+    public static ContextManager Context { get { return Instance._context; } }
     #endregion
 
     void Start()
@@ -80,6 +83,7 @@ public class Managers : MonoBehaviour
             s_instance._data.Init();
             s_instance._generalGame.Init();
             s_instance._vfx.Init();
+            s_instance._context.Init();
         }
     }
 

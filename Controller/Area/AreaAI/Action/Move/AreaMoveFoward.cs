@@ -17,7 +17,7 @@ public class AreaMoveFoward : NodeBase
     public override BTResult Evaluate()
     {
         Vector2 dest = _controller.GetPositionByVector2();
-        dest += new Vector2(_controller.transform.forward.x, _controller.transform.forward.z);
+        dest += _controller.GetForwardVector2() * _controller.TempValue;
         _controller.MoveToDestination(dest);
 
         return BTResult.SUCCESS;

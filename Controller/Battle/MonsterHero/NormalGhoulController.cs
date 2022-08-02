@@ -13,9 +13,44 @@ public class NormalGhoulController : BattleMonsterController
         base.Init();
         _attackAnimCount = 1;
 
-        NodeBase action = new PatrolSequence(this);
-        SelectorNode selector = new SelectorNode(action);
-        _root = selector;
+        //patrol or move close
+        PatrolSequence patrolSeq = new PatrolSequence(this, 3);
+        MoveCloseTarget moveCloseTargetSeq = new MoveCloseTarget(this);
+        CheckNearEnemy checkNearDeco = new CheckNearEnemy(this, moveCloseTargetSeq);
+        SelectorNode encountSel = new SelectorNode();
+        encountSel.Attach(checkNearDeco);
+        encountSel.Attach(patrolSeq);
+
+        //battle seq
+        AttackSequence attackNode = new AttackSequence(this);
+        float battleRandom = 0.1f;
+        MoveAwayFromTargetNode awayNode = new MoveAwayFromTargetNode(this, battleRandom);
+
+        SequenceNode moveCloseNode = new SequenceNode();
+        moveCloseNode.Attach(new SetTempValueNode(this, 1.0f, 0.0f));
+        moveCloseNode.Attach(new PlayStrafeNode(this));
+        moveCloseNode.Attach(new WaitRandomTime(battleRandom));
+        
+        CheckNextStateSetValueNode attackDeco = new CheckNextStateSetValueNode(this, Define.HeroState.Attack, attackNode);
+        CheckNextStateSetValueNode moveAwayDeco = new CheckNextStateSetValueNode(this, Define.HeroState.Strafe, awayNode);
+        CheckNextStateSetValueNode moveCloseDeco = new CheckNextStateSetValueNode(this, Define.HeroState.Running, moveCloseNode);
+
+        SelectorNode fightSelector = new SelectorNode();
+        fightSelector.Attach(attackDeco);
+        fightSelector.Attach(moveAwayDeco);
+        fightSelector.Attach(moveCloseDeco);
+
+        SetTempIntRandomNode stateNode = new SetTempIntRandomNode(this, (int)Define.HeroState.Unknown);
+        SequenceNode fightSequance = new SequenceNode();
+        fightSequance.Attach(stateNode);
+        fightSequance.Attach(fightSelector);
+        
+        NodeBase deco2 = new CheckNearTargetRange(this, _attackRange, fightSequance);
+        moveCloseTargetSeq.Attach(deco2);
+        
+        SequenceNode finalSequance = new SequenceNode(encountSel);
+
+        _root = finalSequance;
     }
 
     protected override void FixedUpdate()

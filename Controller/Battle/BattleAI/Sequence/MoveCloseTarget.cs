@@ -5,15 +5,21 @@ using BehaviorTree;
 
 public class MoveCloseTarget : SequenceNode
 {
-    public MoveCloseTarget(BattleCharacterController controller, BattleCharacterController target)     
+    public MoveCloseTarget(BattleCharacterController controller)     
     {
-        Attach(new RotateHeadToTarget(controller, target));
-        Attach(new SetVerticalNode(controller, 1.0f));
+        Attach(new RotateHeadToTarget(controller));
+        Attach(new SetTempValueNode(controller, 1.0f, 0.0f));
+        Attach(new SetHVValueNode(controller));
         PlayRunNode run = new PlayRunNode(controller);
-        CheckFarTargetRange deco = new CheckFarTargetRange(controller, target, controller.RunRange, run);
-        Attach(deco);
-        Attach(new PlayStrafeNode(controller));
-        //Attach(new RunForwardTarget(controller, target, controller.RunRange));
-        //Attach(new WalkForwardTarget(controller, target, controller.AttackRange));
+        PlayStrafeNode strafe = new PlayStrafeNode(controller);
+        SelectorNode selector = new SelectorNode();
+        selector.Attach(new CheckFarTargetRange(controller, controller.RunRange, run));
+        selector.Attach( strafe);
+        Attach(selector);
+    }
+
+    public override BTResult Evaluate()
+    {
+        return base.Evaluate();
     }
 }

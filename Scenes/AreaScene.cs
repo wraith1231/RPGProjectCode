@@ -40,8 +40,8 @@ public class AreaScene : BaseScene
         if(Input.GetKeyDown(KeyCode.K))
         {
             Managers.Battle.AddCharList(Managers.General.GlobalPlayer.Data);
-            for(int i =1; i < 3;i++)
-                Managers.Battle.AddGroup(Managers.General.GlobalGroups[i]);
+            //for(int i =1; i < 3;i++)
+            //    Managers.Battle.AddGroup(Managers.General.GlobalGroups[i]);
             Managers.Scene.LoadSceneAsync(Define.SceneType.TestScene);
         }
         if(Input.GetKeyDown(KeyCode.Escape))

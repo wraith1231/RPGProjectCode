@@ -25,6 +25,9 @@ public class BattleCharacterData
     public float FinalDefense { get { return Defense * DefenseAdvantage; } }
     public float FinalAgility { get { return Agility / (Agility + 100f); } }
 
+    public float CharacterPower { get { return MaxHealthPoint + MaxStaminaPoint + Power + Agility + Defense; } }
+    public float CurrentPower { get { return CurrentHealthPoint + CurrentStaminaPoint + Power + Agility + Defense; } }
+
     public BattleCharacterData(GlobalCharacterData data = null)
     {
         if (data != null)
@@ -50,5 +53,15 @@ public class BattleCharacterData
         }
         PowerAdvantage = 1.0f;
         DefenseAdvantage = 1.0f;
+    }
+
+    public void BattlePhaseCharacter(BattleCharacterData data)
+    {
+
+    }
+
+    public void BattlePhaseVillage(GlobalVillageData data)
+    {
+
     }
 }

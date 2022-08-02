@@ -12,7 +12,8 @@ public class PlayRunNode : NodeBase
     }
     public override BTResult Evaluate()
     {
-        _controller.PlayAnimation(Define.HeroState.Running);
+        if (_controller.PlayAnimation(Define.HeroState.Running) == true) return BTResult.RUNNING;
+
         return BTResult.SUCCESS;
     }
 }

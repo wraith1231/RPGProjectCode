@@ -4,26 +4,25 @@ using UnityEngine;
 
 public class AreaNPCController : AreaGroupController
 {
-    
-    protected override void FixedUpdate()
-    {
-
-    }
+    //mercenary
 
     protected override void Initialize()
     {
-        int size = Managers.Map.VillageLists.Count;
-        int start = Random.Range(0, size);
+        _apperanceCheck.EnemyTag.Add("Monster");
+        _apperanceCheck.MateTag.Add("AreaCharacter");
+        _apperanceCheck.MateTag.Add("Village");
+    }
 
-
+    protected override void FixedUpdate()
+    {
+        if (_root != null && Status == Define.AreaStatus.Idle)
+            _root.Evaluate();
     }
 
     protected override void DayChangeUpdate(int day)
     {
         base.DayChangeUpdate(day);
 
-        if (_moveToDest == false)
-            TestRandomMove();
     }
 
     protected void TestRandomMove()

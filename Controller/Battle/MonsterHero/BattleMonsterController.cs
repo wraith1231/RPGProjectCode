@@ -105,11 +105,11 @@ public class BattleMonsterController : BattleCharacterController
             {
                 return true;
             }
-            else if (normalizedTime >= 0.7f)
+            else if (normalizedTime >= 0.8f)
             {
                 AttackActivate(false);
             }
-            else if (normalizedTime >= 0.4f)
+            else if (normalizedTime >= 0.2f)
             {
                 AttackActivate(true);
             }
@@ -185,6 +185,96 @@ public class BattleMonsterController : BattleCharacterController
     {
 
     }
+    #endregion
+
+    #region TriggerEvent
+    private void OnTriggerEnter(Collider other)
+    {
+        BattleCharacterController controller = other.GetComponent<BattleCharacterController>();
+
+        if (controller == null || controller.State == Define.HeroState.Die)
+            return;
+        if (controller.IsHero == false)
+            return;
+
+        int id = controller.HeroId;
+        if (_nearCharacter.ContainsKey(id) == false)
+        {
+            int group = controller.Group;
+            if (Group != group)
+            {
+                _charKeys.Add(id);
+                _nearCharacter[id] = controller;
+            }
+        }
+        CalculateNearestCharacter();
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        BattleHeroController controller = other.GetComponent<BattleHeroController>();
+
+        if (controller == null)
+            return;
+
+        int id = controller.HeroId;
+        if (_nearCharacter.ContainsKey(id) == true)
+        {
+            if (State != Define.HeroState.Attack)
+            {
+                _charKeys.Remove(id);
+                _nearCharacter.Remove(id);
+            }
+        }
+        CalculateNearestCharacter();
+    }
+    #endregion
+    #region NearCharacter
+    public override BattleCharacterController CalculateNearestCharacter()
+    {
+        _nearEnemyCollider.enabled = true;
+        if (_charKeys.Count == 0)
+        {
+            _currentNearCharacter = null;
+            return null;
+        }
+
+        int size = _charKeys.Count;
+        float dist = 0;
+        float min = 99999;
+        _currentNearCharacter = null;
+
+        for (int i = 0; i < size;)
+        {
+            if (_nearCharacter[_charKeys[i]].State == Define.HeroState.Die)
+            {
+                _nearCharacter.Remove(_charKeys[i]);
+                _charKeys.RemoveAt(i);
+                size--;
+
+                continue;
+            }
+
+            dist = Vector3.Distance(_transform.position, _nearCharacter[_charKeys[i]].transform.position);
+            if (dist < min)
+            {
+                min = dist;
+                _currentNearCharacter = _nearCharacter[_charKeys[i]];
+            }
+            i++;
+        }
+
+        TargetDistance = min;
+        _nearEnemyCollider.enabled = false;
+        return _currentNearCharacter;
+    }
+
+    public override BattleCharacterController GetNearestCharacter()
+    {
+        if (_currentNearCharacter == null) CalculateNearestCharacter();
+        return _currentNearCharacter;
+    }
+
     #endregion
     /*
 

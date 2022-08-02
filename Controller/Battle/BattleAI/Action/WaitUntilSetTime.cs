@@ -5,13 +5,11 @@ using BehaviorTree;
 
 public class WaitUntilSetTime : NodeBase
 {
-    private BattleCharacterController _controller;
     private float _setTime;
     private float _curTime;
 
-    public WaitUntilSetTime(BattleCharacterController controller, float time)
+    public WaitUntilSetTime( float time)
     {
-        _controller = controller;
         _setTime = time;
         _curTime = 0;
     }

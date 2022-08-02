@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BehaviorTree;
 
 public abstract class AreaGroupController : MonoBehaviour
 {
+
     protected class AStarNode
     {
         //total
@@ -28,7 +30,10 @@ public abstract class AreaGroupController : MonoBehaviour
     public void SetTerrainData(TerrainData data) { _terrainData = data; }
 
     //캐릭터 외형용, 마을 외부에 있으면 끈다
-    protected GameObject _appearance;
+    protected CartCheck _apperanceCheck;
+    protected Renderer[] _appearances;
+    protected bool _currentVisible = true;
+    public bool CurrentVisible { get { return _currentVisible; } }
 
     //이동 관련
     protected Transform _transform;
@@ -42,6 +47,22 @@ public abstract class AreaGroupController : MonoBehaviour
     protected bool _moveInterrupted = false;
     protected AreaNode _currentNode;
     protected Vector3 _currentDest = Vector3.zero;
+    protected int _idleDaytime = 0;
+    public int IdleDayTime { get { return _idleDaytime; } }
+
+    protected float _tempValue = 0f;
+    public float TempValue { get { return _tempValue; } set { _tempValue = value; } }
+    protected Vector2 _tempPoint;
+    public Vector2 TempPoint { get { return _tempPoint; } set { _tempPoint = value; } }
+
+    protected string _targetVillage;
+    public string TargetVillage { get { return _targetVillage; } set { _targetVillage = value; } }
+
+    protected NodeBase _root = null;
+
+    protected VillageStatus _fightVillage = null;
+
+    public Define.GroupType CharacterType { get { return Managers.General.GlobalGroups[_groupId].Type; } }
     
     public bool DestinationClosed(Vector3 pos)
     {
@@ -72,8 +93,28 @@ public abstract class AreaGroupController : MonoBehaviour
 
     public void SetAppearanceVisible(bool visible)
     {
-        _appearance.SetActive(visible);
+        //_appearance.SetActive(visible);
+        _currentVisible = visible;
+
+        int size = _appearances.Length;
+        for (int i = 0; i < size; i++)
+            _appearances[i].enabled = visible;
     }
+
+    public bool CheckNearEnemy()
+    {
+        if (_apperanceCheck.GetEnemy() != null)
+            return true;
+
+        return false;
+    }
+
+    public AreaGroupController GetEnemy()
+    {
+        return _apperanceCheck.GetEnemy();
+    }
+
+    #region Initialize Zone
 
     void Start()
     {
@@ -87,11 +128,17 @@ public abstract class AreaGroupController : MonoBehaviour
         
         _transform = GetComponent<Transform>();
         _rigidBody = GetComponent<Rigidbody>();
-        _animator = GetComponent<Animator>();
         _status = Define.AreaStatus.Idle;
-        _appearance = GetComponentInChildren<CartCheck>().gameObject;
 
+        _apperanceCheck = GetComponentInChildren<CartCheck>();
+        _apperanceCheck.SetParent(this);
+        _appearances = GetComponentsInChildren<Renderer>();
+        _animator = _apperanceCheck.GetComponent<Animator>();
+        
         Managers.General.GlobalGroups[_groupId].AreaTransfrom = _transform;
+
+        if (Managers.Map.Initialized == true)
+            SceneInit();
     }
 
     public void SceneInit()
@@ -141,6 +188,7 @@ public abstract class AreaGroupController : MonoBehaviour
     }
 
     protected abstract void Initialize();
+    #endregion
 
     protected virtual void FixedUpdate()
     {
@@ -149,7 +197,8 @@ public abstract class AreaGroupController : MonoBehaviour
 
     protected virtual void DayChangeUpdate(int day)
     {
-
+        if (Status == Define.AreaStatus.Idle)
+            _idleDaytime++;
     }
 
     #region Move Sequence
@@ -157,8 +206,15 @@ public abstract class AreaGroupController : MonoBehaviour
     protected virtual void BeforeMove()
     {
         Status = Define.AreaStatus.Move;
+        _idleDaytime = 0;
         _moveToDest = true;
         _moveInterrupted = false;
+
+        if (_animator != null)
+        {
+            _animator.SetFloat("Vertical", 1.0f);
+            _animator.Play("Strafe");
+        }
     }
 
     //현재 위치 기준
@@ -181,8 +237,11 @@ public abstract class AreaGroupController : MonoBehaviour
         BeforeMove();
 
         float dist;
-        _currentDest = _destination.Dequeue();
-        _transform.LookAt(_currentDest);
+        if (_destination.Count > 0)
+        {
+            _currentDest = _destination.Dequeue();
+            _transform.LookAt(_currentDest);
+        }
         Vector2 transformPos, destPos;
 
         while(true)
@@ -240,6 +299,10 @@ public abstract class AreaGroupController : MonoBehaviour
         _moveToDest = false;
         _moveInterrupted = false;
         _targetObject = null;
+        if (_animator != null)
+        {
+            _animator.Play("Idle");
+        }
     }
     #endregion
 
@@ -294,6 +357,8 @@ public abstract class AreaGroupController : MonoBehaviour
     #region Village
     public virtual void EnterVillage(List<Define.Facilities> facilities, GlobalVillageData village)
     {
+        SetAppearanceVisible(false);
+
         _transform.position = village.AreaTransfrom.position;
         List<int> memberList = Managers.General.GlobalGroups[_groupId].MemberList;
         int size = memberList.Count;
@@ -305,13 +370,13 @@ public abstract class AreaGroupController : MonoBehaviour
             int num = Random.Range(0, facilities.Count);
             controller.Data.CurrentFacillity = facilities[num];
             village.Facility[facilities[num]].Add(controller.Data.HeroId);
-            //if(village.VillageId == 0)
-            //    Debug.Log($"{controller.Data.CharName} enter {village.VillageName} {num}");
         }
     }
 
     public virtual void ExitViilage(GlobalVillageData village)
     {
+        SetAppearanceVisible(true);
+
         List<int> memberList = Managers.General.GlobalGroups[_groupId].MemberList;
         int size = memberList.Count;
         for(int i = 0; i < size; i++)
@@ -468,6 +533,16 @@ public abstract class AreaGroupController : MonoBehaviour
     {
         return _transform.position;
     }
+    public Vector2 GetForwardVector2()
+    {
+        return new Vector2(_transform.forward.x, _transform.forward.z);
+    }
+
+    public Vector3 GetForwardVector3()
+    {
+        return _transform.forward;
+    }
+
     public float GetDistanceWithVector2(Vector2 dest)
     {
         Vector2 temp = new Vector2(_transform.position.x, _transform.position.z);
@@ -495,8 +570,36 @@ public abstract class AreaGroupController : MonoBehaviour
     #region Move Function
     public void MoveToDestination(Vector2 dest)
     {
+        if (_targetObject != null)
+        {
+            _targetObject = null;
+        }
+
         _destination.Enqueue(new Vector3(dest.x, 0, dest.y));
+
+        StartCoroutine(MoveToTarget());
     }
 
+    public void MoveToTarget(Transform target)
+    {
+        if (_destination.Count > 0)
+            _destination.Clear();
+
+        if (target == _targetObject)
+            return;
+
+        _targetObject = target;
+        StartCoroutine(MoveToTarget());
+    }
+
+
     #endregion
+
+    
+    public void InBattle(VillageStatus village)
+    {
+        _status = Define.AreaStatus.Battle;
+        _fightVillage = village;
+        StopAllCoroutines();
+    }
 }

@@ -7,13 +7,15 @@ public class PatrolSequence : SequenceNode
 {
     private BattleCharacterController _controller;
 
-    public PatrolSequence(BattleCharacterController controller) : base()
+    public PatrolSequence(BattleCharacterController controller, float waitRange) : base()
     {
-        Attach(new WaitRandomTime(controller, 2f));
+        Attach(new WaitRandomTime(waitRange));
+        //Attach(new SetTempValueRandomNode(controller));
         Attach(new RotateAroundBasePos(controller));
-        Attach(new SetVerticalNode(controller, 1.0f));
+        Attach(new SetTempValueNode(controller, 1.0f, 0.0f));
+        Attach(new SetHVValueNode(controller));
         Attach(new PlayStrafeNode(controller));
-        Attach(new WaitRandomTime(controller, 2f));
+        Attach(new WaitRandomTime(waitRange));
         Attach(new PlayIdleNode(controller));
     }
 

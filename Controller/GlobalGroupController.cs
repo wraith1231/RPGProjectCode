@@ -55,6 +55,22 @@ public class GlobalGroupController
     private int _gold;
     public int Gold { get { return _gold; } set { _gold = value; } }
 
+    public float GroupPower
+    {
+        get
+        {
+            List<GlobalCharacterController> members = Managers.General.GlobalCharacters;
+            int size = _memberList.Count;
+            float result = 0;
+            for(int i =0; i < size;i ++)
+            {
+                result += members[_memberList[i]].BattleData.CurrentPower;
+            }
+
+            return result;
+        }
+    }
+
     public GlobalGroupController(int groupId, string groupName, float foods, int golds, Define.GroupType type)
     {
         _group = groupId;
@@ -73,12 +89,16 @@ public class GlobalGroupController
             _memberList = new List<int>();
         int size = memberList.Count;
         for (int i = 0; i < size; i++)
+        {
             _memberList.Add(memberList[i]);
+        }
     }
     public void AddGroupMember(int id)
     {
         if (Managers.General.ConstainsId(id) == true)
         {
+            GlobalCharacterController cont = Managers.General.GlobalCharacters[id];
+            cont.CurrentGroup = _group;
             _memberList.Add(id);
         }
     }
@@ -91,5 +111,13 @@ public class GlobalGroupController
     }
     #endregion
 
+    public void GroupBattleCharacterGroup(GlobalGroupController cont)
+    {
 
+    }
+
+    public void GroupBattleVillage(GlobalVillageData data)
+    {
+
+    }
 }

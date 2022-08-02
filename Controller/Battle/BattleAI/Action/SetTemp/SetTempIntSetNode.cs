@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using BehaviorTree;
 
-public class SetHorizontalNode : NodeBase
+public class SetTempIntSetNode : NodeBase
 {
     private BattleCharacterController _controller;
-    private float _value;
-
-    public SetHorizontalNode(BattleCharacterController controller, float value)
+    private int _value;
+    public SetTempIntSetNode(BattleCharacterController con, int value)
     {
-        _controller = controller;
+        _controller = con;
         _value = value;
     }
 
     public override BTResult Evaluate()
     {
-        _controller.SetAnimatorHorizontal(_value);
+        _controller.TempInt = _value;
+
         return BTResult.SUCCESS;
     }
 }

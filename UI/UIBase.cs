@@ -11,7 +11,8 @@ public abstract class UIBase : MonoBehaviour
 
     private void Start()
     {
-        Init();   
+        Init();
+
     }
 
     public abstract void Init();

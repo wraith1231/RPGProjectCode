@@ -49,7 +49,7 @@ public class AreaPlayerController : AreaGroupController
         Managers.Input.LeftMouseAction -= OnLeftMouseEvent;
         Managers.Input.RightMouseAction -= OnRightMouseEvent;
 
-        Vector3 boxSize = new Vector3(128, 128, 128);
+        Vector3 boxSize = new Vector3(64, 128, 64);
         Vector3 center = _transform.position;
         if (center.x <= 64) center.x = 64;
         if (center.x >= Managers.Map.TerrainSize2.x - 64) center.x = Managers.Map.TerrainSize2.x - 64;
@@ -184,10 +184,13 @@ public class AreaPlayerController : AreaGroupController
                 if (tag == "AreaCharacter" || tag == "Monster")
                 {
                     AreaGroupController controller = rayHit.transform.GetComponent<AreaGroupController>();
+                    if (controller.CurrentVisible == false)
+                        return;
+
                     if (tag == "Monster")
                     {
                         string[] temp = controller.name.Split('/');
-                        _groupPopup.ChangeName(temp[1], _currentPoint);
+                        _groupPopup.ChangeName(temp[1] + Managers.General.GlobalGroups[controller.GroupId].GroupPower, _currentPoint);
                     }
                     else
                     {

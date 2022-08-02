@@ -51,6 +51,7 @@ public class MapGameManager
     private List<int> _needToInstantiateChar = new List<int>();
 
     private bool _initialized = false;
+    public bool Initialized { get { return _initialized; } }
 
     #region Initialize
     public void DataInstantiate()
@@ -191,8 +192,8 @@ public class MapGameManager
         _charLists.Add(go);
         _controllers.Add(controller);
 
-        if (_initialized == true)
-            controller.SceneInit();
+        //if (_initialized == true)
+        //    controller.SceneInit();
 
         CheckInstantiateEnd();
     }
@@ -308,8 +309,62 @@ public class MapGameManager
             _day++;
             Debug.Log($"Day {_day}");
             DayChangeUpdate(_day);
+
+            if(_controllers.Count <= 60)
+            {
+                int count = UnityEngine.Random.Range(3, 15);
+                MakeNewMercenaries(count);
+            }
+
             QueuedCharInstantiate();
         }
+    }
+
+    private void MakeNewMercenaries(int count)
+    {
+        List<GlobalGroupController> list = Managers.General.GlobalGroups;
+        int size = list.Count;
+
+        List<int> groupIds = new List<int>();
+        for(int i = 0; i < size; i++)
+        {
+            if(list[i].MemberList.Count == 0 && groupIds.Count < count)
+            {
+                groupIds.Add(i);
+            }
+
+            if (groupIds.Count >= count)
+                break;
+        }
+
+        int groupId = 0;
+        if(groupIds.Count != count)
+        {
+            size = count - groupIds.Count;
+
+            for (int i = 0; i < size; i++)
+            {
+                Vector3 pos = Managers.Data.GetVillagePosition(0);
+                groupId = Managers.General.MakeGroup($"Group {list.Count}", 0,
+                    0, pos, Define.GroupType.Mercenary);
+
+                groupIds.Add(groupId);
+            }
+        }
+
+        size = groupIds.Count;
+        for(int group =0; group < size; group++)
+        {
+            list[groupIds[group]].Foods = UnityEngine.Random.Range(100, 10000);
+            list[groupIds[group]].Gold = UnityEngine.Random.Range(100, 10000);
+            int memCount = UnityEngine.Random.Range(1, 10);
+            for(int mem = 0; mem < memCount; mem++)
+            {
+                Managers.General.MakeRandomCharacter(groupIds[group], $"NPC NEW");
+            }
+            AddInstantiateChar(groupIds[group]);
+        }
+
     }
 
     public AreaNode GetClosestNode(Vector3 pos)
@@ -355,4 +410,9 @@ public class MapGameManager
         InstantitateCharacter(list);
     }
 
+    public void ReleaseChar(AreaGroupController con)
+    {
+        _controllers.Remove(con);
+        Managers.Resource.Release(con.gameObject);
+    }
 }
