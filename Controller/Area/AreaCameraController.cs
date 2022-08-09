@@ -24,6 +24,7 @@ public class AreaCameraController : MonoBehaviour
         _camera = GetComponent<Camera>();
         _camera.orthographicSize = _orthoSize;
         _mapSize = Managers.Map.TerrainSize;
+        Camera.SetupCurrent(_camera);
     }
 
     // Update is called once per frame

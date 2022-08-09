@@ -10,6 +10,7 @@ public class CharacterOutfit : MonoBehaviour
     private List<int> _currentAllGenderOutfit = new List<int>();
     private List<int> _currentGenderOutfit = new List<int>();
 
+    private Define.LastOutfitChange _lastChanged = Define.LastOutfitChange.AllGenderHair;
     private int _prevAllGenderHeadBase = -1;
     private int _prevAllGenderMask = -1;
     private int _prevAllGenderNoHair = -1;
@@ -22,136 +23,167 @@ public class CharacterOutfit : MonoBehaviour
 
     [SerializeField] private List<GameObject> _genderParts;
 
+    private Dictionary<Define.HumanOutfitAllGender, List<GameObject>> _allGenderParts = new Dictionary<Define.HumanOutfitAllGender, List<GameObject>>();
+    private Dictionary<Define.HumanOutfitOneGender, List<GameObject>> _femaleParts = new Dictionary<Define.HumanOutfitOneGender, List<GameObject>>();
+    private Dictionary<Define.HumanOutfitOneGender, List<GameObject>> _maleParts = new Dictionary<Define.HumanOutfitOneGender, List<GameObject>>();
 
-    #region All Gender
-    [SerializeField] private List<GameObject> _headCoveringsBase;
-    public int HeadCoverBaseSizeCount() { return _headCoveringsBase.Count; }
+    public delegate void InitEndFunc();
+    public InitEndFunc InitEnded;
+    protected HumanOutfit _tempOutfit = null;
 
-    [SerializeField] private List<GameObject> _headCoveringsMask;
-    public int HeadCoverMaskSizeCount() { return _headCoveringsMask.Count; }
-
-    [SerializeField] private List<GameObject> _headCoveringsNoHair;
-    public int HeadCoverNoHairCount() { return _headCoveringsNoHair.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderHair;
-    public int HairCount() { return _allGenderHair.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderHeadAttachment;
-    public int HeadAttachCount() { return _allGenderHeadAttachment.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderBackAttachment;
-    public int BackAttachCount() { return _allGenderBackAttachment.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderShoulderRight;
-    public int ShoulderRightCount() { return _allGenderShoulderRight.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderShoulderLeft;
-    public int ShoulderLeftCount() { return _allGenderShoulderLeft.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderElbowRight;
-    public int ElbowRightCount() { return _allGenderElbowRight.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderElbowLeft;
-    public int ElbowLeftCount() { return _allGenderElbowLeft.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderHips;
-    public int AllHipCount() { return _allGenderHips.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderKneeRight;
-    public int KneeRightCount() { return _allGenderKneeRight.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderKneeLeft;
-    public int KneeLeftCount() { return _allGenderKneeLeft.Count; }
-
-    [SerializeField] private List<GameObject> _allGenderExtra;
-    public int ExtraCount() { return _allGenderExtra.Count; }
-    #endregion
-
-    #region Female
-    [SerializeField] private List<GameObject> _femaleHead;
-    [SerializeField] private List<GameObject> _femaleHeadGear;
-    [SerializeField] private List<GameObject> _femaleEyebrows;
-    [SerializeField] private List<GameObject> _femaleTorso;
-    [SerializeField] private List<GameObject> _femaleArmUpperRight;
-    [SerializeField] private List<GameObject> _femaleArmUpperLeft;
-    [SerializeField] private List<GameObject> _femaleArmLowerRight;
-    [SerializeField] private List<GameObject> _femaleArmLowerLeft;
-    [SerializeField] private List<GameObject> _femaleHandRight;
-    [SerializeField] private List<GameObject> _femaleHandLeft;
-    [SerializeField] private List<GameObject> _femaleHips;
-    [SerializeField] private List<GameObject> _femaleLegRight;
-    [SerializeField] private List<GameObject> _femaleLegLeft;
-
-    public int FemaleHeadCount() { return _femaleHead.Count; }
-    public int FemaleHeadGearCount() { return _femaleHeadGear.Count; }
-    public int FemaleEyebrowsCount() { return _femaleEyebrows.Count; }
-    public int FemaleTorsoCount() { return _femaleTorso.Count; }
-    public int FemaleArmUpperRightCount() { return _femaleArmUpperRight.Count; }
-    public int FemaleArmUpperLeftCount() { return _femaleArmUpperLeft.Count; }
-    public int FemaleArmLowerRightCount() { return _femaleArmLowerRight.Count; }
-    public int FemaleArmLowerLeftCount() { return _femaleArmLowerLeft.Count; }
-    public int FemaleHandRightCount() { return _femaleHandRight.Count; }
-    public int FemaleHandLeftCount() { return _femaleHandLeft.Count; }
-    public int FemaleHipsCount() { return _femaleHips.Count; }
-    public int FemaleLegRightCount() { return _femaleLegRight.Count; }
-    public int FemaleLegLeftCount() { return _femaleLegLeft.Count; }
-    #endregion
-
-    #region Male
-    [SerializeField] private List<GameObject> _maleHead;
-    [SerializeField] private List<GameObject> _maleHeadGear;
-    [SerializeField] private List<GameObject> _maleEyebrows;
-    [SerializeField] private List<GameObject> _maleFacial;
-    [SerializeField] private List<GameObject> _maleTorso;
-    [SerializeField] private List<GameObject> _maleArmUpperRight;
-    [SerializeField] private List<GameObject> _maleArmUpperLeft;
-    [SerializeField] private List<GameObject> _maleArmLowerRight;
-    [SerializeField] private List<GameObject> _maleArmLowerLeft;
-    [SerializeField] private List<GameObject> _maleHandRight;
-    [SerializeField] private List<GameObject> _maleHandLeft;
-    [SerializeField] private List<GameObject> _maleHips;
-    [SerializeField] private List<GameObject> _maleLegRight;
-    [SerializeField] private List<GameObject> _maleLegLeft;
-
-    public int MaleHeadCount() { return _maleHead.Count; }
-    public int MaleHeadGearCount() { return _maleHeadGear.Count; }
-    public int MaleEyebrowsCount() { return _maleEyebrows.Count; }
-    public int MaleFaciallCount() { return _maleFacial.Count; }
-    public int MaleTorsoCount() { return _maleTorso.Count; }
-    public int MaleArmUpperRightCount() { return _maleArmUpperRight.Count; }
-    public int MaleArmUpperLeftCount() { return _maleArmUpperLeft.Count; }
-    public int MaleArmLowerRightCount() { return _maleArmLowerRight.Count; }
-    public int MaleArmLowerLeftCount() { return _maleArmLowerLeft.Count; }
-    public int MaleHandRightCount() { return _maleHandRight.Count; }
-    public int MaleHandLeftCount() { return _maleHandLeft.Count; }
-    public int MaleHipsCount() { return _maleHips.Count; }
-    public int MaleLegRightCount() { return _maleLegRight.Count; }
-    public int MaleLegLeftCount() { return _maleLegLeft.Count; }
-    #endregion
-
-    public CharacterOutfit()
+    public int GetAllGenderPartCount(Define.HumanOutfitAllGender part)
     {
-        Init();
+        return _allGenderParts[part].Count;
+    }
+    public int GetGenderPartCount(Define.HumanOutfitOneGender part)
+    {
+        return _maleParts[part].Count;
+    }
+    public int GetGenderPartCount(Define.HumanGender gender, Define.HumanOutfitOneGender part)
+    {
+        if (gender == Define.HumanGender.Female)
+            return _femaleParts[part].Count;
+        else if (gender == Define.HumanGender.Male)
+            return _maleParts[part].Count;
+        else
+            return -1;
+    }
+
+    private int _allOutfitCheckerCount = 0;
+    private int _allOutfitCheckerInitCount = 0;
+    private bool _allOutfitEnd = false;
+
+    private int _maleOutfitCheckerCount = 0;
+    private int _maleOutfitCheckerInitCount = 0;
+    private bool _maleOutfitEnd = false;
+
+    private int _femaleOutfitCheckerCount = 0;
+    private int _femaleOutfitCheckerInitCount = 0;
+    private bool _femaleOutfitEnd = false;
+
+    private void Start()
+    {
+        AllGenderOutfitChecker[] alls = gameObject.GetComponentsInChildren<AllGenderOutfitChecker>();
+        _allOutfitCheckerCount = alls.Length;
+
+        FemaleOutfitChecker[] females = gameObject.GetComponentsInChildren<FemaleOutfitChecker>();
+        _femaleOutfitCheckerCount = females.Length;
+
+        MaleOutfitChecker[] males = gameObject.GetComponentsInChildren<MaleOutfitChecker>();
+        _maleOutfitCheckerCount = males.Length;
+
+        for (int i = 0; i < _allOutfitCheckerCount; i++)
+            alls[i].GetChildEnd += AllOutfitCheckerInited;
+
+        for (int i = 0; i < _maleOutfitCheckerCount; i++)
+            males[i].GetChildEnd += MaleOutfitCheckerInited;
+
+        for (int i = 0; i < _femaleOutfitCheckerCount; i++)
+            females[i].GetChildEnd += FemaleOutfitCheckerInited;
+
+        //Init();
+    }
+
+    private void AllOutfitCheckerInited()
+    {
+        _allOutfitCheckerInitCount++;
+
+        if(_allOutfitCheckerInitCount == _allOutfitCheckerCount)
+        {
+            _allOutfitEnd = true;
+
+            if (_maleOutfitEnd && _femaleOutfitEnd)
+                Init();
+        }
+    }
+    private void MaleOutfitCheckerInited()
+    {
+        _maleOutfitCheckerInitCount++;
+
+        if (_maleOutfitCheckerInitCount == _maleOutfitCheckerCount)
+        {
+            _maleOutfitEnd = true;
+
+            if (_allOutfitEnd && _femaleOutfitEnd)
+                Init();
+        }
+    }
+
+    private void FemaleOutfitCheckerInited()
+    {
+        _femaleOutfitCheckerInitCount++;
+
+        if (_femaleOutfitCheckerInitCount == _femaleOutfitCheckerCount)
+        {
+            _femaleOutfitEnd = true;
+
+            if (_maleOutfitEnd && _allOutfitEnd)
+                Init();
+        }
     }
 
     private void Init()
     {
         if (_isInit == true)
-            return;
+        {
+            InitEndPlayer();
+        }
 
         int size = (int)Define.HumanOutfitAllGender.Unknown;
-        for (int i = 0; i < size; i++)
-            _currentAllGenderOutfit.Add(-1);
 
-        size = (int)Define.HumanOutfitOneGender.Unknown;
+        AllGenderOutfitChecker[] alls = gameObject.GetComponentsInChildren<AllGenderOutfitChecker>();
+        FemaleOutfitChecker[] females = gameObject.GetComponentsInChildren<FemaleOutfitChecker>();
+        MaleOutfitChecker[] males = gameObject.GetComponentsInChildren<MaleOutfitChecker>();
+
+        size = alls.Length;
+        for(int i = 0; i < size; i++)
+        {
+            Define.HumanOutfitAllGender all = (Define.HumanOutfitAllGender)alls[i].GetOutfitType();
+            _allGenderParts[all] = alls[i].GetChildren();
+        }
+
+        size = males.Length;
+        for(int i =0; i < size; i++)
+        {
+            Define.HumanOutfitOneGender male = (Define.HumanOutfitOneGender)males[i].GetOutfitType();
+            _maleParts[male] = males[i].GetChildren();
+        }
+
+        size = females.Length;
         for (int i = 0; i < size; i++)
         {
-            if (i == (int)Define.HumanOutfitOneGender.HeadGear)
+            Define.HumanOutfitOneGender female = (Define.HumanOutfitOneGender)females[i].GetOutfitType();
+            _femaleParts[female] = females[i].GetChildren();
+        }
+
+        size = (int)Define.HumanOutfitAllGender.Unknown;
+        for(int i = 0; i < size; i++)
+        {
+            if (i == (int)Define.HumanOutfitAllGender.AllGenderHair)
+                _currentAllGenderOutfit.Add(0);
+            else
+                _currentAllGenderOutfit.Add(-1);
+            
+        }
+
+        size = (int)Define.HumanOutfitOneGender.Unknown;
+        for(int i =0; i < size; i++)
+        {
+            if (i == (int)Define.HumanOutfitOneGender.HeadGear || i == (int)Define.HumanOutfitOneGender.Facial)
                 _currentGenderOutfit.Add(-1);
             else
                 _currentGenderOutfit.Add(0);
         }
+
         _isInit = true;
+        InitEndPlayer();
+    }
+
+    private void InitEndPlayer()
+    {
+        if(InitEnded != null)
+            InitEnded();
+        InitEnded = null;
     }
 
     public void ChangeGender(Define.HumanGender gender)
@@ -196,13 +228,17 @@ public class CharacterOutfit : MonoBehaviour
     }
 
 
-    public void SetOutfit(HumanOutfit outfit = null)
+    public void SetOutfit(HumanOutfit outfit)
     {
         if (outfit == null)
             return;
 
         if (_isInit == false)
-            Init();
+        {
+            _tempOutfit = outfit;
+            InitEnded += SetOutfit;
+            return;
+        }
 
         Gender = outfit.Gender;
 
@@ -216,6 +252,57 @@ public class CharacterOutfit : MonoBehaviour
         {
             ChangeGenderOutfit((Define.HumanOutfitOneGender)i, outfit.OneGender[i]);
         }
+
+        switch (outfit.LastChange)
+        {
+            case Define.LastOutfitChange.HeadCoveringBase:
+                ChangeAllGenderOutfit(Define.HumanOutfitAllGender.HeadCoveringBase, outfit.AllGender[(int)Define.HumanOutfitAllGender.HeadCoveringBase]);
+                break;
+            case Define.LastOutfitChange.HeadCoveringMask:
+                ChangeAllGenderOutfit(Define.HumanOutfitAllGender.HeadCoveringMask, outfit.AllGender[(int)Define.HumanOutfitAllGender.HeadCoveringMask]);
+                break;
+            case Define.LastOutfitChange.HeadCoveringNoHair:
+                ChangeAllGenderOutfit(Define.HumanOutfitAllGender.HeadCoveringNoHair, outfit.AllGender[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair]);
+                break;
+            case Define.LastOutfitChange.AllGenderHair:
+                ChangeAllGenderOutfit(Define.HumanOutfitAllGender.AllGenderHair, outfit.AllGender[(int)Define.HumanOutfitAllGender.AllGenderHair]);
+                break;
+            case Define.LastOutfitChange.AllGenderExtra:
+                ChangeAllGenderOutfit(Define.HumanOutfitAllGender.AllGenderExtra, outfit.AllGender[(int)Define.HumanOutfitAllGender.AllGenderExtra]);
+                break;
+            case Define.LastOutfitChange.Head:
+                ChangeGenderOutfit(Define.HumanOutfitOneGender.Head, outfit.OneGender[(int)Define.HumanOutfitOneGender.Head]);
+                break;
+            case Define.LastOutfitChange.HeadGear:
+                ChangeGenderOutfit(Define.HumanOutfitOneGender.HeadGear, outfit.OneGender[(int)Define.HumanOutfitOneGender.HeadGear]);
+                break;
+            case Define.LastOutfitChange.Facial:
+                ChangeGenderOutfit(Define.HumanOutfitOneGender.Facial, outfit.OneGender[(int)Define.HumanOutfitOneGender.Facial]);
+                break;
+        }
+    }
+    public void SetOutfit()
+    {
+        if (_tempOutfit == null)
+            return;
+
+        SetOutfit(_tempOutfit);
+    }
+
+    public void SaveOutfitData(HumanOutfit outfit)
+    {
+        if (outfit == null) return;
+
+        outfit.Gender = _gender;
+        outfit.LastChange = _lastChanged;
+
+        int size = (int)Define.HumanOutfitAllGender.Unknown;
+        for (int i = 0; i < size; i++)
+            outfit.AllGender[i] = _currentAllGenderOutfit[i];
+
+        size = (int)Define.HumanOutfitOneGender.Unknown;
+        for (int i = 0; i < size; i++)
+            outfit.OneGender[i] = _currentGenderOutfit[i];
     }
 
     #region AllGenderOutfit
@@ -248,50 +335,89 @@ public class CharacterOutfit : MonoBehaviour
     {
         _prevAllGenderHeadBase = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringBase];
         if (_prevAllGenderHeadBase >= 0)
-            _headCoveringsBase[_prevAllGenderHeadBase].SetActive(false);
+            _allGenderParts[Define.HumanOutfitAllGender.HeadCoveringBase][_prevAllGenderHeadBase].SetActive(false);
 
         _prevAllGenderMask = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringMask];
         if (_prevAllGenderMask >= 0)
-            _headCoveringsMask[_prevAllGenderMask].SetActive(false);
+            _allGenderParts[Define.HumanOutfitAllGender.HeadCoveringMask][_prevAllGenderMask].SetActive(false);
 
         _prevAllGenderNoHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.HeadCoveringNoHair];
         if (_prevAllGenderNoHair >= 0)
-            _headCoveringsNoHair[_prevAllGenderNoHair].SetActive(false);
+            _allGenderParts[Define.HumanOutfitAllGender.HeadCoveringNoHair][_prevAllGenderNoHair].SetActive(false);
 
         _prevAllGenderHair = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderHair];
         if (_prevAllGenderHair >= 0)
-            _allGenderHair[_prevAllGenderHair].SetActive(false);
+            _allGenderParts[Define.HumanOutfitAllGender.AllGenderHair][_prevAllGenderHair].SetActive(false);
 
         _prevExtra = _currentAllGenderOutfit[(int)Define.HumanOutfitAllGender.AllGenderExtra];
         if (_prevExtra >= 0)
-            _allGenderExtra[_prevExtra].SetActive(false);
+            _allGenderParts[Define.HumanOutfitAllGender.AllGenderExtra][_prevExtra].SetActive(false);
 
         _prevHeadGear = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.HeadGear];
-        if (_prevHeadGear >= 0)
-            ChangeGenderOutfit(Define.HumanOutfitOneGender.HeadGear, -1);
-
         _prevHead = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.Head];
-        if (_prevHead >= 0)
-            ChangeGenderOutfit(Define.HumanOutfitOneGender.Head, -1);
-
+        _prevFacial = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.Facial];
+        
         if(_gender == Define.HumanGender.Male)
         {
-            _prevFacial = _currentGenderOutfit[(int)Define.HumanOutfitOneGender.Facial];
+            if (_prevHeadGear >= 0)
+                _maleParts[Define.HumanOutfitOneGender.HeadGear][_prevHeadGear].SetActive(false);
+
+            if (_prevHead >= 0)
+                _maleParts[Define.HumanOutfitOneGender.Head][_prevHead].SetActive(false);
+
             if (_prevFacial >= 0)
-                ChangeGenderOutfit(Define.HumanOutfitOneGender.Facial, -1);
+                _maleParts[Define.HumanOutfitOneGender.Facial][_prevFacial].SetActive(false);
         }
-            //_maleHead[_prevHead].SetActive(false);
+        else
+        {
+            if (_prevHeadGear >= 0)
+                _femaleParts[Define.HumanOutfitOneGender.HeadGear][_prevHeadGear].SetActive(false);
+
+            if (_prevHead >= 0)
+                _femaleParts[Define.HumanOutfitOneGender.Head][_prevHead].SetActive(false);
+
+            //if (_prevFacial >= 0)
+            //    _femaleParts[Define.HumanOutfitOneGender.Facial][_prevFacial].SetActive(false);
+        }
     }
 
     private void ActiveDefaultGenderHeads(params Define.HumanOutfitOneGender[] ones)
     {
         int size = ones.Length;
-        for(int i = 0; i < size; i++)
+        if(_gender == Define.HumanGender.Female)
         {
-            if (ones[i] == Define.HumanOutfitOneGender.Head)
-                ChangeGenderOutfit(Define.HumanOutfitOneGender.Head, _prevHead);
-            if (ones[i] == Define.HumanOutfitOneGender.Facial)
-                ChangeGenderOutfit(Define.HumanOutfitOneGender.Facial, _prevFacial);
+            for (int i = 0; i < size; i++)
+            {
+                if (ones[i] == Define.HumanOutfitOneGender.Head)
+                {
+                    _currentGenderOutfit[(int)ones[i]] = _prevHead;
+                    if (_prevHead < 0) continue;
+                    _femaleParts[ones[i]][_prevHead].SetActive(true);
+                }
+                if (ones[i] == Define.HumanOutfitOneGender.Facial)
+                {
+                    _currentGenderOutfit[(int)ones[i]] = _prevFacial;
+                    if (_prevFacial < 0) continue;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                if (ones[i] == Define.HumanOutfitOneGender.Head)
+                {
+                    _currentGenderOutfit[(int)ones[i]] = _prevHead;
+                    if (_prevHead < 0) continue;
+                    _maleParts[ones[i]][_prevHead].SetActive(true);
+                }
+                if (ones[i] == Define.HumanOutfitOneGender.Facial)
+                {
+                    _currentGenderOutfit[(int)ones[i]] = _prevFacial;
+                    if (_prevFacial < 0) continue;
+                    _maleParts[ones[i]][_prevFacial].SetActive(true);
+                }
+            }
         }
     }
     private void ActiveDefaultAllHeads(params Define.HumanOutfitAllGender[] alls)
@@ -300,23 +426,32 @@ public class CharacterOutfit : MonoBehaviour
         for(int i = 0; i < size; i++)
         {
             if (alls[i] == Define.HumanOutfitAllGender.AllGenderHair)
-                ChangeAllGenderOutfit(Define.HumanOutfitAllGender.AllGenderHair, _prevAllGenderHair);
+            {
+                _currentAllGenderOutfit[(int)alls[i]] = _prevAllGenderHair;
+                if (_prevAllGenderHair < 0) continue;
+                _allGenderParts[alls[i]][_prevAllGenderHair].SetActive(true);
+            }
             if (alls[i] == Define.HumanOutfitAllGender.AllGenderExtra)
-                ChangeAllGenderOutfit(Define.HumanOutfitAllGender.AllGenderExtra, _prevExtra);
+            {
+                _currentAllGenderOutfit[(int)alls[i]] = _prevExtra;
+                if (_prevExtra < 0) continue;
+                _allGenderParts[alls[i]][_prevExtra].SetActive(true);
+            }
         }
     }
 
     private void SetActiveAllGenderParts(Define.HumanOutfitAllGender part, int num, bool active)
     {
-        if (num >= 0)
+        if(num >= 0)
         {
-            switch (part)
+            switch(part)
             {
                 case Define.HumanOutfitAllGender.HeadCoveringBase:
                     if (active == true)
                         SetActiveFalse();
 
-                    _headCoveringsBase[num].SetActive(active);
+                    _allGenderParts[part][num].SetActive(active);
+                    _lastChanged = Define.LastOutfitChange.HeadCoveringBase;
 
                     ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderExtra);
                     ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
@@ -330,7 +465,8 @@ public class CharacterOutfit : MonoBehaviour
                     if (active == true)
                         SetActiveFalse();
 
-                    _headCoveringsMask[num].SetActive(active);
+                    _allGenderParts[part][num].SetActive(active);
+                    _lastChanged = Define.LastOutfitChange.HeadCoveringMask;
 
                     ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair, Define.HumanOutfitAllGender.AllGenderExtra);
                     ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head);
@@ -343,7 +479,8 @@ public class CharacterOutfit : MonoBehaviour
                     if (active == true)
                         SetActiveFalse();
 
-                    _headCoveringsNoHair[num].SetActive(active);
+                    _allGenderParts[part][num].SetActive(active);
+                    _lastChanged = Define.LastOutfitChange.HeadCoveringNoHair;
 
                     ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
                     if (active == false)
@@ -355,48 +492,26 @@ public class CharacterOutfit : MonoBehaviour
                     if (active == true)
                         SetActiveFalse();
 
-                    _allGenderHair[num].SetActive(active);
+                    _allGenderParts[part][num].SetActive(active);
+                    _lastChanged = Define.LastOutfitChange.AllGenderHair;
 
-                    ActiveDefaultAllHeads( Define.HumanOutfitAllGender.AllGenderExtra);
+                    ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderExtra);
                     ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
-                    break;
-                case Define.HumanOutfitAllGender.AllGenderHeadAttachment:
-                    _allGenderHeadAttachment[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitAllGender.AllGenderBackAttachment:
-                    _allGenderBackAttachment[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitAllGender.AllGenderShoulderRight:
-                    _allGenderShoulderRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitAllGender.AllGenderShoulderLeft:
-                    _allGenderShoulderLeft[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitAllGender.AllGenderElbowRight:
-                    _allGenderElbowRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitAllGender.AllGenderElbowLeft:
-                    _allGenderElbowLeft[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitAllGender.AllGenderHips:
-                    _allGenderHips[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitAllGender.AllGenderKneeRight:
-                    _allGenderKneeRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitAllGender.AllGenderKneeLeft:
-                    _allGenderKneeLeft[num].SetActive(active);
+
                     break;
                 case Define.HumanOutfitAllGender.AllGenderExtra:
                     if (active == true)
                         SetActiveFalse();
 
-                    _allGenderExtra[num].SetActive(active);
+                    _allGenderParts[part][num].SetActive(active);
+                    _lastChanged = Define.LastOutfitChange.AllGenderExtra;
 
                     ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair);
                     ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
                     break;
-                case Define.HumanOutfitAllGender.Unknown:
+                default:
+                    _allGenderParts[part][num].SetActive(active);
+
                     break;
             }
         }
@@ -447,13 +562,14 @@ public class CharacterOutfit : MonoBehaviour
     {
         if(num >= 0)
         {
-            switch (part)
+            switch(part)
             {
                 case Define.HumanOutfitOneGender.Head:
                     if (active == true)
                         SetActiveFalse();
 
-                    _maleHead[num].SetActive(active);
+                    _maleParts[part][num].SetActive(active);
+                    _lastChanged = Define.LastOutfitChange.Head;
 
                     ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair, Define.HumanOutfitAllGender.AllGenderExtra);
                     ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Facial);
@@ -462,7 +578,8 @@ public class CharacterOutfit : MonoBehaviour
                     if (active == true)
                         SetActiveFalse();
 
-                    _maleHeadGear[num].SetActive(active);
+                    _maleParts[part][num].SetActive(active);
+                    _lastChanged = Define.LastOutfitChange.HeadGear;
 
                     if (active == false)
                     {
@@ -470,54 +587,26 @@ public class CharacterOutfit : MonoBehaviour
                         ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
                     }
                     break;
-                case Define.HumanOutfitOneGender.Eyebrows:
-                    _maleEyebrows[num].SetActive(active);
-                    break;
                 case Define.HumanOutfitOneGender.Facial:
                     if (active == true)
                         SetActiveFalse();
 
-                    _maleFacial[num].SetActive(active);
+                    _maleParts[part][num].SetActive(active);
+                    _lastChanged = Define.LastOutfitChange.Facial;
 
-
+                    ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair, Define.HumanOutfitAllGender.AllGenderExtra);
+                    ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head);
                     break;
-                case Define.HumanOutfitOneGender.Torso:
-                    _maleTorso[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.ArmUpperRight:
-                    _maleArmUpperRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.ArmUpperLeft:
-                    _maleArmUpperLeft[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.ArmLowerRight:
-                    _maleArmLowerRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.ArmLowerLeft:
-                    _maleArmLowerLeft[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.HandRight:
-                    _maleHandRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.HandLeft:
-                    _maleHandLeft[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.Hips:
-                    _maleHips[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.LegRight:
-                    _maleLegRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.LegLeft:
-                    _maleLegLeft[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.Unknown:
+                default:
+                    _maleParts[part][num].SetActive(active);
                     break;
             }
         }
 
         if (active == true)
         {
+            if (part == Define.HumanOutfitOneGender.Eyebrows)
+                Debug.Log(num);
             _currentGenderOutfit[(int)part] = num;
         }
     }
@@ -531,13 +620,18 @@ public class CharacterOutfit : MonoBehaviour
                     if (active == true)
                         SetActiveFalse();
 
-                    _femaleHead[num].SetActive(active);
+                    _femaleParts[part][num].SetActive(active);
+                    _lastChanged = Define.LastOutfitChange.Head;
+
+                    ActiveDefaultAllHeads(Define.HumanOutfitAllGender.AllGenderHair, Define.HumanOutfitAllGender.AllGenderExtra);
+                    ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Facial);
                     break;
                 case Define.HumanOutfitOneGender.HeadGear:
                     if (active == true)
                         SetActiveFalse();
 
-                    _femaleHeadGear[num].SetActive(active);
+                    _femaleParts[part][num].SetActive(active);
+                    _lastChanged = Define.LastOutfitChange.HeadGear;
 
                     if (active == false)
                     {
@@ -545,72 +639,22 @@ public class CharacterOutfit : MonoBehaviour
                         ActiveDefaultGenderHeads(Define.HumanOutfitOneGender.Head, Define.HumanOutfitOneGender.Facial);
                     }
                     break;
-                case Define.HumanOutfitOneGender.Eyebrows:
-                    if (num >= _femaleEyebrows.Count)
-                        Debug.Log("Eyebrows Over");
-                    _femaleEyebrows[num].SetActive(active);
-                    break;
                 case Define.HumanOutfitOneGender.Facial:
-                        Debug.Log("Facial Over");
-                    //_femaleFacial[num].SetActive(active);
+
+
                     break;
-                case Define.HumanOutfitOneGender.Torso:
-                    if (num >= _femaleTorso.Count)
-                        Debug.Log("Torso Over");
-                    _femaleTorso[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.ArmUpperRight:
-                    if (num >= _femaleArmUpperRight.Count)
-                        Debug.Log("ArmUpperRight Over");
-                    _femaleArmUpperRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.ArmUpperLeft:
-                    if (num >= _femaleArmUpperLeft.Count)
-                        Debug.Log("ArmUpperLeft Over");
-                    _femaleArmUpperLeft[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.ArmLowerRight:
-                    if (num >= _femaleArmLowerRight.Count)
-                        Debug.Log("ArmLowerRight Over");
-                    _femaleArmLowerRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.ArmLowerLeft:
-                    if (num >= _femaleArmLowerLeft.Count)
-                        Debug.Log("ArmLowerLeft Over");
-                    _femaleArmLowerLeft[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.HandRight:
-                    if (num >= _femaleHandRight.Count)
-                        Debug.Log("HandRight Over");
-                    _femaleHandRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.HandLeft:
-                    if (num >= _femaleHandLeft.Count)
-                        Debug.Log("HandLeft Over");
-                    _femaleHandLeft[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.Hips:
-                    if (num >= _femaleHips.Count)
-                        Debug.Log("Hips Over");
-                    _femaleHips[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.LegRight:
-                    if (num >= _femaleLegRight.Count)
-                        Debug.Log("LegRight Over");
-                    _femaleLegRight[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.LegLeft:
-                    if (num >= _femaleLegLeft.Count)
-                        Debug.Log("LegLeft Over");
-                    _femaleLegLeft[num].SetActive(active);
-                    break;
-                case Define.HumanOutfitOneGender.Unknown:
+                default:
+                    _femaleParts[part][num].SetActive(active);
                     break;
             }
         }
 
         if (active == true)
+        {
+            if (part == Define.HumanOutfitOneGender.Eyebrows)
+                Debug.Log(num);
             _currentGenderOutfit[(int)part] = num;
+        }
     }
 
     #endregion

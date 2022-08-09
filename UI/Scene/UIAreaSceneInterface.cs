@@ -33,6 +33,7 @@ public class UIAreaSceneInterface : UIScene
         Bind<Button>(typeof(Buttons));
 
         Managers.Map.DayChangeUpdate += OnDayChange;
+        GetComponent<Canvas>().worldCamera = Managers.Map.UICam;
     }
 
     public void OnDayChange(int day)

@@ -25,11 +25,10 @@ public class UIChoiceInterface : UIPopup
         Managers.Context.CurrentChoiceInterface = this;
         Bind<GameObject>(typeof(GameObjects));
 
-        GetComponent<Canvas>().worldCamera = Camera.main;
-        GetComponent<Canvas>().planeDistance = GetComponent<Canvas>().sortingOrder;
+        GetComponent<Canvas>().worldCamera = Managers.Map.UICam;
+        //GetComponent<Canvas>().planeDistance = GetComponent<Canvas>().sortingOrder;
 
         ResetChoices();
-        //Get<GameObject>((int)GameObjects.ChoiceSubmenuPanel).GetComponent<RectTransform>().
     }
 
     public void ResetChoices()

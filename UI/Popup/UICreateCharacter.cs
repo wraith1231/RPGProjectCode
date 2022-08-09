@@ -51,16 +51,22 @@ public class UICreateCharacter : UIPopup
         GetComponent<Canvas>().worldCamera = Camera.main;
         GetComponent<Canvas>().planeDistance = 5f;
         _outfit = Get<GameObject>((int)GameObjects.Character).GetComponent<CharacterOutfit>();
-        _outfit.SetOutfit(_baseOutfit);
+        _outfit.InitEnded += SetOutfitFromBase;
 
         Get<GameObject>((int)GameObjects.ChangeButtons).GetComponent<UICharacterSlider>().SetCharacter(_baseOutfit, _outfit.gameObject);
+        _outfit.InitEnded += Get<GameObject>((int)GameObjects.ChangeButtons).GetComponent<UICharacterSlider>().SliderInit;
+
         Get<Button>((int)Buttons.CreateButton).gameObject.BindUIEvent(SubmitClicked);
+    }
+
+    private void SetOutfitFromBase()
+    {
+        _outfit.SetOutfit(_baseOutfit);
     }
 
     private void SubmitClicked(PointerEventData eventData)
     {
         string text = Get<TMP_InputField>((int)InputFields.NameInput).text;
-
 
         if(text.Length < 2 || text.Length > 10)
         {

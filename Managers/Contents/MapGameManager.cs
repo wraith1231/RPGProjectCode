@@ -13,6 +13,9 @@ public class MapGameManager
     private bool _cameraInit = false;
     public bool BothInit { get { return _playerInit == true && _cameraInit == true; } }
 
+    private Camera _uiCamera;
+    public Camera UICam { get { return _uiCamera; } set { _uiCamera = value; } }
+
     private List<VillageStatus> _villageLists = new List<VillageStatus>();
     public List<VillageStatus> VillageLists { get { return _villageLists; } }
     private Dictionary<string, VillageStatus> _villages = new Dictionary<string, VillageStatus>();

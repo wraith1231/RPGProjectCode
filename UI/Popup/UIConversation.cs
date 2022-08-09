@@ -23,8 +23,8 @@ public class UIConversation : UIPopup
 
         Managers.Context.CurrentConversation = this;
 
-        GetComponent<Canvas>().worldCamera = Camera.main;
-        GetComponent<Canvas>().planeDistance = GetComponent<Canvas>().sortingOrder;
+        GetComponent<Canvas>().worldCamera = Managers.Map.UICam;
+        //GetComponent<Canvas>().planeDistance = GetComponent<Canvas>().sortingOrder;
 
         Bind<TMP_Text>(typeof(Texts));
         Bind<GameObject>(typeof(GameObjects));

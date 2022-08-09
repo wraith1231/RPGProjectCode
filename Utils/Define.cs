@@ -4,6 +4,18 @@ using UnityEngine;
 
 public class Define
 {
+    public enum LastOutfitChange
+    {
+        HeadCoveringBase,
+        HeadCoveringMask,
+        HeadCoveringNoHair,
+        AllGenderHair,
+        AllGenderExtra,
+        Head,
+        HeadGear,
+        Facial,
+    }
+
     public enum VillageSubButtonType
     {
         TalkPerson,

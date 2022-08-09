@@ -5,11 +5,22 @@ using UnityEngine;
 public abstract class UIOutfitSliderBase : UIBase
 {
     protected HumanOutfit _outfit;
+    protected HumanOutfit _baseOutfit;
     protected CharacterOutfit _charOutfit;
 
-    public virtual void SetCharacter(HumanOutfit outfit, CharacterOutfit character)
+    protected bool _isInit = false;
+
+    protected UIChangeOutfitInterface _parentUI;
+
+    public void SetParentUI(UIChangeOutfitInterface parent)
+    {
+        _parentUI = parent;
+    }
+
+    public virtual void SetCharacter(HumanOutfit outfit, HumanOutfit baseOutfit, CharacterOutfit character)
     {
         _outfit = outfit;
+        _baseOutfit = baseOutfit;
         _charOutfit = character;
     }
 

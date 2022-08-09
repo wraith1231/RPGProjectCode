@@ -5,9 +5,75 @@ using UnityEngine;
 public class HumanOutfit
 {
     public Define.HumanGender Gender;
-
+    
     public List<int> AllGender = new List<int>();
     public List<int> OneGender = new List<int>();
+
+    public Define.LastOutfitChange LastChange;
+
+    public int CompareDeference(HumanOutfit outfit)
+    {
+        int ret = 0;
+        int size = AllGender.Count;
+        for(int i = 0; i < size; i++)
+        {
+            if (AllGender[i] != outfit.AllGender[i])
+                ret++;
+        }
+
+        size = OneGender.Count;
+        for(int i = 0; i < size; i++)
+        {
+            if (OneGender[i] != outfit.OneGender[i])
+                ret++;
+        }
+
+        return ret;
+    }
+    public bool CompareDeferenceAllGender(Define.HumanOutfitAllGender type, int value)
+    {
+        if (value == AllGender[(int)type])
+            return true;
+
+        return false;
+    }
+    public bool CompareDeferenceAllGender(string type, int value)
+    {
+        int size = (int)Define.HumanOutfitAllGender.Unknown;
+        for (int i = 0; i < size; i++)
+        {
+            if (type == ((Define.HumanOutfitAllGender)i).ToString())
+            {
+                if (value == AllGender[i])
+                    return true;
+
+                return false;
+            }
+        }
+        return false;
+    }
+    public bool CompareDeferenceGender(Define.HumanOutfitOneGender type, int value)
+    {
+        if (value == OneGender[(int)type])
+            return true;
+
+        return false;
+    }
+    public bool CompareDeferenceGender(string type, int value)
+    {
+        int size = (int)Define.HumanOutfitOneGender.Unknown;
+        for (int i = 0; i < size; i++)
+        {
+            if (type == ((Define.HumanOutfitOneGender)i).ToString())
+            {
+                if (value == OneGender[i])
+                    return true;
+
+                return false;
+            }
+        }
+        return false;
+    }
 
     public HumanOutfit()
     {

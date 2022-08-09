@@ -7,7 +7,6 @@ public class UIOneGenderOutfitSlider : UIOutfitSliderBase
 {
     enum Sliders
     {
-        Facial,
         HeadGear,
         Torso,
         ArmUpperRight,
@@ -25,28 +24,26 @@ public class UIOneGenderOutfitSlider : UIOutfitSliderBase
 
     public override void Init()
     {
+        if (_isInit == true)
+            return;
+
         Bind<Slider>(typeof(Sliders));
 
-        MaxValueChange();
+        _isInit = true;
+    }
 
-        if (_outfit.Gender == Define.HumanGender.Female)
-        {
-            Get<Slider>((int)Sliders.Facial).gameObject.SetActive(false);
-        }
+    public void SliderInit()
+    {
+        Init();
+
+        MaxValueChange();
 
         AddListener();
     }
 
-    //public override void SetCharacter(HumanOutfit outfit, CharacterOutfit character)
-    //{
-    //    base.SetCharacter(outfit, character);
-    //}
-
-
     protected override void AddListener()
     {
         Get<Slider>((int)Sliders.HeadGear).onValueChanged.AddListener(HeadgearChanged);
-        Get<Slider>((int)Sliders.Facial).onValueChanged.AddListener(FacialChanged);
         Get<Slider>((int)Sliders.Torso).onValueChanged.AddListener(TorsoChanged);
         Get<Slider>((int)Sliders.ArmUpperRight).onValueChanged.AddListener(ArmUpperRightChanged);
 
@@ -65,62 +62,53 @@ public class UIOneGenderOutfitSlider : UIOutfitSliderBase
     {
         Get<Slider>((int)Sliders.HeadGear).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.HeadGear);
         Get<Slider>((int)Sliders.HeadGear).minValue = -1;
-        Get<Slider>((int)Sliders.HeadGear).maxValue = _charOutfit.MaleHeadGearCount()-1;
-
-        Get<Slider>((int)Sliders.Facial).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.Facial);
-        Get<Slider>((int)Sliders.Facial).minValue = -1;
-        Get<Slider>((int)Sliders.Facial).maxValue = _charOutfit.MaleFaciallCount()-1;
+        Get<Slider>((int)Sliders.HeadGear).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.HeadGear)-1;
 
         Get<Slider>((int)Sliders.Torso).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.Torso);
         //Get<Slider>((int)Sliders.Torso).minValue = -1;
-        Get<Slider>((int)Sliders.Torso).maxValue = _charOutfit.MaleTorsoCount()-1;
+        Get<Slider>((int)Sliders.Torso).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.Torso) - 1;
 
         Get<Slider>((int)Sliders.ArmUpperRight).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.ArmUpperRight);
         //Get<Slider>((int)Sliders.ArmUpperRight).minValue = -1;
-        Get<Slider>((int)Sliders.ArmUpperRight).maxValue = _charOutfit.MaleArmUpperRightCount()-1;
+        Get<Slider>((int)Sliders.ArmUpperRight).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.ArmUpperRight) - 1;
 
         Get<Slider>((int)Sliders.ArmUpperLeft).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.ArmUpperLeft);
         //Get<Slider>((int)Sliders.ArmUpperLeft).minValue = -1;
-        Get<Slider>((int)Sliders.ArmUpperLeft).maxValue = _charOutfit.MaleArmUpperLeftCount()-1;
+        Get<Slider>((int)Sliders.ArmUpperLeft).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.ArmUpperLeft) - 1;
 
         Get<Slider>((int)Sliders.ArmLowerRight).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.ArmLowerRight);
         //Get<Slider>((int)Sliders.ArmLowerRight).minValue = -1;
-        Get<Slider>((int)Sliders.ArmLowerRight).maxValue = _charOutfit.MaleArmLowerRightCount()-1;
+        Get<Slider>((int)Sliders.ArmLowerRight).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.ArmLowerRight) - 1;
 
         Get<Slider>((int)Sliders.ArmLowerLeft).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.ArmLowerLeft);
         //Get<Slider>((int)Sliders.ArmLowerLeft).minValue = -1;
-        Get<Slider>((int)Sliders.ArmLowerLeft).maxValue = _charOutfit.MaleArmLowerLeftCount()-1;
+        Get<Slider>((int)Sliders.ArmLowerLeft).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.ArmLowerLeft) - 1;
 
         Get<Slider>((int)Sliders.HandRight).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.HandRight);
         //Get<Slider>((int)Sliders.HandRight).minValue = -1;
-        Get<Slider>((int)Sliders.HandRight).maxValue = _charOutfit.MaleHandRightCount()-1;
+        Get<Slider>((int)Sliders.HandRight).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.HandRight) - 1;
 
         Get<Slider>((int)Sliders.HandLeft).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.HandLeft);
         //Get<Slider>((int)Sliders.HandLeft).minValue = -1;
-        Get<Slider>((int)Sliders.HandLeft).maxValue = _charOutfit.MaleHandLeftCount()-1;
+        Get<Slider>((int)Sliders.HandLeft).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.HandLeft) - 1;
 
         Get<Slider>((int)Sliders.Hips).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.Hips);
         //Get<Slider>((int)Sliders.Hips).minValue = -1;
-        Get<Slider>((int)Sliders.Hips).maxValue = _charOutfit.MaleHipsCount()-1;
+        Get<Slider>((int)Sliders.Hips).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.Hips) - 1;
 
         Get<Slider>((int)Sliders.LegRight).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.LegRight);
         //Get<Slider>((int)Sliders.LegRight).minValue = -1;
-        Get<Slider>((int)Sliders.LegRight).maxValue = _charOutfit.MaleLegRightCount()-1;
+        Get<Slider>((int)Sliders.LegRight).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.LegRight) - 1;
 
         Get<Slider>((int)Sliders.LegLeft).value = _outfit.GetOneGenderData(Define.HumanOutfitOneGender.LegLeft);
         //Get<Slider>((int)Sliders.LegLeft).minValue = -1;
-        Get<Slider>((int)Sliders.LegLeft).maxValue = _charOutfit.MaleLegLeftCount()-1;
+        Get<Slider>((int)Sliders.LegLeft).maxValue = _charOutfit.GetGenderPartCount(Define.HumanOutfitOneGender.LegLeft) - 1;
     }
 
     #region slider value change listner
     private void HeadgearChanged(float value)
     {
         SliderValueChange(Sliders.HeadGear, value);
-    }
-
-    private void FacialChanged(float value)
-    {
-        SliderValueChange(Sliders.Facial, value);
     }
 
     private void TorsoChanged(float value)
@@ -177,9 +165,35 @@ public class UIOneGenderOutfitSlider : UIOutfitSliderBase
     private void SliderValueChange(Sliders type, float value)
     {
         int val = Mathf.RoundToInt(Get<Slider>((int)type).value);
-        Get<Slider>((int)type).value = value;
+        Get<Slider>((int)type).value = val;
 
         _outfit.SetOneGenderData(type.ToString(), val);
         _charOutfit.ChangeGenderOutfit(type.ToString(), _outfit.GetOneGenderData(type.ToString()));
+
+        _parentUI.RefreshNeedString();
+    }
+
+    public void ValueInit()
+    {
+        int size = (int)Sliders.LegLeft;
+        for (int i = 0; i <= size; i++)
+        {
+            string type = ((Sliders)i).ToString();
+            _outfit.SetOneGenderData(type, _baseOutfit.GetOneGenderData(type));
+            Get<Slider>(i).value = _outfit.GetOneGenderData(type);
+        }
+    }
+    public int CompareDeference()
+    {
+        int size = (int)Sliders.LegLeft;
+        int ret = 0;
+        for (int i = 0; i <= size; i++)
+        {
+            string type = ((Sliders)i).ToString();
+            if (_outfit.CompareDeferenceGender(type, _baseOutfit.GetOneGenderData(type)) == false)
+                ret++;
+        }
+
+        return ret;
     }
 }

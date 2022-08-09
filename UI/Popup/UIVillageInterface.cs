@@ -41,8 +41,8 @@ public class UIVillageInterface : UIPopup
         Bind<Button>(typeof(Buttons));
         Bind<TMP_Text>(typeof(Texts));
 
-        GetComponent<Canvas>().worldCamera = Camera.main;
-        GetComponent<Canvas>().planeDistance = GetComponent<Canvas>().sortingOrder;
+        GetComponent<Canvas>().worldCamera = Managers.Map.UICam;
+        //GetComponent<Canvas>().planeDistance = GetComponent<Canvas>().sortingOrder;
 
         GameObject panel = Get<GameObject>((int)GameObjects.SubMenuPanel);
         foreach (Transform child in panel.transform)

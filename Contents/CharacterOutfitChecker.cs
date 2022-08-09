@@ -7,11 +7,25 @@ public class CharacterOutfitChecker : MonoBehaviour
     [SerializeField]
     private int OutfitType;
 
-    private GameObject[] _children;
-    private void Start()
+    private List<GameObject> _children = new List<GameObject>();
+
+    public delegate void InitEndCheck();
+    public InitEndCheck GetChildEnd;
+
+    protected void Start()
     {
-        _children = gameObject.GetComponentsInChildren<GameObject>();
+        int size = transform.childCount;
+
+        for(int i = 0 ; i < size ; i++)
+        {
+            _children.Add(transform.GetChild(i).gameObject);
+            transform.GetChild(i).gameObject.SetActive(false);
+        }
+
+        if (GetChildEnd != null)
+            GetChildEnd();
     }
 
-    public GameObject[] GetChildren() { return _children; }
+    public int GetOutfitType() { return OutfitType; }
+    public List<GameObject> GetChildren() { return _children; }
 }

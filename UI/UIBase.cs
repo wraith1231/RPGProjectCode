@@ -23,7 +23,10 @@ public abstract class UIBase : MonoBehaviour
 
         UnityEngine.Object[] objects = new UnityEngine.Object[types.Length];
 
-        _objects.Add(typeof(T), objects);
+        if(_objects.ContainsKey(typeof(T)) == false)
+        {
+            _objects.Add(typeof(T), objects);
+        }
 
         for(int i = 0; i < types.Length; i++)
         {
