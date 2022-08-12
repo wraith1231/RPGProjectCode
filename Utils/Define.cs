@@ -18,33 +18,33 @@ public class Define
 
     public enum VillageSubButtonType
     {
-        TalkPerson,
-        TalkMaster,
-        TalkMayer,
-        TalkGuard,
-        TalkGuild,
-        TalkMerchant,
-        OpenChangeOutfit,
-        OpenBlacksmith,
-        OpenEnchant,
-        OpenQuest,
-        CheckQuest,
-        OpenRest,
+        TalkPerson = 0 ,
+        TalkMaster = 1,
+        TalkMayer = 2,
+        TalkGuard = 3,
+        TalkGuild = 4,
+        TalkMerchant = 5,
+        OpenChangeOutfit = 6,
+        OpenBlacksmith = 7,
+        OpenEnchant = 8,
+        OpenQuest = 9,
+        CheckQuest = 10,
+        OpenRest = 11,
         Unknown,
     }
 
     public enum InteractionEvent
     {
-        End,
-        Context,
-        Question,
-        Reward,
-        Quest,
-        Outfit,
-        Blacksmith,
-        Enchant,
-        Rest,
-        Unknown,
+        End = 0,
+        Context = 1,
+        Question = 2,
+        Reward = 3,
+        Quest = 4,
+        Outfit = 5,
+        Blacksmith = 6,
+        Enchant = 7,
+        Rest = 8,
+        Unknown = 9,
     }
 
     public enum VillageCondition

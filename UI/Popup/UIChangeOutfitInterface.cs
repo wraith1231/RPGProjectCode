@@ -91,6 +91,7 @@ public class UIChangeOutfitInterface : UIPopup
         _checkPanel = Get<GameObject>((int)UIObjects.CheckPanel).GetComponent<UICheckPanel>();
         _checkPanel.Init();
         _checkPanel.gameObject.SetActive(false);
+
     }
     private void SetBaseDataToOutfit()
     {

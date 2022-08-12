@@ -24,7 +24,6 @@ public class UIConversation : UIPopup
         Managers.Context.CurrentConversation = this;
 
         GetComponent<Canvas>().worldCamera = Managers.Map.UICam;
-        //GetComponent<Canvas>().planeDistance = GetComponent<Canvas>().sortingOrder;
 
         Bind<TMP_Text>(typeof(Texts));
         Bind<GameObject>(typeof(GameObjects));
@@ -32,8 +31,6 @@ public class UIConversation : UIPopup
         ChangeContext();
 
         Get<GameObject>((int)GameObjects.Panel).BindUIEvent(CheckNextConversation);
-        //Managers.Input.LeftMouseAction -= CheckNextConversation;
-        //Managers.Input.LeftMouseAction += CheckNextConversation;
     }
 
     public void ChangeContext()
@@ -74,6 +71,8 @@ public class UIConversation : UIPopup
                 Managers.UI.ClosePopupUI(this);
                 break;
             case Define.InteractionEvent.Blacksmith:
+                Managers.UI.MakePopupUI<UIBlacksmithWindow>();
+                Managers.UI.ClosePopupUI(this);
                 break;
             case Define.InteractionEvent.Enchant:
                 break;

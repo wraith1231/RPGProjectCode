@@ -113,8 +113,10 @@ public class EquipWeapon
                     Size = new Vector3(data.SizeX, data.SizeY, data.SizeZ);
                 }
                 break;
-            default:
-                Debug.Log($"Category is unknown!!");
+            case Define.WeaponCategory.Unknown:
+                Category = Define.WeaponCategory.Unknown;
+                Type = Define.WeaponType.Unknown;
+                File = "";
                 break;
         }
         Category = category;

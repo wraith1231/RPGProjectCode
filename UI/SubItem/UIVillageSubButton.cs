@@ -86,6 +86,12 @@ public class UIVillageSubButton : UIScene
                 Managers.UI.MakePopupUI<UIConversation>();
                 break;
             case Define.VillageSubButtonType.OpenBlacksmith:
+                Managers.Context.CurrentTalker = "Blacksmith";
+
+                Managers.Context.SetContextValue("Blacksmith", $"{Managers.General.GlobalPlayer.Data.CharName}");
+
+                Managers.Context.OpenBlacksmithWindow();
+                Managers.UI.MakePopupUI<UIConversation>();
                 break;
             case Define.VillageSubButtonType.OpenEnchant:
                 break;

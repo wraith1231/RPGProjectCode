@@ -185,7 +185,7 @@ public class UIVillageInterface : UIPopup
         GameObject panel = Get<GameObject>((int)GameObjects.SubMenuPanel);
         Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Talk Worker", TalkToGuild);
         Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Accept Quest", OpenQuest);
-        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Check Quest");
+        Managers.UI.MakeSubItem<UIVillageSubButton>(panel.transform, "Check Quest", CheckCurrentQuest);
 
         panel = Get<GameObject>((int)GameObjects.CharacterPanel);
         MakeCharacters(panel.transform, Define.Facilities.Guild);

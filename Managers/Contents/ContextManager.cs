@@ -118,6 +118,10 @@ public class ContextManager
     {
         CurrentContext = 7;
     }
+    public void OpenBlacksmithWindow()
+    {
+        CurrentContext = 8;
+    }
 
     public Define.InteractionEvent CheckNextContext()
     {
