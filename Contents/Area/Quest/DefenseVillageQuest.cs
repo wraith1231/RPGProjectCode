@@ -18,6 +18,7 @@ public class DefenseVillageQuest : QuestBase
 
     public override void QuestExpired()
     {
+        base.QuestExpired();
         TargetVillage.Condition = Define.VillageCondition.Destroyed;
     }
 

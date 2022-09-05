@@ -18,7 +18,6 @@ public class CheckFarTargetRange : DecoratorNode
     {
         float dist = _controller.GetDistanceTarget(_controller.GetTarget().transform);
 
-        Debug.Log($"dist : {dist}, range { _range}");
         if (dist < _range)
         {
             return false;

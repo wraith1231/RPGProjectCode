@@ -29,7 +29,7 @@ public class GlobalGroupController
 
     //돈이 아니라 식량으로 쓴다
     private float _foods = 0f;
-    public float Foods { get { return _foods; } set { _foods = value; } }
+    public float Foods { get { return _foods; } set { _foods = value; if(CallFoodChange != null) CallFoodChange(_foods); } }
 
     private Define.GroupType _type = Define.GroupType.Unknown;
     public Define.GroupType Type { get { return _type; } set { _type = value; } }
@@ -53,7 +53,17 @@ public class GlobalGroupController
     public Vector3 Position { get { return _position; } set { _position = value; } }
 
     private int _gold;
-    public int Gold { get { return _gold; } set { _gold = value; } }
+    public int Gold { get { return _gold; } set { _gold = value; if(CallMoneyChange != null) CallMoneyChange(_gold); } }
+
+    private float _goodFame;
+    private float _badFame;
+    private float _performance;
+    public float Performance { get { return _performance; } set { _performance = value; } }
+
+    public delegate void MoneyChange(int val);
+    public MoneyChange CallMoneyChange;
+    public delegate void FoodChange(float val);
+    public FoodChange CallFoodChange;
 
     public float GroupPower
     {
@@ -78,6 +88,9 @@ public class GlobalGroupController
         _foods = foods;
         _gold = golds;
         _type = type;
+        _goodFame = 0;
+        _badFame = 0;
+        _performance = 0;
     }
 
     #region Group Member Management
@@ -119,5 +132,39 @@ public class GlobalGroupController
     public void GroupBattleVillage(GlobalVillageData data)
     {
 
+    }
+
+    public void InnRest()
+    {
+        int size = _memberList.Count;
+        for(int  i=0; i < size; i++)
+        {
+            Managers.General.GlobalCharacters[_memberList[i]].InnRest();
+        }
+    }
+
+    public void AddGoodFame(float value)
+    {
+        _goodFame += value;
+        float point = value * 0.1f;
+        int size = _memberList.Count;
+        for (int i = 0; i < size; i++)
+        {
+            Managers.General.GlobalCharacters[_memberList[i]].GoodFame += point;
+        }
+    }
+    public void AddBadFame(float value)
+    {
+        _badFame += value;
+        float point = value * 0.1f;
+        int size = _memberList.Count;
+        for (int i = 0; i < size; i++)
+        {
+            Managers.General.GlobalCharacters[_memberList[i]].BadFame += point;
+        }
+    }
+    public void AddPerformance(float value)
+    {
+        _performance += value;
     }
 }

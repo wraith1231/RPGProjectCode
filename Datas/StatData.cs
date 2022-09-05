@@ -21,6 +21,8 @@ namespace Data
         public float DefenseAdvantage;
         public float AgilityAdvantage;
 
+        public float WeaponSkill;
+
         public bool Gender;
 
         public List<int> AllGenderOutfit = new List<int>();

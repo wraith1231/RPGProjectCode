@@ -94,12 +94,29 @@ public class UIVillageSubButton : UIScene
                 Managers.UI.MakePopupUI<UIConversation>();
                 break;
             case Define.VillageSubButtonType.OpenEnchant:
+                Managers.Context.CurrentTalker = "Mayer";
+
+                Managers.Context.SetContextValue("Mayer", $"{Managers.General.GlobalPlayer.Data.CharName}");
+
+                Managers.Context.OpenEnchantWindow();
+                Managers.UI.MakePopupUI<UIConversation>();
                 break;
             case Define.VillageSubButtonType.OpenQuest:
+                Managers.Context.CurrentTalker = "Employee";
+                Managers.Context.SetContextValue("Employee", $"{Managers.General.GlobalPlayer.Data.CharName}");
+
+                Managers.Context.OpenQuestBoardWindow();
+                Managers.UI.MakePopupUI<UIConversation>();
                 break;
             case Define.VillageSubButtonType.CheckQuest:
                 break;
             case Define.VillageSubButtonType.OpenRest:
+                Managers.Context.CurrentTalker = "Master";
+
+                Managers.Context.SetContextValue("Master", $"{Managers.General.GlobalPlayer.Data.CharName}");
+
+                Managers.Context.OpenInnContext();
+                Managers.UI.MakePopupUI<UIConversation>();
                 break;
             case Define.VillageSubButtonType.Unknown:
                 break;

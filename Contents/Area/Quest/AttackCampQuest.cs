@@ -18,6 +18,7 @@ public class AttackCampQuest : QuestBase
 
     public override void QuestExpired()
     {
+        base.QuestExpired();
 
     }
 

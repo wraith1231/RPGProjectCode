@@ -24,6 +24,6 @@ public class HuntQuest : QuestBase
 
     public override void QuestExpired()
     {
-
+        base.QuestExpired();
     }
 }

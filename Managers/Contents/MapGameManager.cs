@@ -76,7 +76,6 @@ public class MapGameManager
 
         _areaTerrain = go.GetComponent<Terrain>();
         TerrainSize2 = _areaTerrain.terrainData.size;
-        Debug.Log("terrain end");
         _progress++;
 
         CharInstantiate();
@@ -244,7 +243,6 @@ public class MapGameManager
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Village");
 
         int size = objects.Length;
-        Debug.Log(size);
         for(int i = 0; i < size; i++)
         {
             VillageStatus status = objects[i].GetComponent<VillageStatus>();

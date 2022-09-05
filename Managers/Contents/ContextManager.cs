@@ -114,6 +114,11 @@ public class ContextManager
         }
     }
 
+    public void RequestRejected()
+    {
+        CurrentContext = 10;
+    }
+
     public void OpenChangeOutfitSelected()
     {
         CurrentContext = 7;
@@ -121,6 +126,18 @@ public class ContextManager
     public void OpenBlacksmithWindow()
     {
         CurrentContext = 8;
+    }
+    public void OpenInnContext()
+    {
+        CurrentContext = 9;
+    }
+    public void OpenEnchantWindow()
+    {
+        CurrentContext = 11;
+    }
+    public void OpenQuestBoardWindow()
+    {
+        CurrentContext = 12;
     }
 
     public Define.InteractionEvent CheckNextContext()

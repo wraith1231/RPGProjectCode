@@ -49,6 +49,7 @@ public class AreaPlayerController : AreaGroupController
         Managers.Input.LeftMouseAction -= OnLeftMouseEvent;
         Managers.Input.RightMouseAction -= OnRightMouseEvent;
 
+        //battle scene에 보낼 object들
         Vector3 boxSize = new Vector3(64, 128, 64);
         Vector3 center = _transform.position;
         if (center.x <= 64) center.x = 64;
@@ -61,7 +62,8 @@ public class AreaPlayerController : AreaGroupController
         int cSize = colliders.Length;
         for (int i = 0; i < cSize; i++)
             Managers.Battle.AddAreaObject(colliders[i].name, colliders[i].transform.position);
-
+        
+        //기존 컨트롤러의 이동하던 정보
         GlobalGroupController controller = Managers.General.GlobalGroups[_groupId];
 
         controller.Position = _transform.position;

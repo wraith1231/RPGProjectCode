@@ -21,8 +21,11 @@ public class BattleCharacterData
     public int Defense { get; set; }
     public float DefenseAdvantage { get; set; }
 
-    public float FinalPower { get { return Power * PowerAdvantage; } }
-    public float FinalDefense { get { return Defense * DefenseAdvantage; } }
+    public float WeaponPower { get; set; }
+    public float WeaponDefense { get; set; }
+
+    public float FinalPower { get { return (Power * WeaponPower) * PowerAdvantage; } }
+    public float FinalDefense { get { return (Defense * WeaponDefense) * DefenseAdvantage; } }
     public float FinalAgility { get { return Agility / (Agility + 100f); } }
 
     public float CharacterPower { get { return MaxHealthPoint + MaxStaminaPoint + Power + Agility + Defense; } }
@@ -30,10 +33,21 @@ public class BattleCharacterData
 
     public BattleCharacterData(GlobalCharacterData data = null)
     {
+        SetData(data);
+    }
+
+    public void SetData(GlobalCharacterData data = null)
+    {
+        WeaponPower = 1.0f;
+        WeaponDefense = 1.0f;
+        PowerAdvantage = 1.0f;
+        DefenseAdvantage = 1.0f;
         if (data != null)
         {
-            MaxHealthPoint = CurrentHealthPoint = data.HealthPoint;
-            MaxStaminaPoint = CurrentStaminaPoint = data.StaminaPoint;
+            CurrentHealthPoint = data.CurrentHealthPoint;
+            CurrentStaminaPoint = data.CurrentStaminaPoint;
+            MaxHealthPoint = data.HealthPoint;
+            MaxStaminaPoint = data.StaminaPoint;
             HealthRecovery = data.HealthRecovery;
             StaminaRecovery = data.StaminaRecovery;
             Power = data.Power;
@@ -51,8 +65,6 @@ public class BattleCharacterData
             Agility = 5;
             Defense = 5;
         }
-        PowerAdvantage = 1.0f;
-        DefenseAdvantage = 1.0f;
     }
 
     public void BattlePhaseCharacter(BattleCharacterData data)
@@ -63,5 +75,11 @@ public class BattleCharacterData
     public void BattlePhaseVillage(GlobalVillageData data)
     {
 
+    }
+
+    public void InnRest()
+    {
+        CurrentHealthPoint = MaxHealthPoint;
+        CurrentStaminaPoint = MaxStaminaPoint;
     }
 }

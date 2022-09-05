@@ -36,7 +36,7 @@ public class UIConversation : UIPopup
     public void ChangeContext()
     {
         string name = Managers.Context.CurrentTalker;
-        Debug.Log($"talke = {name}, context = {Managers.Context.CurrentContext}");
+
         string context = Managers.Context.GetCurrentContextString();
 
         Get<TMP_Text>((int)Texts.NameText).text = name;
@@ -63,8 +63,8 @@ public class UIConversation : UIPopup
             case Define.InteractionEvent.Reward:
                 break;
             case Define.InteractionEvent.Quest:
-                break;
-            case Define.InteractionEvent.Unknown:
+                Managers.UI.MakePopupUI<UIQuestBoardWindow>();
+                Managers.UI.ClosePopupUI(this);
                 break;
             case Define.InteractionEvent.Outfit:
                 Managers.UI.MakePopupUI<UIChangeOutfitInterface>();
@@ -75,8 +75,22 @@ public class UIConversation : UIPopup
                 Managers.UI.ClosePopupUI(this);
                 break;
             case Define.InteractionEvent.Enchant:
+                Managers.UI.MakePopupUI<UIEnchantWindow>();
+                Managers.UI.ClosePopupUI(this);
                 break;
             case Define.InteractionEvent.Rest:
+                if (Managers.General.GlobalGroups[0].Gold < 10)
+                {
+                    Managers.Context.RequestRejected();
+                    ChangeContext();
+                }
+                else
+                {
+                    Managers.General.GlobalGroups[0].InnRest();
+                    Managers.UI.ClosePopupUI(this);
+                }
+                break;
+            case Define.InteractionEvent.CheckQuest:
                 break;
         }
     }

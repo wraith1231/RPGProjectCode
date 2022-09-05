@@ -310,6 +310,7 @@ public class BattleGameManager
 
         outfit.SetOutfit(cont.Data.Outfit);
         controller.SetEquipWeapon(cont.Data.Left, cont.Data.Right);
+        cont.BattleDataUpdate();
         BattleControllerSetting(cont, go, controller);
 
         if (_instantiatedChar == _generated)
@@ -340,8 +341,6 @@ public class BattleGameManager
         //pos.z += UnityEngine.Random.Ra
         Debug.Log(pos);
         controller.transform.position = pos;
-
-        Debug.Log(controller.transform.position);
     }
 
     private void MonsterCharacterInstantiate(GameObject go)

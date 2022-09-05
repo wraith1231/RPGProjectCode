@@ -605,8 +605,6 @@ public class CharacterOutfit : MonoBehaviour
 
         if (active == true)
         {
-            if (part == Define.HumanOutfitOneGender.Eyebrows)
-                Debug.Log(num);
             _currentGenderOutfit[(int)part] = num;
         }
     }

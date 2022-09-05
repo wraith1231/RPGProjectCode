@@ -247,6 +247,9 @@ public class CharacterData
     private string _characterName;
     public string CharName { get { return _characterName; } set { _characterName = value; } }
 
+    private int _fame;
+    public int Fame { get { return _fame; } set { _fame = value; } }
+
     private List<int> _charRelationList = new List<int>();
     private Dictionary<int, float> _characterRelation = new Dictionary<int, float>();
 
@@ -300,4 +303,5 @@ public class CharacterData
 
         return Define.CharacterRelationship.Best;
     }
+
 }

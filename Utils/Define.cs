@@ -4,6 +4,64 @@ using UnityEngine;
 
 public class Define
 {
+    public static string GetGrade(float performance)
+    {
+        string ret = "";
+
+        if(performance < 1000)
+        {
+            ret = "F";
+        }
+        else if(performance < 3000)
+        {
+            ret = "E";
+        }
+        else if(performance < 5000)
+        {
+            ret = "D";
+        }
+        else if(performance < 7500)
+        {
+            ret = "C";
+        }
+        else if(performance < 10000)
+        {
+            ret = "B";
+        }
+        else
+        {
+            ret = "A";
+        }
+        return ret;
+    }
+
+    public static float[] WeaponBaseAdvantage =
+        {
+        1.3f, //onehand Sword 0,
+        1.8f, //onehand Axe 1,
+        1.1f, //onehand Dagger 2,
+        1.6f, //onehand Mace 3,
+        1.5f, //onehand Spear 4,
+        2.0f, //twohand sword 5,
+        2.7f, //twohand axe 6,
+        1.8f, //twohand dagger 7,
+        2.6f, //twohand mace 8,
+        2.3f, //twohand spear 9,
+        1.0f, //twohand Bow 10,
+        1.0f, //twohand Gauntlet 11,
+        1.2f, //Shield 12,
+    };
+
+    public enum EnchantResult
+    {
+        HealthPoint,
+        StaminaPoint,
+        Power,
+        Defense,
+        Agility,
+        Unknown,
+    }
+
     public enum LastOutfitChange
     {
         HeadCoveringBase,
@@ -33,6 +91,7 @@ public class Define
         Unknown,
     }
 
+    //context, choice 이벤트는 여기 참고하시오
     public enum InteractionEvent
     {
         End = 0,
@@ -44,7 +103,8 @@ public class Define
         Blacksmith = 6,
         Enchant = 7,
         Rest = 8,
-        Unknown = 9,
+        CheckQuest = 9,
+        Unknown = 10,
     }
 
     public enum VillageCondition

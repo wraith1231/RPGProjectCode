@@ -5,7 +5,7 @@ using UnityEngine;
 public struct Rewards
 {
     //player 보상
-    public float Foods;
+    public int Gold;
     public float Experience;
     public float VillRelationship;
 
@@ -23,7 +23,8 @@ public abstract class QuestBase
     public bool Cleared = false;
     public string QuestText;
     //만기일자
-    public int Maturity;
+    public int Deadline;
+    public float NeedPerformance;
 
     //퀘스트 받은 그룹들 당장은 필요없을듯
     public List<int> AcceptedGroups = new List<int>();
@@ -37,9 +38,13 @@ public abstract class QuestBase
     public virtual void Reward(params int[] groupId)
     {
         int size = groupId.Length;
+        int gold = RewardList.Gold / size;
+        float fame = RewardList.Experience / size;
+        Cleared = true;
         for (int i = 0; i < size; i++)
         {
-            Managers.General.GlobalGroups[groupId[i]].Foods += RewardList.Foods;
+            Managers.General.GlobalGroups[groupId[i]].Gold += gold;
+            Managers.General.GlobalGroups[groupId[i]].AddGoodFame(fame);
 
             TargetVillage.Safety += RewardList.Safety;
             TargetVillage.IncreaseCharacterFavor(groupId[i], RewardList.VillRelationship);
@@ -47,12 +52,18 @@ public abstract class QuestBase
     }
 
     public Rewards RewardList;
-    public string RewardText;
+    public string RewardText
+    {
+        get
+        {
+            return $"Gold\n{RewardList.Gold}";
+        }
+    }
 
     //defense나 raid는 마을에도 영향 가야하니 추가
     public virtual void QuestExpired()
     {
-
+        Cleared = true;
     }
     public GlobalVillageData OrderedVillage;
     public GlobalVillageData TargetVillage;
